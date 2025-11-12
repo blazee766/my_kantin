@@ -1,0 +1,27 @@
+public function update_address()
+{
+    $uid = session('user.id');
+    if (!$uid) return redirect()->to('/login');
+
+    $building = trim($this->request->getPost('building'));
+    $room     = trim($this->request->getPost('room'));
+    $note     = trim($this->request->getPost('note'));
+
+    if ($building && $room) {
+        $db = db_connect();
+        $db->table('users')->where('id', $uid)->update([
+            'building' => $building,
+            'room'     => $room,
+            'note'     => $note,
+        ]);
+
+        // update session juga
+        session()->set('user.building', $building);
+        session()->set('user.room', $room);
+        session()->set('user.note', $note);
+
+        return redirect()->back()->with('success', 'Alamat kampus berhasil diperbarui.');
+    }
+
+    return redirect()->back()->with('error', 'Isi gedung dan ruangan terlebih dahulu.');
+}
