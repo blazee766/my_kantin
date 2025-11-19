@@ -9,82 +9,98 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #fff6f1;
-      font-family: 'Poppins', sans-serif;
-    }
+ <style>
+  :root {
+    --bg-page: #fdeff0;          /* pink lembut */
+    --card-bg: #ffffff;
+    --text-dark: #0b2130;        /* navy gelap */
+    --muted: #6b7280;
+    --accent: #ff4766;           /* coral/pink */
+    --accent-dark: #e03f5d;
+    --field-border: #e6d6d8;
+  }
 
-    .auth-card {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      width: 400px;
-      padding: 2rem 2.5rem;
-      text-align: center;
-    }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--bg-page);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+  }
 
-    .auth-card h2 {
-      margin-bottom: 1.5rem;
-      color: #ff6a00;
-      font-weight: 700;
-    }
+  .auth-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.08);
+    width: 400px;
+    padding: 2rem 2.5rem;
+    text-align: center;
+  }
 
-    form {
-      text-align: left;
-    }
+  .auth-card h2 {
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
 
-    label {
-      display: block;
-      margin-bottom: .3rem;
-      font-weight: 500;
-      color: #444;
-    }
+  form {
+    text-align: left;
+  }
 
-    input {
-      width: 100%;
-      padding: .6rem .8rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+  label {
+    display: block;
+    margin-bottom: .3rem;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
 
-    button {
-      width: 100%;
-      background: #ff6a00;
-      border: none;
-      color: #fff;
-      font-size: 1rem;
-      padding: .7rem 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background .3s;
-    }
+  input {
+    width: 100%;
+    padding: .6rem .8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text-dark);
+  }
 
-    button:hover {
-      background: #e95d00;
-    }
+  button {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    padding: .7rem 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .25s;
+    font-weight: 600;
+  }
 
-    p {
-      margin-top: 1rem;
-      font-size: 14px;
-    }
+  button:hover {
+    background: var(--accent-dark);
+  }
 
-    a {
-      color: #ff6a00;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  p {
+    margin-top: 1rem;
+    font-size: 14px;
+    color: var(--muted);
+  }
 
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
 </head>
 
 <body>

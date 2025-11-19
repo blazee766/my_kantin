@@ -6,24 +6,182 @@
   <title>Pesanan Saya - KantinKamu</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <style>
-    .page-head{margin:20px 0 10px;text-align:center}
-    .orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .card{background:#fff;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.08);padding:16px}
-    .meta{color:#666;font-size:.9rem;margin:6px 0}
-    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.8rem}
-    .badge.wait{background:#fff1cc;color:#a87000}
-    .badge.paid{background:#eaffea;color:#1b7a2e}
-    .badge.cancel{background:#ffe4e4;color:#b21d1d}
-    .btn-link{display:inline-block;margin-top:8px;background:#FF6B35;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none}
-    .empty{padding:24px;text-align:center;color:#777;background:#fff;border-radius:16px}
-  </style>
+  :root {
+    --bg-page: #fdeff0;         /* pink lembut */
+    --card-bg: #ffffff;
+    --text-dark: #0b2130;       /* navy gelap */
+    --muted: #6b7280;
+    --accent: #ff4766;          /* coral/pink */
+    --accent-dark: #e03f5d;
+
+    --pending-bg: #fff3d6;
+    --pending-text: #a26a00;
+
+    --paid-bg: #e8ffe8;
+    --paid-text: #1b7a2e;
+
+    --cancel-bg: #ffe5e7;
+    --cancel-text: #b21d1d;
+
+    --flash-success-bg: #e8fce9;
+    --flash-success-border: #c0f0c6;
+    --flash-success-text: #1f7d1f;
+
+    --flash-error-bg: #ffeaea;
+    --flash-error-border: #f3c3c3;
+    --flash-error-text: #842323;
+  }
+
+  /* Pastikan body/html memenuhi seluruh layar sehingga background terlihat menyeluruh */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg-page) fixed center/cover; /* background menyeluruh dan tetap */
+    min-height: 100vh;                              /* memastikan menutupi viewport */
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Container: hilangkan margin atas yang menyebabkan efek 'setengah' */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;        /* no top gap */
+    padding: 28px 16px;    /* beri padding untuk jarak isi dari tepi */
+    box-sizing: border-box;
+  }
+
+  .page-head {
+    margin: 8px 0 18px; /* lebih kecil sehingga tidak terlihat terpisah */
+    text-align: center;
+  }
+
+  .page-head h2 {
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .orders {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    padding: 16px;
+  }
+
+  .card h3 {
+    color: var(--text-dark);
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: .9rem;
+    margin: 6px 0;
+  }
+
+  /* Badge Status */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+  }
+  .badge.pending {
+    background: var(--pending-bg);
+    color: var(--pending-text);
+  }
+  .badge.paid {
+    background: var(--paid-bg);
+    color: var(--paid-text);
+  }
+  .badge.cancel {
+    background: var(--cancel-bg);
+    color: var(--cancel-text);
+  }
+
+  /* Tombol */
+  .btn-link {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background .25s;
+  }
+  .btn-link:hover {
+    background: var(--accent-dark);
+  }
+
+  /* Empty state */
+  .empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    background: #fff;
+    border-radius: 16px;
+    font-size: 1rem;
+  }
+  .empty a {
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  /* Flash Messages */
+  .flash {
+    max-width: 900px;
+    margin: 10px auto;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .flash.success {
+    background: var(--flash-success-bg);
+    color: var(--flash-success-text);
+    border: 1px solid var(--flash-success-border);
+  }
+  .flash.error {
+    background: var(--flash-error-bg);
+    color: var(--flash-error-text);
+    border: 1px solid var(--flash-error-border);
+  }
+
+  /* Responsive tweak, tetap rapih di layar kecil */
+  @media (max-width: 720px) {
+    .container { padding: 18px 12px; }
+    .orders { gap: 12px; grid-template-columns: 1fr; }
+  }
+</style>
+
 </head>
 <body>
 <div class="container">
   <div class="page-head">
     <h2>Pesanan Saya</h2>
-    <?php if(session()->getFlashdata('error')): ?>
-      <div class="meta" style="color:#b21d1d;"><?= esc(session()->getFlashdata('error')); ?></div>
+
+    <!-- FLASH MESSAGES -->
+    <?php if ($msg = session()->getFlashdata('success')): ?>
+      <div class="flash success"><?= esc($msg); ?></div>
+    <?php endif; ?>
+    <?php if ($msg = session()->getFlashdata('error')): ?>
+      <div class="flash error"><?= esc($msg); ?></div>
     <?php endif; ?>
   </div>
 
@@ -35,14 +193,24 @@
     <div class="orders">
       <?php foreach ($orders as $o): ?>
         <?php
-          $status = strtolower($o['status'] ?? 'menunggu');
-          $cls = $status==='dibayar'?'paid':($status==='batal'?'cancel':'wait');
+          // normalisasi status (DB: 'paid', 'cancel', 'pending' / 'pending' default)
+          $st = strtolower($o['status'] ?? 'pending');
+          if ($st === 'paid') {
+              $cls = 'paid';
+              $label = 'Dibayar';
+          } elseif ($st === 'cancel' || $st === 'batal') {
+              $cls = 'cancel';
+              $label = 'Dibatalkan';
+          } else {
+              $cls = 'pending';
+              $label = 'Menunggu';
+          }
         ?>
         <div class="card">
           <h3 style="margin:0 0 8px;">#<?= esc($o['code'] ?? $o['id']); ?></h3>
           <div class="meta">Tanggal: <?= date('d M Y H:i', strtotime($o['created_at'] ?? 'now')); ?></div>
           <div class="meta">Total: <b>Rp <?= number_format((int)($o['total_amount'] ?? 0),0,',','.'); ?></b></div>
-          <div class="meta">Status: <span class="badge <?= $cls; ?>"><?= ucfirst($status); ?></span></div>
+          <div class="meta">Status: <span class="badge <?= $cls; ?>"><?= esc($label); ?></span></div>
           <a class="btn-link" href="<?= site_url('p/orders/'.$o['id']); ?>">Lihat Detail</a>
         </div>
       <?php endforeach; ?>

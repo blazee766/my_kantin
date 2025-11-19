@@ -10,81 +10,97 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #fff6f1;
-      font-family: 'Poppins', sans-serif;
-    }
+  :root {
+    --bg-page: #fdeff0;          /* lembut pink seperti hero */
+    --card-bg: #ffffff;
+    --text-dark: #0b2130;        /* navy gelap */
+    --muted: #6b7280;
+    --accent: #ff4766;           /* coral/pink seperti tombol */
+    --accent-dark: #e03f5d;
+    --field-border: #e6d6d8;
+  }
 
-    .auth-card {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      width: 380px;
-      padding: 2rem 2.5rem;
-      text-align: center;
-    }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--bg-page);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+  }
 
-    .auth-card h2 {
-      margin-bottom: 1.5rem;
-      color: #ff6a00;
-      font-weight: 700;
-    }
+  .auth-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: 0 4px 22px rgba(0, 0, 0, 0.08);
+    width: 380px;
+    padding: 2rem 2.5rem;
+    text-align: center;
+  }
 
-    .auth-card form {
-      text-align: left;
-    }
+  .auth-card h2 {
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
 
-    .auth-card label {
-      display: block;
-      margin-bottom: .3rem;
-      font-weight: 500;
-      color: #444;
-    }
+  .auth-card form {
+    text-align: left;
+  }
 
-    .auth-card input {
-      width: 100%;
-      padding: .6rem .8rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+  .auth-card label {
+    display: block;
+    margin-bottom: .3rem;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
 
-    .auth-card button {
-      width: 100%;
-      background: #ff6a00;
-      border: none;
-      color: #fff;
-      font-size: 1rem;
-      padding: .7rem 0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background .3s;
-    }
+  .auth-card input {
+    width: 100%;
+    padding: .6rem .8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text-dark);
+  }
 
-    .auth-card button:hover {
-      background: #e95d00;
-    }
+  .auth-card button {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    padding: .7rem 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .25s;
+    font-weight: 600;
+  }
 
-    .auth-card p {
-      margin-top: 1rem;
-      font-size: 14px;
-    }
+  .auth-card button:hover {
+    background: var(--accent-dark);
+  }
 
-    .auth-card a {
-      color: #ff6a00;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  .auth-card p {
+    margin-top: 1rem;
+    font-size: 14px;
+    color: var(--muted);
+  }
 
-    .auth-card a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  .auth-card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .auth-card a:hover {
+    text-decoration: underline;
+  }
+</style>
+
 </head>
 
 <body>

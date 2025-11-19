@@ -1,4 +1,91 @@
 <?php $title='Laporan Keuangan'; include APPPATH.'Views/admin/partials/head.php'; ?>
+<style>
+  :root{
+    --bg-page:#fdeff0;
+    --card-bg:#ffffff;
+    --text-dark:#0b2130;
+    --muted:#6b7280;
+    --accent:#ff4766;
+    --accent-dark:#e03f5d;
+    --border:#e9e6e8;
+    --shadow:rgba(10,25,40,0.06);
+  }
+
+  /* latar belakang halaman */
+  body{
+    background:var(--bg-page);
+    color:var(--text-dark);
+    font-family:'Poppins',sans-serif;
+  }
+
+  /* card */
+  .card{
+    background:var(--card-bg);
+    border-radius:16px;
+    box-shadow:0 12px 30px var(--shadow);
+  }
+
+  h1,h3{
+    color:var(--text-dark);
+  }
+
+  label{
+    font-weight:600;
+    color:var(--text-dark);
+  }
+
+  /* input tanggal */
+  input[type="date"]{
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text-dark);
+    border-radius:10px;
+    padding:8px 10px;
+  }
+  input[type="date"]:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(255,71,102,0.12);
+  }
+
+  /* tombol */
+  .btn{
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text-dark);
+    font-weight:600;
+  }
+
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+  }
+  .btn-primary:hover{
+    background:var(--accent-dark);
+  }
+
+  /* table */
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  thead th{
+    padding:10px;
+    border-bottom:1px solid var(--border);
+    color:var(--text-dark);
+    background:rgba(255,255,255,0.5);
+  }
+  tbody td{
+    padding:10px;
+    border-bottom:1px solid #f2f2f2;
+    color:var(--text-dark);
+  }
+
+  small{ color:var(--muted); }
+</style>
+
 <div class="card">
   <h1>Laporan Keuangan</h1>
 

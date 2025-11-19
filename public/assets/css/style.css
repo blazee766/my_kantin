@@ -176,3 +176,4 @@ main{padding-bottom:40px}
 @supports (padding: max(0px)){
   header{padding-top:max(12px, env(safe-area-inset-top));}
 }
+

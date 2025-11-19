@@ -7,19 +7,127 @@ include APPPATH . 'Views/admin/partials/head.php';
 ?>
 
 <style>
-  /* scoped styling – aman tidak mengganggu halaman lain */
-  .page-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 18px}
+  :root{
+    --bg-page: #fdeff0;     /* latar lembut */
+    --card-bg: #fff;
+    --text-dark: #0b2130;   /* navy gelap */
+    --muted: #6b7280;
+    --accent: #ff4766;      /* coral/pink */
+    --accent-dark: #e03f5d;
+    --border: #e9e6e8;
+    --shadow: rgba(10,25,40,0.06);
+    --success: #1f7d1f;
+  }
+
+  /* pastikan background menyeluruh */
+  html,body{height:100%;margin:0}
+  body{
+    min-height:100vh;
+    background:var(--bg-page);
+    font-family:'Poppins',sans-serif;
+    color:var(--text-dark);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* card utama */
+  .card{
+    max-width:1100px;
+    margin:28px auto;
+    background:var(--card-bg);
+    border-radius:16px;
+    box-shadow:0 12px 30px var(--shadow);
+    padding:20px;
+    box-sizing:border-box;
+  }
+
+  .page-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:4px 0 18px;
+  }
+  .page-head h1{margin:0;font-size:1.25rem;color:var(--text-dark)}
+  .page-head .btn{padding:8px 12px;border-radius:10px;background:#fff;border:1px solid var(--border);color:var(--text-dark);text-decoration:none}
+
+  /* grid form */
   .form-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px}
+  @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
+
   .field{margin-bottom:14px}
-  .field label{display:block;font-weight:600;margin-bottom:6px}
+  .field label{display:block;font-weight:700;margin-bottom:8px;color:var(--text-dark)}
+  .help{font-size:.88rem;color:var(--muted);margin-top:6px}
+
+  /* input, textarea, select */
+  input[type="text"],
+  input[type="number"],
+  input[type="file"],
+  select,
+  textarea {
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text-dark);
+    font-size:0.95rem;
+    box-sizing:border-box;
+    transition: box-shadow .18s, border-color .18s;
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(255,71,102,0.08);
+  }
+  textarea{min-height:120px;resize:vertical;padding-top:10px}
+
+  /* thumb preview */
+  .thumb{
+    display:block;
+    width:180px;height:180px;object-fit:cover;border-radius:12px;
+    box-shadow:0 6px 18px rgba(10,25,40,0.06);border:1px solid var(--border);
+    margin-top:10px;
+    background:#fff;
+  }
+
+  /* row helper */
   .row{display:grid;grid-template-columns:1fr 180px;gap:12px}
-  .help{font-size:.85rem;color:#777;margin-top:6px}
-  .thumb{display:block;width:180px;height:180px;object-fit:cover;border-radius:12px;
-         box-shadow:0 4px 12px rgba(0,0,0,.08);border:1px solid #eee;margin-top:10px}
+  @media (max-width:900px){ .row{grid-template-columns:1fr} }
+
+  /* switches (checkbox labels) */
   .switch{display:flex;align-items:center;gap:10px;margin-top:10px}
-  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;padding-top:12px;border-top:1px solid #f1f1f1}
-  @media (max-width:900px){ .form-grid{grid-template-columns:1fr} .row{grid-template-columns:1fr} }
+  .switch input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent)}
+
+  /* actions/footer */
+  .actions{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    margin-top:18px;
+    padding-top:12px;
+    border-top:1px solid rgba(14,14,14,0.03);
+  }
+  .actions .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text-dark);text-decoration:none;font-weight:600}
+  .actions .btn.btn-primary{background:var(--accent);color:#fff;border:none;box-shadow:0 8px 20px rgba(224,63,93,0.08)}
+  .actions .btn.btn-primary:hover{background:var(--accent-dark)}
+
+  /* alert */
+  .alert{padding:12px 14px;border-radius:10px;background:#fff6f5;border:1px solid #ffdede;color:#8a2b2b;font-weight:600}
+
+  /* tiny helpers */
+  .help.small{font-size:.82rem;color:var(--muted)}
+  .field small{color:var(--muted)}
+
+  /* responsive tweaks */
+  @media (max-width:520px){
+    .card{padding:14px;margin:14px}
+    .thumb{width:140px;height:140px}
+    .row{grid-template-columns:1fr}
+    .form-grid{gap:18px}
+  }
 </style>
+
 
 <div class="card">
   <div class="page-head">

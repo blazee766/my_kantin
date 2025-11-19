@@ -55,8 +55,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function($routes){
     $routes->get('/', 'Admin\Menus::index');
     // orders (sudah ada index & show dari Tahap 3)
     $routes->get('orders', 'Admin\Orders::index');
-    $routes->get('orders/(:segment)', 'Admin\Orders::show/$1');
-    $routes->post('orders/(:segment)/status', 'Admin\Orders::updateStatus/$1'); // NEW
+    $routes->get('orders/(:num)', 'Admin\Orders::show/$1');
+    $routes->post('orders/(:num)/status', 'Admin\Orders::updateStatus/$1');
 });
 
 // Pembeli area (contoh halaman pesanan nanti)
@@ -64,7 +64,8 @@ $routes->group('p', ['filter' => 'role:pembeli'], function($routes){
 $routes->get('orders', 'Buyer\Orders::index', ['filter' => 'role:pembeli']);
 $routes->get('orders/(:num)', 'Buyer\Orders::show/$1', ['filter' => 'role:pembeli']);
 
-
+ $routes->post('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
+ $routes->delete('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
 });
 // ... route kamu yang lain tetap
 $routes->get('menu/search', 'Menu::search');   // endpoint AJAX pencarian menu

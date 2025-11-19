@@ -5,19 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pendaftaran Berhasil - KantinKamu</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body{background:#fff6f1;font-family:'Poppins',sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh}
-    .card{background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:32px;max-width:460px;text-align:center}
-    h2{color:#ff6a00;margin:0 0 12px}
-    p{color:#555;margin:0 0 20px}
-    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px}
-    .btn{padding:12px 18px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
-    .btn-primary{background:#ff6a00;color:#fff}
-    .btn-primary:hover{background:#ff8533}
-    .btn-ghost{background:#fff;border:1px solid #eee;color:#333}
-    .check{font-size:48px;line-height:1;margin-bottom:8px;color:#2ecc71}
-    .alert{background:#eaffea;border:1px solid #c6f3c6;color:#207d20;padding:10px 14px;border-radius:10px;margin:12px 0}
-  </style>
+ <style>
+  :root {
+    --bg-page: #fdeff0;        /* pink lembut */
+    --card-bg: #ffffff;
+    --text-dark: #0b2130;      /* navy gelap */
+    --muted: #6b7280;
+    --accent: #ff4766;         /* coral/pink */
+    --accent-dark: #e03f5d;
+    --success-bg: #e8ffe8;
+    --success-border: #bdf5bd;
+    --success-text: #1f7d1f;
+  }
+
+  body{
+    background: var(--bg-page);
+    font-family:'Poppins',sans-serif;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    color: var(--text-dark);
+  }
+
+  .card{
+    background: var(--card-bg);
+    border-radius:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    padding:32px;
+    max-width:460px;
+    text-align:center;
+  }
+
+  h2{
+    color: var(--accent);
+    margin:0 0 12px;
+    font-weight:700;
+  }
+
+  p{
+    color: var(--muted);
+    margin:0 0 20px;
+  }
+
+  .actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+
+  .btn{
+    padding:12px 18px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    text-decoration:none;
+    display:inline-block;
+  }
+
+  .btn-primary{
+    background: var(--accent);
+    color:#fff;
+  }
+
+  .btn-primary:hover{
+    background: var(--accent-dark);
+  }
+
+  .btn-ghost{
+    background:#fff;
+    border:1px solid #eee;
+    color:var(--text-dark);
+  }
+
+  .check{
+    font-size:48px;
+    line-height:1;
+    margin-bottom:8px;
+    color:#2ecc71;
+  }
+
+  .alert{
+    background: var(--success-bg);
+    border:1px solid var(--success-border);
+    color: var(--success-text);
+    padding:10px 14px;
+    border-radius:10px;
+    margin:12px 0;
+  }
+</style>
+
 </head>
 <body>
   <div class="card">

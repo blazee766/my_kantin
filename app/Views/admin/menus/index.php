@@ -1,5 +1,117 @@
 <?php $title = 'Kelola Menu';
 include APPPATH . 'Views/admin/partials/head.php'; ?>
+
+<style>
+  :root{
+    --bg-page:#fdeff0;
+    --card-bg:#fff;
+    --text-dark:#0b2130;
+    --muted:#6b7280;
+    --accent:#ff4766;
+    --accent-dark:#e03f5d;
+    --border:#e9e6e8;
+    --shadow:rgba(10,25,40,0.06);
+    --danger:#ff4d4f;
+  }
+
+  /* pastikan background menyeluruh */
+  html,body{height:100%;margin:0}
+  body{
+    min-height:100vh;
+    background:var(--bg-page);
+    font-family:'Poppins',sans-serif;
+    color:var(--text-dark);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .card{
+    max-width:1200px;
+    margin:28px auto;
+    background:var(--card-bg);
+    border-radius:14px;
+    box-shadow:0 12px 30px var(--shadow);
+    padding:20px;
+    box-sizing:border-box;
+  }
+
+  .card h1{margin:0 0 12px;color:var(--text-dark);font-size:1.25rem}
+  .mb-2{margin-bottom:12px}
+
+  /* tombol */
+  .btn{
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    padding:8px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text-dark);
+    text-decoration:none;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn:hover{box-shadow:0 8px 20px rgba(10,25,40,0.06)}
+  .btn.btn-primary{background:var(--accent);color:#fff;border:none;box-shadow:0 8px 20px rgba(224,63,93,0.08)}
+  .btn.btn-danger{background:var(--danger);color:#fff;border:none}
+
+  /* table */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    background:transparent;
+  }
+  thead th{
+    text-align:left;
+    padding:12px 10px;
+    color:var(--text-dark);
+    font-weight:700;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  tbody td{
+    padding:12px 10px;
+    border-bottom:1px solid #f4f3f4;
+    vertical-align:middle;
+    color:var(--text-dark);
+  }
+
+  /* thumbnail in table */
+  .thumb{
+    width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--border);
+    box-shadow:0 6px 16px rgba(10,25,40,0.04);
+    display:inline-block;
+  }
+
+  /* badge states */
+  .badge{
+    display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:.85rem;
+    background:#fff;border:1px solid var(--border);color:var(--text-dark)
+  }
+
+  /* aksi kolom */
+  td[style*="white-space:nowrap"]{white-space:nowrap}
+  td .btn{padding:6px 10px;font-size:.92rem}
+
+  /* alerts */
+  .alert{padding:12px 14px;border-radius:10px;background:#fff6f5;border:1px solid #ffdede;color:#8a2b2b;font-weight:600;margin-bottom:12px}
+
+  /* responsive */
+  @media (max-width:880px){
+    .card{padding:16px}
+    thead th, tbody td{padding:10px 8px}
+    .thumb{width:48px;height:48px}
+  }
+
+  @media (max-width:520px){
+    .card{margin:12px;padding:12px}
+    table{font-size:.95rem}
+    .btn{padding:7px 10px}
+  }
+</style>
+
 <div class="card">
   <h1>Kelola Menu</h1>
 

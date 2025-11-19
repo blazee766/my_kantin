@@ -33,7 +33,15 @@ class Cart extends BaseController
     public function add()
     {
         $u = session('user');
-        if (!$u) return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Unauthenticated']);
+        if (!$u) {
+            return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
+        }
+
+        // ---- BLOCK ADMIN: admin tidak boleh membuat pesanan ----
+        if (isset($u['role']) && $u['role'] === 'admin') {
+            return $this->response->setStatusCode(403)->setJSON(['ok' => false, 'msg' => 'Akun admin tidak diperbolehkan memesan.']);
+        }
+        // --------------------------------------------------------
 
         $id  = (int) $this->request->getPost('id');
         $qty = max(1, (int) $this->request->getPost('qty'));
@@ -98,6 +106,12 @@ class Cart extends BaseController
 
     public function updateQty()
     {
+        // optional: require login to update cart (keputusan produk)
+        $u = session('user');
+        if (!$u) {
+            return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
+        }
+
         $id  = (int)$this->request->getPost('id');
         $qty = max(1, (int)$this->request->getPost('qty'));
         $cart = session('cart') ?? [];
@@ -110,6 +124,11 @@ class Cart extends BaseController
 
     public function remove()
     {
+        $u = session('user');
+        if (!$u) {
+            return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
+        }
+
         $id = (int)$this->request->getPost('id');
         $cart = session('cart') ?? [];
         unset($cart[$id]);
@@ -119,6 +138,11 @@ class Cart extends BaseController
 
     public function clear()
     {
+        $u = session('user');
+        if (!$u) {
+            return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
+        }
+
         session()->remove('cart');
         return $this->response->setJSON(['ok' => true]);
     }
@@ -135,6 +159,12 @@ class Cart extends BaseController
     {
         $u = $this->userOrRedirect();
         if ($u instanceof \CodeIgniter\HTTP\RedirectResponse) return $u;
+
+        // ---- BLOCK ADMIN: admin tidak boleh checkout ----
+        if (isset($u['role']) && $u['role'] === 'admin') {
+            return redirect()->to(site_url('cart'))->with('error', 'Admin tidak boleh membuat pesanan.');
+        }
+        // --------------------------------------------------
 
         $cart = session('cart') ?? [];
         if (empty($cart)) {
