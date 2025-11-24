@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <style>
   :root{
-    --bg-page: #fdeff0;       /* pink lembut */
+    --bg-page: #fdeff0;      
     --card-bg: #ffffff;
-    --text-dark: #0b2130;     /* navy gelap */
+    --text-dark: #0b2130;    
     --muted: #6b7280;
-    --accent: #ff4766;        /* coral/pink */
+    --accent: #ff4766;        
     --accent-dark: #e03f5d;
     --shadow: rgba(10,25,40,0.06);
     --table-border: #f3f2f4;
@@ -25,14 +25,14 @@
     margin:0;
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
-    min-height: 100vh;       /* memastikan latar belakang memenuhi seluruh layar */
+    min-height: 100vh;       
     padding: 0;
 }
 
 .container{
     max-width: 1100px;
-    margin: 0 auto;          /* hilangkan jarak atas */
-    padding: 20px 16px;      /* beri padding agar konten tidak mepet */
+    margin: 0 auto;         
+    padding: 20px 16px;     
 }
 
   .section{
@@ -75,7 +75,6 @@
     background: transparent;
   }
 
-  /* Tombol */
   .btn{
     padding: 10px 14px;
     border-radius: 10px;
@@ -113,7 +112,6 @@
     flex-wrap:wrap;
   }
 
-  /* responsive tweak */
   @media (max-width:720px){
     th, td{padding:10px 8px;font-size:0.92rem}
     .section{padding:14px}

@@ -11,11 +11,11 @@
 
   <style>
   :root {
-    --bg-page: #fdeff0;          /* lembut pink seperti hero */
+    --bg-page: #fdeff0;          
     --card-bg: #ffffff;
-    --text-dark: #0b2130;        /* navy gelap */
+    --text-dark: #0b2130;        
     --muted: #6b7280;
-    --accent: #ff4766;           /* coral/pink seperti tombol */
+    --accent: #ff4766;           
     --accent-dark: #e03f5d;
     --field-border: #e6d6d8;
   }

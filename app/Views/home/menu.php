@@ -9,34 +9,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Palette baru: navy gelap untuk teks, coral/pink sebagai aksen, pink very-light untuk area besar,
-       dan hitam lembut untuk tombol sekunder. Hanya warna yang diubah — struktur tetap sama. */
 
     :root {
       --bg-page: #fdeff0;
       --hero-pale: #fdeff0;
-      /* area hero/panel lembut */
       --text-dark: #0b2130;
-      /* teks utama: navy gelap */
       --muted: #6b7280;
-      /* teks deskripsi */
       --accent: #ff4766;
-      /* warna tombol / aksen coral/pink */
       --accent-dark: #e03f5d;
-      /* hover aksen */
       --nav-active: #ff6a4a;
-      /* underline / active nav (sedikit oranye) */
       --card-bg: #ffffff;
       --card-shadow: rgba(10, 25, 40, 0.06);
       --fab-bg: #111111;
-      /* tombol bulat hitam pada gambar (seperti pada screenshot ada varian hitam) */
       --fab-accent: var(--accent);
       --skeleton: #f3f3f5;
       --whatsapp: #25D366;
-      /* biarkan WA hijau */
     }
 
-    /* dasar layout */
     body {
       background: var(--bg-page) !important;
       font-family: 'Poppins', sans-serif;
@@ -44,7 +33,6 @@
       color: var(--text-dark);
     }
 
-    /* header: putih bersih agar kontras dengan hero */
     header {
       display: flex;
       justify-content: space-between;
@@ -79,7 +67,6 @@
       border-bottom: 2px solid var(--accent);
     }
 
-    /* container */
     .container {
       max-width: 1200px;
       margin: 20px auto;
@@ -93,7 +80,6 @@
       font-weight: 700
     }
 
-    /* Tabs */
     .tabs {
       display: flex;
       gap: 8px;
@@ -122,7 +108,6 @@
       border-color: var(--accent)
     }
 
-    /* grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -145,7 +130,6 @@
       box-shadow: 0 14px 30px rgba(10, 25, 40, 0.08);
     }
 
-    /* gambar + tombol mengambang */
     .thumb {
       position: relative;
       border-radius: 12px;
@@ -160,7 +144,6 @@
       display: block
     }
 
-    /* FAB: gunakan aksen coral untuk tambah, tapi bila disabled tampil hitam lembut seperti di UI */
     .fab {
       position: absolute;
       right: 12px;
@@ -218,7 +201,6 @@
       min-height: 38px
     }
 
-    /* harga memakai warna aksen */
     .price {
       display: block;
       color: var(--accent);
@@ -257,7 +239,6 @@
       }
     }
 
-    /* contact modal + whatsapp small styles */
     .whatsapp-btn {
       background: var(--whatsapp);
       color: #fff;
@@ -306,7 +287,6 @@
       margin-top: 6px
     }
 
-    /* tambahan: area hero/panel bila ada (warnanya diambil dari gambar) */
     .hero-panel {
       background: linear-gradient(180deg, var(--hero-pale), #fff);
       border-radius: 16px;
@@ -315,7 +295,6 @@
       box-shadow: 0 10px 30px rgba(10, 25, 40, 0.03);
     }
 
-    /* small responsive tweak */
     @media (max-width:720px) {
       header {
         padding: 16px
@@ -332,10 +311,9 @@
 <body>
 
   <?php
-  // Ambil nomor dari env atau fallback; normalisasi untuk tel & wa
   $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
-  $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone); // tel: allows + and digits
-  $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone)); // wa.me needs digits only, no +
+  $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
+  $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone)); 
   $waMessage = rawurlencode("Halo KantinKamu, saya ingin memesan.");
   $telDisplay = $contactPhone;
   ?>
@@ -346,8 +324,6 @@
       <ul>
         <li><a href="<?= site_url('/'); ?>">Home</a></li>
         <li><a href="<?= site_url('menu'); ?>" class="active">Menu</a></li>
-
-        <!-- Contact -> buka modal -->
         <li><a href="https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>" id="contactLink">Contact</a></li>
 
         <li><a href="#">About Us</a></li>
@@ -359,7 +335,6 @@
   <div class="container">
     <h2>Daftar Menu Lengkap</h2>
 
-    <!-- Tabs -->
     <div class="tabs" id="tabs">
       <a href="#" data-slug="" class="tab">Semua</a>
       <?php foreach ($categories as $c): ?>
@@ -367,11 +342,9 @@
       <?php endforeach; ?>
     </div>
 
-    <!-- Grid menu -->
     <div id="menuGrid" class="grid" aria-live="polite"></div>
   </div>
 
-  <!-- CONTACT MODAL -->
   <div class="contact-modal-backdrop" id="contactModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
       <h3 id="contactModalTitle">Hubungi KantinKamu</h3>
@@ -410,7 +383,6 @@
         return new Intl.NumberFormat('id-ID').format(x);
       }
 
-      // ====== kartu dengan tombol di atas gambar ======
       function cardTemplate(m) {
         const img = m.image ? `${app.asset}/assets/img/${m.image}` : `${app.asset}/assets/img/placeholder.png`;
         const disabled = !(m.stock > 0);
@@ -486,7 +458,6 @@
         });
       }
 
-      // klik tab
       tabs.forEach(a => {
         a.addEventListener('click', e => {
           e.preventDefault();
@@ -496,10 +467,8 @@
         });
       });
 
-      // initial load
       loadMenus(activeInitial);
 
-      // ---------------- CONTACT modal logic ----------------
       const contactLink = document.getElementById('contactLink');
       const contactModal = document.getElementById('contactModal');
       const modalPhone = document.getElementById('modalPhone');
@@ -532,7 +501,6 @@
       if (modalCancel) modalCancel.addEventListener('click', () => hideContactModal());
       if (modalCall) modalCall.addEventListener('click', () => {
         hideContactModal();
-        // redirect to tel:
         window.location.href = 'tel:' + TEL_NUMBER;
       });
 
@@ -542,7 +510,6 @@
         });
       }
 
-      // optional: intercept direct tel: links to show modal
       document.querySelectorAll('a[href^="tel:"]').forEach(a => {
         a.addEventListener('click', function(e) {
           const href = this.getAttribute('href') || '';

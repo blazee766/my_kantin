@@ -9,42 +9,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ===== tambahan CSS untuk hero rotate & gambar tanpa kotak ===== -->
   <style>
-    /* NAVBAR HOVER / ACTIVE (paste ke dalam <style> Anda) */
     :root {
       --nav-accent: #ff4766;
-      /* warna pink/coral yang dipakai */
       --nav-text: #0b2130;
-      /* warna teks default */
     }
 
-    /* dasar navbar: buat sedikit ruang bawah supaya underline tidak "memindahkan" teks */
     header nav a {
       color: var(--nav-text);
       text-decoration: none;
       padding-bottom: 6px;
-      /* ruang untuk underline */
       transition: color .22s, border-color .22s, transform .18s;
       border-bottom: 2px solid transparent;
-      /* placeholder underline */
       display: inline-block;
-      /* agar border-bottom hanya di bawah teks */
     }
 
-    /* hover: semua item berubah pink + muncul underline */
     header nav a:hover {
       color: var(--nav-accent);
       border-bottom-color: var(--nav-accent);
     }
 
-    /* jika ada class "active" di link (halaman sekarang), beri styling yang sama */
     header nav a.active {
       color: var(--nav-accent);
       border-bottom-color: var(--nav-accent);
     }
 
-    /* opsi: beri sedikit jarak antar list item agar penekanan hover rapi */
     header nav ul {
       gap: 18px;
       display: flex;
@@ -54,14 +43,12 @@
       padding: 0;
     }
 
-    /* responsif: di layar kecil beri padding lebih kecil supaya tetap rapi */
     @media (max-width:720px) {
       header nav a {
         padding-bottom: 4px;
       }
     }
 
-    /* Hilangkan kotak / shadow khusus di area gambar hero & dish (CSS override) */
     .hero-image,
     .dishes .dish,
     .dishes .dish img {
@@ -70,17 +57,14 @@
       padding: 0 !important;
     }
 
-    /* HERO: continuous slow rotation (non-stop) */
     .hero-image img {
       width: 100%;
       height: auto;
       object-fit: cover;
       border-radius: 12px;
-      /* ubah ke 50% jika ingin lingkaran */
       box-shadow: none;
       transform-origin: 50% 50%;
       animation: kk-hero-spin 24s linear infinite;
-      /* 24s = pelan */
       will-change: transform;
       display: block;
     }
@@ -95,7 +79,6 @@
       }
     }
 
-    /* DISH / POPULAR: hover rotate (lebih aman) */
     .dishes .dish img {
       width: 100%;
       height: 140px;
@@ -113,12 +96,6 @@
       transform: rotate(360deg);
     }
 
-    /* Jika mau agar dish juga berputar terus, ubah:
-       .dishes .dish img { animation: kk-dish-spin 18s linear infinite; }
-       and add keyframes kk-dish-spin like kk-hero-spin.
-    */
-
-    /* Hormati prefer-reduced-motion */
     @media (prefers-reduced-motion: reduce) {
 
       .hero-image img,
@@ -129,7 +106,6 @@
       }
     }
 
-    /* Responsive tweak: menjaga tinggi gambar agar proporsional */
     @media (min-width:560px) {
       .hero-image {
         max-width: 460px;
@@ -150,7 +126,6 @@
       }
     }
 
-    /* CONTACT modal / WA button (basic styles) */
     .whatsapp-btn {
       background: #25D366;
       color: #fff;
@@ -208,7 +183,6 @@
       }
     }
   </style>
-  <!-- ===== end tambahan CSS ===== -->
 </head>
 
 <body>
@@ -303,7 +277,6 @@
     </div>
 
     <script>
-      // otomatis hilang setelah 3.5 detik
       setTimeout(() => {
         const toast = document.getElementById('welcomeToast');
         if (toast) {
@@ -416,7 +389,6 @@
       </section>
     </main>
   </div>
-  <!-- letakkan sebelum <script src="assets/js/script.js"></script> -->
 
   <!-- CONTACT / CALL CONFIRMATION MODAL -->
   <div class="contact-modal-backdrop" id="contactModal" aria-hidden="true">
@@ -494,18 +466,14 @@
       window.location.href = 'tel:' + TEL_NUMBER;
     });
 
-    // Close modal on click outside modal box
     if (contactModal) {
       contactModal.addEventListener('click', (e) => {
         if (e.target === contactModal) hideContactModal();
       });
     }
 
-    // Also capture any <a href="tel:..."> clicks and show modal instead (if you want)
-    // OPTIONAL: disable default tel links to require confirmation - comment out if not wanted
     document.querySelectorAll('a[href^="tel:"]').forEach(a => {
       a.addEventListener('click', function(e) {
-        // If link already points to same TEL_NUMBER, show modal; otherwise allow
         const href = this.getAttribute('href') || '';
         if (href.includes(TEL_NUMBER) || href.includes('tel:')) {
           e.preventDefault();
@@ -514,10 +482,8 @@
       });
     });
 
-    // Quick: open WA links in new tab (already target="_blank"), no extra handling needed.
   </script>
 
-  <!-- Tambahkan keranjang (tidak mengubah tampilan) -->
   <script>
     document.querySelectorAll('.add-to-cart').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -534,14 +500,12 @@
             body: payload.toString()
           });
 
-          // Jika unauthorized -> tanyakan dan arahkan ke login (browser fetch tidak auto-redirect)
           if (res.status === 401 || res.redirected || res.status === 302) {
             const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
             if (go) window.location.href = '<?= site_url('login'); ?>';
             return;
           }
 
-          // parse JSON (status bukan 401)
           const data = await res.json().catch(() => ({
             ok: false,
             msg: 'Respon tidak valid'
@@ -553,7 +517,6 @@
             alert('✅ Ditambahkan ke keranjang: ' + btn.dataset.name);
             if (data.redirect) window.location.href = data.redirect;
           } else {
-            // Jika server mengeklaim user perlu login lewat pesan, tangani juga
             const msg = (data.msg || '').toLowerCase();
             if (msg.includes('login') || msg.includes('unauth') || msg.includes('silakan login')) {
               const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');

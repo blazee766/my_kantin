@@ -36,7 +36,7 @@ class Checkout extends BaseController
         $total    = max(0, $subtotal - $discount);
 
         $db = db_connect();
-        $db->transStart(); // ----- START TRANSACTION
+        $db->transStart(); 
 
         // (1) Validasi & KURANGI STOK atomik
         foreach ($cart as $row) {
@@ -62,7 +62,7 @@ class Checkout extends BaseController
         $orderId = $orders->insert([
             'user_id'   => $user['id'],
             'code'      => $orders->generateCode(),
-            'status'    => 'pending',      // bisa kamu ubah sesuai flow
+            'status'    => 'pending',      
             'subtotal'  => $subtotal,
             'discount'  => $discount,
             'total'     => $total,
@@ -81,7 +81,7 @@ class Checkout extends BaseController
         }
         model(OrderItemModel::class)->insertBatch($items);
 
-        // (3) Buat payment (di sini langsung paid, bisa diubah nanti)
+        // (3) Buat payment
         model(PaymentModel::class)->insert([
             'order_id'  => $orderId,
             'method'    => $method,
@@ -92,7 +92,7 @@ class Checkout extends BaseController
         ]);
         $orders->update($orderId, ['status'=>'paid']);
 
-        $db->transComplete(); // ----- COMMIT
+        $db->transComplete(); 
 
         session()->remove('cart');
         return redirect()->to('/orders/'.$orderId)->with('success','Pesanan berhasil dibuat!');

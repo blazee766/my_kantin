@@ -9,7 +9,14 @@ class Menus extends BaseController
 {
     public function index()
     {
-        $menus = (new MenuModel())->orderBy('id', 'DESC')->findAll();
+        $menuModel = new MenuModel();
+
+        $menus = $menuModel
+            ->select('menus.*, categories.name AS category_name')
+            ->join('categories', 'categories.id = menus.category_id', 'left')
+            ->orderBy('menus.id', 'DESC')
+            ->findAll();
+
         return view('admin/menus/index', compact('menus'));
     }
 
@@ -33,7 +40,7 @@ class Menus extends BaseController
             'is_popular' => $this->request->getPost('is_popular') ? 1 : 0,
             'category_id' => (int)$this->request->getPost('category_id') ?: null,
 
-            
+
 
         ];
         if (!$m->save($data)) {
@@ -105,18 +112,18 @@ class Menus extends BaseController
         $model = new MenuModel();
 
         // builder dasar: hanya menu aktif + kolom yang diperlukan
-        $builder = $model->select(['id','name','description','price','image'])
-                         ->where('is_active', 1);
+        $builder = $model->select(['id', 'name', 'description', 'price', 'image'])
+            ->where('is_active', 1);
 
         if ($q === '') {
             $builder->orderBy('id', 'DESC');
             $menus = $builder->findAll($limit ?? 20); // default list pendek
         } else {
             $builder->groupStart()
-                        ->like('name', $q)
-                        ->orLike('description', $q)
-                    ->groupEnd()
-                    ->orderBy('name', 'ASC');
+                ->like('name', $q)
+                ->orLike('description', $q)
+                ->groupEnd()
+                ->orderBy('name', 'ASC');
 
             $menus = $builder->findAll($limit ?? 40);
         }
@@ -137,5 +144,4 @@ class Menus extends BaseController
             }, $menus),
         ]);
     }
-
 }

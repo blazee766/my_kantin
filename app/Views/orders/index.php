@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <style>
   :root {
-    --bg-page: #fdeff0;         /* pink lembut */
+    --bg-page: #fdeff0;        
     --card-bg: #ffffff;
-    --text-dark: #0b2130;       /* navy gelap */
+    --text-dark: #0b2130;      
     --muted: #6b7280;
-    --accent: #ff4766;          /* coral/pink */
+    --accent: #ff4766;          
     --accent-dark: #e03f5d;
 
     --pending-bg: #fff3d6;
@@ -32,7 +32,6 @@
     --flash-error-text: #842323;
   }
 
-  /* Pastikan body/html memenuhi seluruh layar sehingga background terlihat menyeluruh */
   html, body {
     height: 100%;
     margin: 0;
@@ -40,24 +39,23 @@
   }
 
   body {
-    background: var(--bg-page) fixed center/cover; /* background menyeluruh dan tetap */
-    min-height: 100vh;                              /* memastikan menutupi viewport */
+    background: var(--bg-page) fixed center/cover; 
+    min-height: 100vh;                             
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
 
-  /* Container: hilangkan margin atas yang menyebabkan efek 'setengah' */
   .container {
     max-width: 1100px;
-    margin: 0 auto;        /* no top gap */
-    padding: 28px 16px;    /* beri padding untuk jarak isi dari tepi */
+    margin: 0 auto;       
+    padding: 28px 16px;    
     box-sizing: border-box;
   }
 
   .page-head {
-    margin: 8px 0 18px; /* lebih kecil sehingga tidak terlihat terpisah */
+    margin: 8px 0 18px; 
     text-align: center;
   }
 
@@ -92,7 +90,6 @@
     margin: 6px 0;
   }
 
-  /* Badge Status */
   .badge {
     display: inline-block;
     padding: 4px 10px;
@@ -113,7 +110,6 @@
     color: var(--cancel-text);
   }
 
-  /* Tombol */
   .btn-link {
     display: inline-block;
     margin-top: 8px;
@@ -129,7 +125,6 @@
     background: var(--accent-dark);
   }
 
-  /* Empty state */
   .empty {
     padding: 24px;
     text-align: center;
@@ -144,7 +139,6 @@
     text-decoration: none;
   }
 
-  /* Flash Messages */
   .flash {
     max-width: 900px;
     margin: 10px auto;
@@ -163,7 +157,6 @@
     border: 1px solid var(--flash-error-border);
   }
 
-  /* Responsive tweak, tetap rapih di layar kecil */
   @media (max-width: 720px) {
     .container { padding: 18px 12px; }
     .orders { gap: 12px; grid-template-columns: 1fr; }
@@ -176,7 +169,6 @@
   <div class="page-head">
     <h2>Pesanan Saya</h2>
 
-    <!-- FLASH MESSAGES -->
     <?php if ($msg = session()->getFlashdata('success')): ?>
       <div class="flash success"><?= esc($msg); ?></div>
     <?php endif; ?>
@@ -193,7 +185,6 @@
     <div class="orders">
       <?php foreach ($orders as $o): ?>
         <?php
-          // normalisasi status (DB: 'paid', 'cancel', 'pending' / 'pending' default)
           $st = strtolower($o['status'] ?? 'pending');
           if ($st === 'paid') {
               $cls = 'paid';

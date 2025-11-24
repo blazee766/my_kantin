@@ -10,14 +10,14 @@ class Home extends BaseController
     {
         $menus = (new \App\Models\MenuModel())
             ->where('is_active', 1)
-            ->where('is_popular', 1)   // <— hanya populer
+            ->where('is_popular', 1)   
             ->orderBy('name', 'ASC')
             ->findAll();
         return view('home/index_full', ['menus' => $menus]);
     }
     public function menu()
     {
-        // hanya kirim daftar kategori + slug & slug aktif (jika ada)
+        // hanya kirim daftar kategori + slug & slug aktif 
         $catSlug     = $this->request->getGet('cat');
         $categories  = model(\App\Models\CategoryModel::class)->orderBy('name', 'ASC')->findAll();
 
@@ -29,7 +29,7 @@ class Home extends BaseController
 
     public function menuJson()
     {
-        $catSlug   = $this->request->getGet('cat'); // 'makanan'|'minuman'|null
+        $catSlug   = $this->request->getGet('cat'); 
         $catModel  = model(\App\Models\CategoryModel::class);
         $menuModel = model(\App\Models\MenuModel::class);
 

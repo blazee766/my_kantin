@@ -34,10 +34,10 @@ class AuthController extends BaseController
         // Tentukan mode login: prioritas email, fallback ke npm
         if ($email !== '') {
             $user = $users->where('email', $email)->first();
-            $pwdHashField = 'password';        // versi model yang menyimpan kolom "password"
+            $pwdHashField = 'password';       
         } else {
             $user = $users->where('npm', $npm)->first();
-            $pwdHashField = 'password_hash';   // versi model yang menyimpan kolom "password_hash"
+            $pwdHashField = 'password_hash';   
         }
 
         // Validasi user & password
@@ -53,17 +53,17 @@ class AuthController extends BaseController
             return redirect()->back()->with('error', 'Akun nonaktif.')->withInput();
         }
 
-        // Ambil nama role dari tabel roles (jika ada role_id)
+        // Ambil nama role dari tabel roles 
         $roleName = 'pembeli';
         if (!empty($user['role_id'])) {
             $roleRow  = db_connect()->table('roles')->where('id', $user['role_id'])->get()->getRowArray();
             $roleName = $roleRow['name'] ?? 'pembeli';
         } elseif (!empty($user['role'])) {
-            $roleName = $user['role']; // fallback jika tabel roles tidak dipakai
+            $roleName = $user['role']; 
         }
 
         // --- KEAMANAN SESSION ---
-        session()->regenerate(); // cegah session fixation
+        session()->regenerate(); 
 
         $safeUser = [
             'id'        => (int) ($user['id'] ?? 0),
@@ -133,7 +133,7 @@ class AuthController extends BaseController
         // ---- Simpan user baru ----
         $data = [
             'role_id'       => $roles['id'] ?? null,
-            'role'          => $roles['id'] ? null : 'pembeli', // fallback bila tidak pakai tabel roles
+            'role'          => $roles['id'] ? null : 'pembeli', 
             'name'          => $name,
             'npm'           => $npm,
             'email'         => $email ?: null,
