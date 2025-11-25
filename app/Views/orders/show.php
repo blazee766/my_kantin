@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <style>
   :root{
-    --bg-page: #fdeff0;      
+    --bg-page: #fdeff0;
     --card-bg: #ffffff;
-    --text-dark: #0b2130;    
+    --text-dark: #0b2130;
     --muted: #6b7280;
-    --accent: #ff4766;        
+    --accent: #ff4766;
     --accent-dark: #e03f5d;
     --shadow: rgba(10,25,40,0.06);
     --table-border: #f3f2f4;
@@ -25,15 +25,15 @@
     margin:0;
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
-    min-height: 100vh;       
+    min-height: 100vh;
     padding: 0;
-}
+  }
 
-.container{
+  .container{
     max-width: 1100px;
-    margin: 0 auto;         
-    padding: 20px 16px;     
-}
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
 
   .section{
     background: var(--card-bg);
@@ -112,6 +112,26 @@
     flex-wrap:wrap;
   }
 
+  .badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:600;
+  }
+  .badge.pending{
+    background:#fff3d6;
+    color:#a26a00;
+  }
+  .badge.paid{
+    background:#e8ffe8;
+    color:#1b7a2e;
+  }
+  .badge.cancel{
+    background:#ffe5e7;
+    color:#b21d1d;
+  }
+
   @media (max-width:720px){
     th, td{padding:10px 8px;font-size:0.92rem}
     .section{padding:14px}
@@ -121,12 +141,44 @@
 </head>
 
 <body>
+  <?php
+    $status = $order['status'] ?? 'pending';
+
+    $labelMap = [
+        'pending'    => 'Menunggu',
+        'menunggu'   => 'Menunggu',
+        'processing' => 'Diproses',
+        'diproses'   => 'Diproses',
+        'completed'  => 'Selesai',
+        'selesai'    => 'Selesai',
+        'canceled'   => 'Batal',
+        'batal'      => 'Batal',
+    ];
+
+    $classMap = [
+        'pending'    => 'pending',
+        'menunggu'   => 'pending',
+        'processing' => 'pending',
+        'diproses'   => 'pending',
+        'completed'  => 'paid',
+        'selesai'    => 'paid',
+        'canceled'   => 'cancel',
+        'batal'      => 'cancel',
+    ];
+
+    $statusLabel = $labelMap[$status]  ?? ucfirst($status);
+    $statusClass = $classMap[$status] ?? 'pending';
+  ?>
+
   <div class="container">
     <div class="section">
       <h2>Detail Pesanan #<?= esc($order['code'] ?? $order['id']); ?></h2>
       <p>Tanggal: <?= date('d M Y H:i', strtotime($order['created_at'] ?? 'now')); ?></p>
       <p>Total: <b>Rp <?= number_format((int)($order['total_amount'] ?? 0), 0, ',', '.'); ?></b></p>
-      <p>Status: <b><?= esc($order['status'] ?? 'pending'); ?></b></p>
+      <p>
+        Status:
+        <span class="badge <?= $statusClass; ?>"><?= esc($statusLabel); ?></span>
+      </p>
     </div>
 
     <div class="section">
@@ -153,19 +205,18 @@
       </table>
 
       <div class="btn-inline" style="margin-top:12px">
-        <a href="<?= site_url('p/orders'); ?>" class="btn btn-ghost">Kembali</a>
+        <a href="<?= site_url('/'); ?>" class="btn btn-ghost">Kembali</a>
         <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Tambah Pesanan</a>
 
-        <?php if (($order['status'] ?? '') !== 'paid'): ?>
-          <!-- Hapus/Batalkan pesanan -->
+        <?php
+        if (!in_array($status, ['completed','selesai','canceled','batal'], true)): ?>
           <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
-            method="post"
-            onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"
-            style="display:inline">
+                method="post"
+                onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"
+                style="display:inline">
             <?= csrf_field(); ?>
             <button type="submit" class="btn btn-danger">Hapus / Batalkan</button>
           </form>
-
         <?php endif; ?>
       </div>
     </div>

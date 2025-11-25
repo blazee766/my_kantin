@@ -64,8 +64,7 @@
       border-radius: 12px;
       box-shadow: none;
       transform-origin: 50% 50%;
-      animation: kk-hero-spin 24s linear infinite;
-      will-change: transform;
+      animation: kk-hero-spin 40s linear infinite;
       display: block;
     }
 
@@ -90,20 +89,6 @@
       box-shadow: none;
       background: transparent;
       display: block;
-    }
-
-    .dishes .dish img:hover {
-      transform: rotate(360deg);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-
-      .hero-image img,
-      .dishes .dish img {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-      }
     }
 
     @media (min-width:560px) {
@@ -187,15 +172,10 @@
 
 <body>
   <?php
-  // Ambil nomor dari env atau fallback
   $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
-  // Normalisasi: biarkan + dan digits saja
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
-  // Untuk wa.me: harus tanpa + dan tanpa simbol lain. wa.me expects international format without plus, e.g. 628123...
   $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
-  // Pesan default WhatsApp (URL-encoded)
   $waMessage = rawurlencode("Halo Admin KantinKamu, saya ingin memesan.");
-  // Tampilan nomor (apa adanya)
   $telDisplay = $contactPhone;
   ?>
 
@@ -213,7 +193,6 @@
       .toast {
         position: fixed;
         top: 30px;
-        /* tengah atas */
         left: 50%;
         transform: translateX(-50%);
         background: #fff;
@@ -297,10 +276,7 @@
         <ul>
           <li><a href="<?= base_url('/'); ?>">Home</a></li>
           <li><a href="<?= base_url('menu'); ?>">Menu</a></li>
-
-          <!-- Contact: show modal -->
           <li><a href="https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>" id="contactLink">Contact</a></li>
-
           <li><a href="#">About Us</a></li>
           <li><a href="#">Gallery</a></li>
         </ul>
@@ -324,7 +300,6 @@
           <?php if (session('user.role') === 'admin'): ?>
             <a href="<?= base_url('admin'); ?>" class="btn btn-primary">Dashboard</a>
           <?php else: ?>
-            <!-- di dalam <div class="buttons"> ... sebelum hamburger -->
             <a href="<?= site_url('p/orders'); ?>" class="btn header-cart" aria-label="Keranjang">
               <i class="fas fa-shopping-bag"></i>
               <span class="cart-count" style="display:none">0</span>
@@ -349,7 +324,6 @@
         </div>
       <?php endif; ?>
 
-      <!-- Hero section sama persis -->
       <section class="hero">
         <div class="hero-text">
           <h1>Temukan Keunggulan Kuliner</h1>
@@ -360,19 +334,16 @@
         </div>
 
         <div class="hero-image">
-          <!-- Hero image akan berputar non-stop -->
           <img src="<?= base_url('assets/img/1.png'); ?>" alt="Gourmet Food Selection" id="heroImage">
         </div>
       </section>
 
-      <!-- Section Popular Menu -->
       <section class="popular-dishes" id="menu">
         <h2>Popular Menu</h2>
 
         <div class="dishes">
           <?php foreach ($menus as $m): ?>
             <div class="dish" data-img="<?= esc($m['image']); ?>">
-              <!-- Dish image: hover akan memicu rotasi satu putaran -->
               <img src="<?= base_url('assets/img/' . esc($m['image'])); ?>" alt="<?= esc($m['name']); ?>">
               <h3><?= esc(ucwords($m['name'])); ?></h3>
               <p><?= esc($m['description']); ?></p>
@@ -390,7 +361,6 @@
     </main>
   </div>
 
-  <!-- CONTACT / CALL CONFIRMATION MODAL -->
   <div class="contact-modal-backdrop" id="contactModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
       <h3 id="contactModalTitle">Hubungi KantinKamu</h3>
@@ -419,12 +389,29 @@
   <script src="<?= base_url('assets/js/script.js'); ?>"></script>
 
   <script>
-    // Globals: nomor tersedia di JS via data dari PHP
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroImg = document.getElementById('heroImage');
+      if (!heroImg) return;
+
+      const originalSrc = heroImg.src;
+
+      document.querySelectorAll('.dishes .dish').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          heroImg.src = originalSrc;
+        });
+        card.addEventListener('mouseleave', () => {
+          heroImg.src = originalSrc;
+        });
+      });
+    });
+  </script>
+
+
+  <script>
     const TEL_NUMBER = "<?= esc($telNormalized); ?>";
     const TEL_DISPLAY = "<?= esc($telDisplay); ?>";
     const WA_URL = "https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>";
 
-    // modal elements
     const contactLink = document.getElementById('contactLink');
     const orderNowBtn = document.getElementById('orderNowBtn');
     const contactModal = document.getElementById('contactModal');
@@ -433,7 +420,6 @@
     const modalCall = document.getElementById('modalCall');
     const modalWhatsApp = document.getElementById('modalWhatsApp');
 
-    // Show modal helper
     function showContactModal() {
       if (!contactModal) return;
       modalPhone.textContent = TEL_DISPLAY;
@@ -448,7 +434,6 @@
       contactModal.setAttribute('aria-hidden', 'true');
     }
 
-    // Attach events: navbar Contact and Order Now both show modal
     if (contactLink) contactLink.addEventListener('click', (e) => {
       e.preventDefault();
       showContactModal();
@@ -458,10 +443,8 @@
       showContactModal();
     });
 
-    // modal buttons
     if (modalCancel) modalCancel.addEventListener('click', () => hideContactModal());
     if (modalCall) modalCall.addEventListener('click', () => {
-      // direct dial
       hideContactModal();
       window.location.href = 'tel:' + TEL_NUMBER;
     });
@@ -481,7 +464,6 @@
         }
       });
     });
-
   </script>
 
   <script>
@@ -512,8 +494,19 @@
           }));
 
           if (data.ok) {
-            const countEl = document.querySelector('.cart-count');
-            if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
+            // Kalau fungsi global refreshCartCount ada, pakai itu supaya pasti sama dengan server
+            if (typeof refreshCartCount === 'function') {
+              refreshCartCount();
+            } else {
+              // fallback: cuma naikin angka lokal
+              const countEl = document.querySelector('.cart-count');
+              if (countEl) {
+                const next = parseInt(countEl.textContent || '0', 10) + 1;
+                countEl.textContent = next;
+                if (next > 0) countEl.style.display = 'inline-block';
+              }
+            }
+
             alert('✅ Ditambahkan ke keranjang: ' + btn.dataset.name);
             if (data.redirect) window.location.href = data.redirect;
           } else {
@@ -533,7 +526,6 @@
         }
       });
     });
-    
   </script>
 
   <script>

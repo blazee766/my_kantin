@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pesanan Saya - KantinKamu</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
   :root {
-    --bg-page: #fdeff0;        
+    --bg-page: #fdeff0;
     --card-bg: #ffffff;
-    --text-dark: #0b2130;      
+    --text-dark: #0b2130;
     --muted: #6b7280;
-    --accent: #ff4766;          
+    --accent: #ff4766;
     --accent-dark: #e03f5d;
 
     --pending-bg: #fff3d6;
@@ -32,30 +35,78 @@
     --flash-error-text: #842323;
   }
 
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
   body {
-    background: var(--bg-page) fixed center/cover; 
-    min-height: 100vh;                             
+    background: var(--bg-page) fixed center/cover;
+    min-height: 100vh;
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: var(--bg-page);
+    box-shadow: 0 2px 8px rgba(10, 25, 40, 0.03);
+    position: static;   
+    top: auto;
+    border-bottom: none;
+    z-index: 10;
+  }
+
+  header .logo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header .logo i {
+    color: var(--accent);
+  }
+
+  header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+  }
+
+  header nav a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    padding-bottom: 4px;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+
+  header nav a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  header nav a.active {
+    color: var(--text-dark);
+    border-bottom: none;
   }
 
   .container {
     max-width: 1100px;
-    margin: 0 auto;       
-    padding: 28px 16px;    
+    margin: 0 auto;
+    padding: 28px 16px;
     box-sizing: border-box;
   }
 
   .page-head {
-    margin: 8px 0 18px; 
+    margin: 8px 0 18px;
     text-align: center;
   }
 
@@ -158,6 +209,9 @@
   }
 
   @media (max-width: 720px) {
+    header {
+      padding: 16px;
+    }
     .container { padding: 18px 12px; }
     .orders { gap: 12px; grid-template-columns: 1fr; }
   }
@@ -165,48 +219,90 @@
 
 </head>
 <body>
-<div class="container">
-  <div class="page-head">
-    <h2>Pesanan Saya</h2>
 
-    <?php if ($msg = session()->getFlashdata('success')): ?>
-      <div class="flash success"><?= esc($msg); ?></div>
-    <?php endif; ?>
-    <?php if ($msg = session()->getFlashdata('error')): ?>
-      <div class="flash error"><?= esc($msg); ?></div>
+  <header>
+    <div class="logo">
+      <i class="fas fa-utensils"></i> KantinKamu
+    </div>
+    <nav>
+      <ul>
+        <li><a href="<?= site_url('/'); ?>">Home</a></li>
+        <li><a href="<?= site_url('menu'); ?>">Menu</a></li>
+        <li><a href="<?= site_url('about'); ?>">About Us</a></li>
+        <li><a href="#">Gallery</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="page-head">
+      <h2>Pesanan Saya</h2>
+
+      <?php if ($msg = session()->getFlashdata('success')): ?>
+        <div class="flash success"><?= esc($msg); ?></div>
+      <?php endif; ?>
+      <?php if ($msg = session()->getFlashdata('error')): ?>
+        <div class="flash error"><?= esc($msg); ?></div>
+      <?php endif; ?>
+    </div>
+
+    <?php if (empty($orders)): ?>
+      <div class="empty">
+        Belum ada pesanan. Mulai dari
+        <a href="<?= site_url('menu'); ?>">Menu</a>.
+      </div>
+    <?php else: ?>
+      <?php
+        $statusLabelMap = [
+            'pending'    => 'Menunggu',
+            'menunggu'   => 'Menunggu',
+            'processing' => 'Diproses',
+            'diproses'   => 'Diproses',
+            'completed'  => 'Selesai',
+            'selesai'    => 'Selesai',
+            'canceled'   => 'Batal',
+            'batal'      => 'Batal',
+        ];
+
+        $statusClassMap = [
+            'pending'    => 'pending',
+            'menunggu'   => 'pending',
+            'processing' => 'pending',
+            'diproses'   => 'pending',
+            'completed'  => 'paid',
+            'selesai'    => 'paid',
+            'canceled'   => 'cancel',
+            'batal'      => 'cancel',
+        ];
+      ?>
+      <div class="orders">
+        <?php foreach ($orders as $o): ?>
+          <?php
+            $status = $o['status'] ?? 'pending';
+            $label  = $statusLabelMap[$status] ?? ucfirst($status);
+            $cls    = $statusClassMap[$status] ?? 'pending';
+          ?>
+          <div class="card">
+            <h3>#<?= esc($o['code'] ?? $o['id']); ?></h3>
+            <div class="meta">
+              Tanggal:
+              <?= date('d M Y H:i', strtotime($o['created_at'] ?? 'now')); ?>
+            </div>
+            <div class="meta">
+              Total:
+              <b>Rp <?= number_format((int)($o['total_amount'] ?? 0),0,',','.'); ?></b>
+            </div>
+            <div class="meta">
+              Status:
+              <span class="badge <?= $cls; ?>"><?= esc($label); ?></span>
+            </div>
+            <a class="btn-link" href="<?= site_url('p/orders/'.$o['id']); ?>">
+              Lihat Detail
+            </a>
+          </div>
+        <?php endforeach; ?>
+      </div>
     <?php endif; ?>
   </div>
-
-  <?php if (empty($orders)): ?>
-    <div class="empty">
-      Belum ada pesanan. Mulai dari <a href="<?= site_url('menu'); ?>" style="color:#FF6B35;font-weight:600;">Menu</a>.
-    </div>
-  <?php else: ?>
-    <div class="orders">
-      <?php foreach ($orders as $o): ?>
-        <?php
-          $st = strtolower($o['status'] ?? 'pending');
-          if ($st === 'paid') {
-              $cls = 'paid';
-              $label = 'Dibayar';
-          } elseif ($st === 'cancel' || $st === 'batal') {
-              $cls = 'cancel';
-              $label = 'Dibatalkan';
-          } else {
-              $cls = 'pending';
-              $label = 'Menunggu';
-          }
-        ?>
-        <div class="card">
-          <h3 style="margin:0 0 8px;">#<?= esc($o['code'] ?? $o['id']); ?></h3>
-          <div class="meta">Tanggal: <?= date('d M Y H:i', strtotime($o['created_at'] ?? 'now')); ?></div>
-          <div class="meta">Total: <b>Rp <?= number_format((int)($o['total_amount'] ?? 0),0,',','.'); ?></b></div>
-          <div class="meta">Status: <span class="badge <?= $cls; ?>"><?= esc($label); ?></span></div>
-          <a class="btn-link" href="<?= site_url('p/orders/'.$o['id']); ?>">Lihat Detail</a>
-        </div>
-      <?php endforeach; ?>
-    </div>
-  <?php endif; ?>
-</div>
 </body>
 </html>

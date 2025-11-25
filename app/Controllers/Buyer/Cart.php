@@ -19,7 +19,6 @@ class Cart extends BaseController
         return $u;
     }
 
-    // tampilkan isi keranjang sederhana
     public function index()
     {
         $u = $this->userOrRedirect();
@@ -29,7 +28,6 @@ class Cart extends BaseController
         return view('cart/index', ['cart' => $cart]);
     }
 
-    // tambah item ke keranjang (session)
     public function add()
     {
         $u = session('user');
@@ -37,11 +35,9 @@ class Cart extends BaseController
             return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
         }
 
-        // ---- BLOCK ADMIN: admin tidak boleh membuat pesanan ----
         if (isset($u['role']) && $u['role'] === 'admin') {
             return $this->response->setStatusCode(403)->setJSON(['ok' => false, 'msg' => 'Akun admin tidak diperbolehkan memesan.']);
         }
-        // --------------------------------------------------------
 
         $id  = (int) $this->request->getPost('id');
         $qty = max(1, (int) $this->request->getPost('qty'));
@@ -62,10 +58,8 @@ class Cart extends BaseController
             $orderModel = model(\App\Models\OrderModel::class);
             $itemModel  = model(\App\Models\OrderItemModel::class);
 
-            // Hitung total
             $total = $menu['price'] * $qty;
 
-            // Buat order baru
             $orderCode = 'ORD' . date('ymdHis');
             $orderId = $orderModel->insert([
                 'user_id'      => $u['id'],
@@ -75,7 +69,6 @@ class Cart extends BaseController
                 'created_at'   => date('Y-m-d H:i:s'),
             ]);
 
-            // Simpan item pesanan
             $itemModel->insert([
                 'order_id' => $orderId,
                 'menu_id'  => $menu['id'],
@@ -85,7 +78,6 @@ class Cart extends BaseController
                 'subtotal' => $total,
             ]);
 
-            // Kurangi stok
             $db->query("UPDATE menus SET stock = stock - ? WHERE id = ? AND stock >= ?", [$qty, $menu['id'], $qty]);
             if ($db->affectedRows() === 0) {
                 throw new \RuntimeException('Stok berubah, gagal menyimpan pesanan.');
@@ -106,7 +98,6 @@ class Cart extends BaseController
 
     public function updateQty()
     {
-        // optional: require login to update cart (keputusan produk)
         $u = session('user');
         if (!$u) {
             return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
@@ -154,17 +145,14 @@ class Cart extends BaseController
         return $this->response->setJSON(['count' => $count]);
     }
 
-    // ←— BAGIAN PENTING —→  Membuat pesanan dari isi keranjang
     public function checkout()
     {
         $u = $this->userOrRedirect();
         if ($u instanceof \CodeIgniter\HTTP\RedirectResponse) return $u;
 
-        // ---- BLOCK ADMIN: admin tidak boleh checkout ----
         if (isset($u['role']) && $u['role'] === 'admin') {
             return redirect()->to(site_url('cart'))->with('error', 'Admin tidak boleh membuat pesanan.');
         }
-        // --------------------------------------------------
 
         $cart = session('cart') ?? [];
         if (empty($cart)) {
@@ -197,7 +185,7 @@ class Cart extends BaseController
                 'user_id'      => (int)$u['id'],
                 'code'         => $code,
                 'total_amount' => $total,
-                'status'       => 'menunggu', // atau 'dibuat'
+                'status'       => 'pending', 
                 'created_at'   => date('Y-m-d H:i:s'),
             ]);
 
@@ -224,7 +212,7 @@ class Cart extends BaseController
 
             $db->transCommit();
             session()->remove('cart');
-            return redirect()->to(site_url('p/orders'))
+            return redirect()->to(site_url('/'))
                 ->with('success', 'Pesanan berhasil dibuat.');
         } catch (\Throwable $e) {
             $db->transRollback();

@@ -449,7 +449,7 @@
               ok: false
             }));
             if (data.ok) {
-              alert('✅ Item ditambahkan ke keranjang!');
+              alert('✅ Pesanan ditambahkan ke keranjang!');
               if (data.redirect) window.location.href = data.redirect;
             } else {
               alert(data.msg || 'Gagal menambahkan item.');

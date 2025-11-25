@@ -1,31 +1,79 @@
 <?php
+
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\OrderModel;
+use App\Models\OrderItemModel;
+use App\Models\UserModel;
 
 class Orders extends BaseController
 {
     public function index()
     {
-        $uid = (int) session('user.id');
-        $orders = (new OrderModel())
-            ->where('user_id',$uid)
-            ->orderBy('id','DESC')
+        $orderModel = model(OrderModel::class);
+        $userModel  = model(UserModel::class);
+
+        $orders = $orderModel
+            ->select('orders.*, users.name as customer_name')
+            ->join('users', 'users.id = orders.user_id', 'left')
+            ->orderBy('orders.created_at', 'DESC')
             ->findAll();
 
-        return view('buyer/orders/index', compact('orders'));
+        return view('admin/orders/index', [
+            'orders' => $orders,
+        ]);
     }
 
     public function show($id)
     {
-        $uid   = (int) session('user.id');
-        $order = (new OrderModel())->withItems((int)$id);
+        $id         = (int) $id;
+        $orderModel = model(OrderModel::class);
+        $itemModel  = model(OrderItemModel::class);
+        $userModel  = model(UserModel::class);
 
-        if (!$order || (int)$order['user_id'] !== $uid) {
-            return redirect()->to('/orders')->with('error','Pesanan tidak ditemukan.');
+        $order = $orderModel
+            ->select('orders.*, users.name as customer_name, users.building, users.room')
+            ->join('users', 'users.id = orders.user_id', 'left')
+            ->where('orders.id', $id)
+            ->first();
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')
+                ->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        return view('buyer/orders/show', compact('order'));
+        $items = $itemModel
+            ->where('order_id', $id)
+            ->findAll();
+
+        return view('admin/orders/show', [
+            'order' => $order,
+            'items' => $items,
+        ]);
     }
+
+    public function updateStatus($id)
+{
+    $id     = (int) $id;
+    $status = $this->request->getPost('status');
+
+    $allowed = ['pending', 'processing', 'completed', 'canceled'];
+
+    if (!in_array($status, $allowed, true)) {
+        return redirect()->back()->with('error', 'Status tidak dikenal.');
+    }
+
+    $orderModel = model(OrderModel::class);
+    $order      = $orderModel->find($id);
+
+    if (!$order) {
+        return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+    }
+
+    $orderModel->update($id, ['status' => $status]);
+
+    return redirect()->back()->with('success', 'Status pesanan diperbarui.');
+}
+
 }

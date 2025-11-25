@@ -48,7 +48,6 @@ class Menus extends BaseController
         }
         $id = $m->getInsertID();
 
-        // upload image (opsional)
         $file = $this->request->getFile('image');
         if ($file && $file->isValid()) {
             $newName = $id . '-' . time() . '.' . $file->getExtension();
@@ -86,7 +85,6 @@ class Menus extends BaseController
             return redirect()->back()->with('error', implode(' ', $m->errors()))->withInput();
         }
 
-        // ganti gambar jika ada upload baru
         $file = $this->request->getFile('image');
         if ($file && $file->isValid()) {
             $newName = $id . '-' . time() . '.' . $file->getExtension();
@@ -98,26 +96,35 @@ class Menus extends BaseController
 
     public function delete($id)
     {
-        (new MenuModel())->delete((int)$id);
+        $id = (int) $id;
+        $db = \Config\Database::connect();
+
+        $used = $db->table('order_items')->where('menu_id', $id)->countAllResults();
+
+        if ($used > 0) {
+            return redirect()->to('/admin/menus')
+                ->with('error', 'Menu ini sudah pernah dipesan sehingga tidak dapat dihapus. Silakan nonaktifkan menu saja.');
+        }
+
+        (new MenuModel())->delete($id);
         return redirect()->to('/admin/menus')->with('success', 'Menu dihapus.');
     }
+
     public function search()
     {
         $q = trim((string) $this->request->getGet('q'));
 
-        // limit opsional: ?limit=30 (dibatasi 5..100)
         $limitParam = (int) $this->request->getGet('limit');
         $limit = ($limitParam >= 5 && $limitParam <= 100) ? $limitParam : null;
 
         $model = new MenuModel();
 
-        // builder dasar: hanya menu aktif + kolom yang diperlukan
         $builder = $model->select(['id', 'name', 'description', 'price', 'image'])
             ->where('is_active', 1);
 
         if ($q === '') {
             $builder->orderBy('id', 'DESC');
-            $menus = $builder->findAll($limit ?? 20); // default list pendek
+            $menus = $builder->findAll($limit ?? 20);
         } else {
             $builder->groupStart()
                 ->like('name', $q)
@@ -128,7 +135,6 @@ class Menus extends BaseController
             $menus = $builder->findAll($limit ?? 40);
         }
 
-        // kembalikan JSON untuk dipakai JS di halaman
         return $this->response->setJSON([
             'ok'    => true,
             'q'     => $q,
@@ -138,7 +144,7 @@ class Menus extends BaseController
                     'id'    => (int) $m['id'],
                     'name'  => (string) $m['name'],
                     'desc'  => (string) ($m['description'] ?? ''),
-                    'price' => (float) $m['price'],   // konsisten dengan decimal
+                    'price' => (float) $m['price'],   
                     'image' => (string) ($m['image'] ?? ''),
                 ];
             }, $menus),
