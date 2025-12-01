@@ -30,20 +30,42 @@ class Cart extends BaseController
 
     public function add()
     {
+        $id  = (int) $this->request->getPost('id');
+        $qty = (int) $this->request->getPost('qty');
+
+        // normalisasi metode pengiriman
+        $deliveryMethod = $this->request->getPost('delivery_method');
+        if (! in_array($deliveryMethod, ['pickup', 'delivery'], true)) {
+            $deliveryMethod = 'pickup';
+        }
+        // simpan ke session supaya bisa dipakai di tempat lain juga
+        session()->set('delivery_method', $deliveryMethod);
+
         $u = session('user');
         if (!$u) {
-            return $this->response->setStatusCode(401)->setJSON(['ok' => false, 'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?']);
+            return $this->response
+                ->setStatusCode(401)
+                ->setJSON([
+                    'ok'  => false,
+                    'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?',
+                ]);
         }
 
+        // larang admin melakukan pemesanan
         if (isset($u['role']) && $u['role'] === 'admin') {
-            return $this->response->setStatusCode(403)->setJSON(['ok' => false, 'msg' => 'Akun admin tidak diperbolehkan memesan.']);
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON([
+                    'ok'  => false,
+                    'msg' => 'Akun admin tidak diperbolehkan memesan.',
+                ]);
         }
 
         $id  = (int) $this->request->getPost('id');
         $qty = max(1, (int) $this->request->getPost('qty'));
 
         $menu = model(\App\Models\MenuModel::class)->find($id);
-        if (!$menu || !(int)$menu['is_active']) {
+        if (!$menu || !(int) $menu['is_active']) {
             return $this->response->setJSON(['ok' => false, 'msg' => 'Menu tidak tersedia']);
         }
 
@@ -51,34 +73,54 @@ class Cart extends BaseController
             return $this->response->setJSON(['ok' => false, 'msg' => 'Stok tidak mencukupi']);
         }
 
-        $db = db_connect();
+        $db         = db_connect();
+        $orderModel = model(\App\Models\OrderModel::class);
+        $itemModel  = model(\App\Models\OrderItemModel::class);
+
         $db->transBegin();
 
         try {
-            $orderModel = model(\App\Models\OrderModel::class);
-            $itemModel  = model(\App\Models\OrderItemModel::class);
+            $total = (int) $menu['price'] * $qty;
 
-            $total = $menu['price'] * $qty;
+            // 1) Cek apakah sudah ada pesanan "pending/menunggu" milik user ini
+            $existingOrder = $orderModel->getPendingByUser((int) $u['id']);
 
-            $orderCode = 'ORD' . date('ymdHis');
-            $orderId = $orderModel->insert([
-                'user_id'      => $u['id'],
-                'code'         => $orderCode,
-                'total_amount' => $total,
-                'status'       => 'menunggu',
-                'created_at'   => date('Y-m-d H:i:s'),
-            ]);
-
+            if ($existingOrder) {
+                // Pakai order lama → update total_amount + delivery_method
+                $orderId = (int) $existingOrder['id'];
+                $orderModel->update($orderId, [
+                    'total_amount'     => (int) $existingOrder['total_amount'] + $total,
+                    'delivery_method'  => $deliveryMethod,
+                    // JANGAN pakai updated_at karena kolomnya tidak ada
+                ]);
+            } else {
+                // Belum ada → buat order baru
+                $orderCode = 'ORD' . date('ymdHis');
+                $orderId   = $orderModel->insert([
+                    'user_id'         => (int) $u['id'],
+                    'code'            => $orderCode,
+                    'total_amount'    => $total,
+                    'status'          => 'pending', // konsisten
+                    'delivery_method' => $deliveryMethod,
+                    'created_at'      => date('Y-m-d H:i:s'),
+                    // tidak ada updated_at
+                ]);
+            }
+            // 2) Tambah item ke order_items (SELALU INSERT BARU)
             $itemModel->insert([
                 'order_id' => $orderId,
                 'menu_id'  => $menu['id'],
                 'name'     => $menu['name'],
-                'price'    => $menu['price'],
+                'price'    => (int) $menu['price'],
                 'qty'      => $qty,
                 'subtotal' => $total,
             ]);
 
-            $db->query("UPDATE menus SET stock = stock - ? WHERE id = ? AND stock >= ?", [$qty, $menu['id'], $qty]);
+            // 3) Kurangi stok
+            $db->query(
+                "UPDATE menus SET stock = stock - ? WHERE id = ? AND stock >= ?",
+                [$qty, $menu['id'], $qty]
+            );
             if ($db->affectedRows() === 0) {
                 throw new \RuntimeException('Stok berubah, gagal menyimpan pesanan.');
             }
@@ -86,13 +128,17 @@ class Cart extends BaseController
             $db->transCommit();
 
             return $this->response->setJSON([
-                'ok' => true,
-                'msg' => 'Pesanan berhasil dibuat.',
-                'redirect' => site_url('p/orders')
+                'ok'       => true,
+                'msg'      => 'Pesanan berhasil dibuat / ditambahkan.',
+                'redirect' => site_url('p/orders'),
             ]);
         } catch (\Throwable $e) {
             $db->transRollback();
-            return $this->response->setJSON(['ok' => false, 'msg' => $e->getMessage()]);
+            return $this->response->setJSON([
+                'ok'  => false,
+                // kalau mau lihat detail error, sementara bisa kirim $e->getMessage()
+                'msg' => 'Gagal menambahkan item: ' . $e->getMessage(),
+            ]);
         }
     }
 
@@ -185,7 +231,7 @@ class Cart extends BaseController
                 'user_id'      => (int)$u['id'],
                 'code'         => $code,
                 'total_amount' => $total,
-                'status'       => 'pending', 
+                'status'       => 'pending',
                 'created_at'   => date('Y-m-d H:i:s'),
             ]);
 

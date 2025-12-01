@@ -167,6 +167,113 @@
         padding: 7px 10px
       }
     }
+
+        /* === Styling khusus modal delivery === */
+    #deliveryModal {
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity .25s ease, background .25s ease;
+    }
+
+    #deliveryModal.show {
+      opacity: 1;
+    }
+
+    #deliveryModal .contact-modal {
+      max-width: 480px;
+      border-radius: 20px;
+      padding: 20px 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, .25);
+      transform: translateY(18px) scale(.94);
+      opacity: 0;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+
+    #deliveryModal.show .contact-modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    #deliveryModal .delivery-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    #deliveryModal .delivery-pill {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    #deliveryModal .delivery-pill .icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4ff;
+      color: #4f46e5;
+      flex-shrink: 0;
+    }
+
+    #deliveryModal .delivery-pill .text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    #deliveryModal .delivery-pill .title {
+      font-weight: 600;
+      font-size: 0.94rem;
+      color: #111827;
+    }
+
+    #deliveryModal .delivery-pill .subtitle {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    #deliveryModal .delivery-pill.primary .icon {
+      background: #ffe4ea;
+      color: #ef4444;
+    }
+
+    #deliveryModal .delivery-pill.primary .title {
+      color: #b91c1c;
+    }
+
+    #deliveryModal .delivery-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, .15);
+      border-color: #fecaca;
+      background: #fff7f7;
+    }
+
+    #deliveryModal .delivery-pill:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, .18);
+    }
+
+    @media (max-width:480px) {
+      #deliveryModal .contact-modal {
+        padding: 18px 16px;
+      }
+
+      #deliveryModal .delivery-pill {
+        border-radius: 16px;
+      }
+    }
   </style>
 </head>
 
@@ -278,7 +385,6 @@
           <li><a href="<?= base_url('menu'); ?>">Menu</a></li>
           <li><a href="https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>" id="contactLink">Contact</a></li>
           <li><a href="#">About Us</a></li>
-          <li><a href="#">Gallery</a></li>
         </ul>
       </nav>
 
@@ -380,6 +486,37 @@
       </div>
     </div>
   </div>
+    <!-- Modal pilihan metode pengambilan pesanan -->
+  <div class="contact-modal-backdrop" id="deliveryModal" aria-hidden="true">
+    <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="deliveryModalTitle">
+      <h3 id="deliveryModalTitle" style="margin-bottom:4px;">Pilih Metode Pengambilan</h3>
+      <p style="margin:4px 0 14px;color:#6b7280;font-size:0.92rem;">
+        Silakan pilih apakah pesanan akan diantar ke tempatmu atau kamu ambil sendiri di kantin.
+      </p>
+
+      <div class="delivery-options">
+        <button type="button" class="delivery-pill" id="deliveryPickupBtn">
+          <div class="icon">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="text">
+            <span class="title">Ambil Sendiri</span>
+            <span class="subtitle">Datang ke kantin, tanpa biaya antar.</span>
+          </div>
+        </button>
+
+        <button type="button" class="delivery-pill primary" id="deliveryDeliveryBtn">
+          <div class="icon">
+            <i class="fas fa-motorcycle"></i>
+          </div>
+          <div class="text">
+            <span class="title">Diantar</span>
+            <span class="subtitle">Pesanan diantar ke lokasi kamu.</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
     window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
@@ -468,93 +605,176 @@
 
   <script>
     document.querySelectorAll('.add-to-cart').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const payload = new URLSearchParams();
-        payload.append('id', btn.dataset.id);
-        payload.append('qty', '1');
+      btn.addEventListener('click', () => {
 
-        try {
-          const res = await fetch('<?= base_url('cart/add'); ?>', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: payload.toString()
-          });
+        // buka modal di tengah, tunggu user pilih
+        openDeliveryModal(async (deliveryMethod) => {
+          const payload = new URLSearchParams();
+          payload.append('id', btn.dataset.id);
+          payload.append('qty', '1');
+          payload.append('delivery_method', deliveryMethod); // <─ kirim ke backend
 
-          if (res.status === 401 || res.redirected || res.status === 302) {
-            const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
-            if (go) window.location.href = '<?= site_url('login'); ?>';
-            return;
-          }
+          try {
+            const res = await fetch('<?= base_url('cart/add'); ?>', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: payload.toString()
+            });
 
-          const data = await res.json().catch(() => ({
-            ok: false,
-            msg: 'Respon tidak valid'
-          }));
-
-          if (data.ok) {
-            // Kalau fungsi global refreshCartCount ada, pakai itu supaya pasti sama dengan server
-            if (typeof refreshCartCount === 'function') {
-              refreshCartCount();
-            } else {
-              // fallback: cuma naikin angka lokal
-              const countEl = document.querySelector('.cart-count');
-              if (countEl) {
-                const next = parseInt(countEl.textContent || '0', 10) + 1;
-                countEl.textContent = next;
-                if (next > 0) countEl.style.display = 'inline-block';
-              }
-            }
-
-            alert('✅ Ditambahkan ke keranjang: ' + btn.dataset.name);
-            if (data.redirect) window.location.href = data.redirect;
-          } else {
-            const msg = (data.msg || '').toLowerCase();
-            if (msg.includes('login') || msg.includes('unauth') || msg.includes('silakan login')) {
+            // Belum login → paksa ke halaman login
+            if (res.status === 401 || res.redirected || res.status === 302) {
               const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
               if (go) window.location.href = '<?= site_url('login'); ?>';
               return;
             }
 
-            alert(data.msg || 'Gagal menambah.');
-            if (typeof refreshCartCount === 'function') refreshCartCount();
+            const data = await res.json().catch(() => ({
+              ok: false,
+              msg: 'Respon tidak valid'
+            }));
+
+            if (data.ok) {
+              const countEl = document.querySelector('.cart-count');
+
+              if (countEl) {
+                let next;
+
+                // Kalau API sudah kirim total keranjang, pakai itu
+                if (typeof data.cart_count !== 'undefined') {
+                  next = parseInt(data.cart_count, 10);
+                } else {
+                  // Kalau tidak, naikkan 1 dari angka saat ini
+                  next = parseInt(countEl.textContent || '0', 10);
+                  if (isNaN(next)) next = 0;
+                  next += 1;
+                }
+
+                countEl.textContent = next;
+                if (next > 0) {
+                  countEl.style.display = 'inline-block';
+                }
+              }
+
+              //alert('Pesanan ditambahkan ke keranjang!');
+            } else {
+              const msg = (data.msg || '').toLowerCase();
+              if (msg.includes('login') || msg.includes('unauth') || msg.includes('silakan login')) {
+                const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
+                if (go) window.location.href = '<?= site_url('login'); ?>';
+                return;
+              }
+
+              alert(data.msg || 'Gagal menambah.');
+            }
+
+          } catch (err) {
+            console.error(err);
+            alert('Terjadi kesalahan jaringan. Coba lagi.');
           }
-        } catch (err) {
-          console.error(err);
-          alert('Terjadi kesalahan jaringan. Coba lagi.');
-        }
+
+        }); // end openDeliveryModal
+      });
+    });
+  </script>
+
+  <script>
+    // ===== Helper modal delivery (di tengah) =====
+    let pendingAddToCartCallback = null;
+
+        function openDeliveryModal(onChoice) {
+      const dm = document.getElementById('deliveryModal');
+      if (!dm) {
+        // fallback kalau modal tidak ada → anggap pickup
+        onChoice('pickup');
+        return;
+      }
+      pendingAddToCartCallback = onChoice;
+      dm.style.display = 'flex';
+      dm.setAttribute('aria-hidden', 'false');
+
+      // kecil animasi smooth
+      requestAnimationFrame(() => {
+        dm.classList.add('show');
+      });
+    }
+
+    function closeDeliveryModal() {
+      const dm = document.getElementById('deliveryModal');
+      if (!dm) return;
+
+      dm.classList.remove('show');
+      dm.setAttribute('aria-hidden', 'true');
+      pendingAddToCartCallback = null;
+
+      // tunggu animasi selesai baru hide
+      setTimeout(() => {
+        dm.style.display = 'none';
+      }, 220);
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dm = document.getElementById('deliveryModal');
+      if (!dm) return;
+
+      const btnPickup = document.getElementById('deliveryPickupBtn');
+      const btnDelivery = document.getElementById('deliveryDeliveryBtn');
+
+      if (btnPickup) {
+        btnPickup.addEventListener('click', () => {
+          if (pendingAddToCartCallback) pendingAddToCartCallback('pickup');
+          closeDeliveryModal();
+        });
+      }
+
+      if (btnDelivery) {
+        btnDelivery.addEventListener('click', () => {
+          if (pendingAddToCartCallback) pendingAddToCartCallback('delivery');
+          closeDeliveryModal();
+        });
+      }
+
+      // klik area gelap untuk tutup
+      dm.addEventListener('click', (e) => {
+        if (e.target === dm) closeDeliveryModal();
       });
     });
   </script>
 
   <script>
     async function addToCart(id) {
-      const payload = new URLSearchParams();
-      payload.append('id', id);
-      payload.append('qty', '1');
+      // buka modal, tunggu user pilih
+      openDeliveryModal(async (deliveryMethod) => {
+        const payload = new URLSearchParams();
+        payload.append('id', id);
+        payload.append('qty', '1');
+        payload.append('delivery_method', deliveryMethod);
 
-      const res = await fetch('<?= site_url('cart/add'); ?>', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: payload.toString()
+        const res = await fetch('<?= site_url('cart/add'); ?>', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: payload.toString()
+        });
+
+        if (res.status === 401) {
+          const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
+          if (go) window.location.href = '<?= site_url('login'); ?>';
+          return;
+        }
+
+        const data = await res.json().catch(() => ({
+          ok: false
+        }));
+        alert(data.ok ? 'Ditambahkan ke keranjang' : (data.msg || 'Gagal menambah'));
       });
-
-      if (res.status === 401) {
-        const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
-        if (go) window.location.href = '<?= site_url('login'); ?>';
-        return;
-      }
-
-      const data = await res.json().catch(() => ({
-        ok: false
-      }));
-      alert(data.ok ? 'Ditambahkan ke keranjang' : (data.msg || 'Gagal menambah'));
     }
     if (typeof refreshCartCount === 'function') refreshCartCount();
   </script>
+
 </body>
 
 </html>

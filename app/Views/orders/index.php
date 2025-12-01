@@ -229,7 +229,6 @@
         <li><a href="<?= site_url('/'); ?>">Home</a></li>
         <li><a href="<?= site_url('menu'); ?>">Menu</a></li>
         <li><a href="<?= site_url('about'); ?>">About Us</a></li>
-        <li><a href="#">Gallery</a></li>
       </ul>
     </nav>
   </header>
@@ -281,6 +280,12 @@
             $status = $o['status'] ?? 'pending';
             $label  = $statusLabelMap[$status] ?? ucfirst($status);
             $cls    = $statusClassMap[$status] ?? 'pending';
+
+            // --- teks metode delivery (baru) ---
+            $deliveryRaw  = $o['delivery_method'] ?? 'pickup';          // pickup / delivery
+            $deliveryText = $deliveryRaw === 'delivery'
+                ? 'Diantar'
+                : 'Ambil Sendiri';
           ?>
           <div class="card">
             <h3>#<?= esc($o['code'] ?? $o['id']); ?></h3>
@@ -291,6 +296,11 @@
             <div class="meta">
               Total:
               <b>Rp <?= number_format((int)($o['total_amount'] ?? 0),0,',','.'); ?></b>
+            </div>
+            <!-- Metode pengambilan / pengantaran (baru) -->
+            <div class="meta">
+              Metode:
+              <b><?= esc($deliveryText); ?></b>
             </div>
             <div class="meta">
               Status:

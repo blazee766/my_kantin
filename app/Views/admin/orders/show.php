@@ -172,15 +172,23 @@ include APPPATH . 'Views/admin/partials/head.php';
     $label      = $labelMap[$status] ?? ucfirst($status);
     $badgeClass = $badgeMap[$status] ?? 'badge';
     ?>
-    Status:
-    <span class="<?= esc($badgeClass); ?>"><?= esc($label); ?></span>
-
     <div class="card">
         <h2>Detail Pesanan #<?= esc($order['code']); ?></h2>
+        <?php
+        $deliveryLabel = '-';
+        $dm = $order['delivery_method'] ?? null;
+
+        if ($dm === 'pickup') {
+            $deliveryLabel = 'Ambil Sendiri';
+        } elseif ($dm === 'delivery') {
+            $deliveryLabel = 'Diantar';
+        }
+        ?>
         <p class="muted">
             Tanggal: <?= esc(date('d M Y H:i', strtotime($order['created_at']))); ?><br>
-            Total: <strong>Rp <?= number_format((int)$order['total_amount'], 0, ',', '.'); ?></strong><br>
             Pemesan: <?= esc($order['customer_name'] ?? '-'); ?><br>
+            Total: <strong>Rp <?= number_format((int)$order['total_amount'], 0, ',', '.'); ?></strong><br>
+            Metode: <strong><?= esc($deliveryLabel); ?></strong><br>
             Lokasi: <?= esc(($order['building'] ?? '-') . ' ' . ($order['room'] ?? '')); ?><br>
             Status:
             <span class="badge <?= $badgeClass; ?>"><?= $label; ?></span>
@@ -222,14 +230,23 @@ include APPPATH . 'Views/admin/partials/head.php';
                 </tr>
             </thead>
             <tbody>
+                <?php $grandTotal = 0; ?>
                 <?php foreach ($items as $it): ?>
                     <tr>
                         <td><?= esc($it['name']); ?></td>
-                        <td><?= (int)$it['qty']; ?></td>
+                        <td><?= $it['qty']; ?></td>
                         <td>Rp <?= number_format((int)$it['price'], 0, ',', '.'); ?></td>
                         <td>Rp <?= number_format((int)$it['subtotal'], 0, ',', '.'); ?></td>
                     </tr>
+                    <?php $grandTotal += (int)$it['subtotal']; ?>
                 <?php endforeach; ?>
+
+                <tr>
+                    <td style="font-weight:bold;">Total</td>
+                    <td></td>
+                    <td></td>
+                    <td style="font-weight:bold;">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
+                </tr>
             </tbody>
         </table>
 
