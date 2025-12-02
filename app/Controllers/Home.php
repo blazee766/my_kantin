@@ -13,21 +13,54 @@ class Home extends BaseController
             ->where('is_popular', 1)
             ->orderBy('name', 'ASC')
             ->findAll();
-        return view('home/index_full', ['menus' => $menus]);
+
+        // === Ambil daftar RUANGAN global (bukan per user) ===
+        $addresses = [];
+        $user = session('user');
+
+        if ($user) {
+            $addresses = (new \App\Models\UserAddressModel())
+                ->orderBy('is_default', 'DESC')
+                ->orderBy('id', 'ASC')
+                ->findAll();   // <--- TANPA where('user_id', ...)
+        }
+        // ====================================================
+
+        return view('home/index_full', [
+            'menus'     => $menus,
+            'addresses' => $addresses,
+        ]);
     }
+
 
     public function about()
     {
         return view('home/about');
     }
+
     public function menu()
     {
         $catSlug     = $this->request->getGet('cat');
-        $categories  = model(\App\Models\CategoryModel::class)->orderBy('name', 'ASC')->findAll();
+        $categories  = model(\App\Models\CategoryModel::class)
+            ->orderBy('name', 'ASC')
+            ->findAll();
+
+        // === Ambil daftar RUANGAN global (bukan per user) ===
+        $addresses = [];
+        $user = session('user');
+
+        if ($user) {
+            $addresses = (new \App\Models\UserAddressModel())
+                ->orderBy('is_default', 'DESC')
+                ->orderBy('id', 'ASC')
+                ->findAll();   // <--- TANPA where('user_id', ...)
+        }
+        // ====================================================
 
         return view('home/menu', [
             'categories' => $categories,
-            'activeSlug' => $catSlug
+            'activeSlug' => $catSlug,
+            'addresses'  => $addresses,
         ]);
     }
 

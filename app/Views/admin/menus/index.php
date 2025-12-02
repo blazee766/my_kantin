@@ -14,7 +14,20 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     --danger: #ff4d4f;
   }
 
-  html, body { height: 100%; margin: 0 }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0
+  }
+
   body {
     min-height: 100vh;
     background: var(--bg-page);
@@ -34,8 +47,15 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     box-sizing: border-box;
   }
 
-  .card h1 { margin: 0 0 12px; color: var(--text-dark); font-size: 1.25rem }
-  .mb-2 { margin-bottom: 12px }
+  .card h1 {
+    margin: 0 0 12px;
+    color: var(--text-dark);
+    font-size: 1.25rem
+  }
+
+  .mb-2 {
+    margin-bottom: 12px
+  }
 
   .btn {
     display: inline-flex;
@@ -50,14 +70,23 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     font-weight: 600;
     cursor: pointer;
   }
-  .btn:hover { box-shadow: 0 8px 20px rgba(10, 25, 40, 0.06) }
+
+  .btn:hover {
+    box-shadow: 0 8px 20px rgba(10, 25, 40, 0.06)
+  }
+
   .btn.btn-primary {
     background: var(--accent);
     color: #fff;
     border: none;
     box-shadow: 0 8px 20px rgba(224, 63, 93, 0.08)
   }
-  .btn.btn-danger { background: var(--danger); color:#fff; border:none }
+
+  .btn.btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none
+  }
 
   table {
     width: 100%;
@@ -65,6 +94,7 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     margin-top: 10px;
     background: transparent;
   }
+
   thead th {
     text-align: left;
     padding: 12px 10px;
@@ -73,6 +103,7 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
   }
+
   tbody td {
     padding: 12px 10px;
     border-bottom: 1px solid #f4f3f4;
@@ -101,8 +132,14 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
     color: var(--text-dark)
   }
 
-  td[style*="white-space:nowrap"] { white-space: nowrap }
-  td .btn { padding: 6px 10px; font-size: .92rem }
+  td[style*="white-space:nowrap"] {
+    white-space: nowrap
+  }
+
+  td .btn {
+    padding: 6px 10px;
+    font-size: .92rem
+  }
 
   .alert {
     padding: 12px 14px;
@@ -115,15 +152,34 @@ include APPPATH . 'Views/admin/partials/head.php'; ?>
   }
 
   @media (max-width:880px) {
-    .card { padding:16px }
-    thead th, tbody td { padding:10px 8px }
-    .thumb { width:48px; height:48px }
+    .card {
+      padding: 16px
+    }
+
+    thead th,
+    tbody td {
+      padding: 10px 8px
+    }
+
+    .thumb {
+      width: 48px;
+      height: 48px
+    }
   }
 
   @media (max-width:520px) {
-    .card { margin:12px; padding:12px }
-    table { font-size:.95rem }
-    .btn { padding:7px 10px }
+    .card {
+      margin: 12px;
+      padding: 12px
+    }
+
+    table {
+      font-size: .95rem
+    }
+
+    .btn {
+      padding: 7px 10px
+    }
   }
 </style>
 

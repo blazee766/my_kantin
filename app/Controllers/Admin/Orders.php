@@ -33,8 +33,15 @@ class Orders extends BaseController
         $userModel  = model(UserModel::class);
 
         $order = $orderModel
-            ->select('orders.*, users.name as customer_name, users.building, users.room')
+            ->select(
+                'orders.*,
+             users.name AS customer_name,
+             ua.building AS address_building,
+             ua.room     AS address_room,
+             ua.note     AS address_note'
+            )
             ->join('users', 'users.id = orders.user_id', 'left')
+            ->join('user_addresses ua', 'ua.id = orders.delivery_address_id', 'left')
             ->where('orders.id', $id)
             ->first();
 
@@ -53,27 +60,27 @@ class Orders extends BaseController
         ]);
     }
 
+
     public function updateStatus($id)
-{
-    $id     = (int) $id;
-    $status = $this->request->getPost('status');
+    {
+        $id     = (int) $id;
+        $status = $this->request->getPost('status');
 
-    $allowed = ['pending', 'processing', 'completed', 'canceled'];
+        $allowed = ['pending', 'processing', 'completed', 'canceled'];
 
-    if (!in_array($status, $allowed, true)) {
-        return redirect()->back()->with('error', 'Status tidak dikenal.');
+        if (!in_array($status, $allowed, true)) {
+            return redirect()->back()->with('error', 'Status tidak dikenal.');
+        }
+
+        $orderModel = model(OrderModel::class);
+        $order      = $orderModel->find($id);
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        $orderModel->update($id, ['status' => $status]);
+
+        return redirect()->back()->with('success', 'Status pesanan diperbarui.');
     }
-
-    $orderModel = model(OrderModel::class);
-    $order      = $orderModel->find($id);
-
-    if (!$order) {
-        return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
-    }
-
-    $orderModel->update($id, ['status' => $status]);
-
-    return redirect()->back()->with('success', 'Status pesanan diperbarui.');
-}
-
 }

@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-
     :root {
       --bg-page: #fdeff0;
       --hero-pale: #fdeff0;
@@ -24,6 +23,14 @@
       --fab-accent: var(--accent);
       --skeleton: #f3f3f5;
       --whatsapp: #25D366;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+      overflow-x: hidden;
     }
 
     body {
@@ -305,18 +312,20 @@
       }
     }
 
-        /* === Styling khusus modal delivery === */
-    #deliveryModal {
+    #deliveryModal,
+    #addressModal {
       backdrop-filter: blur(3px);
       opacity: 0;
       transition: opacity .25s ease, background .25s ease;
     }
 
-    #deliveryModal.show {
+    #deliveryModal.show,
+    #addressModal.show {
       opacity: 1;
     }
 
-    #deliveryModal .contact-modal {
+    #deliveryModal .contact-modal,
+    #addressModal .contact-modal {
       max-width: 480px;
       border-radius: 20px;
       padding: 20px 22px;
@@ -326,7 +335,8 @@
       transition: transform .25s ease, opacity .25s ease;
     }
 
-    #deliveryModal.show .contact-modal {
+    #deliveryModal.show .contact-modal,
+    #addressModal.show .contact-modal {
       transform: translateY(0) scale(1);
       opacity: 1;
     }
@@ -338,7 +348,44 @@
       margin-top: 4px;
     }
 
-    #deliveryModal .delivery-pill {
+    #addressModal .delivery-options {
+      display: none;
+      margin-top: 8px;
+    }
+
+    #addressModal.open .delivery-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .dropdown-trigger {
+      border: 1px solid #e5e7eb;
+      padding: 12px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: #fff;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .dropdown-trigger i {
+      font-size: 18px;
+      color: #555;
+      transition: transform .25s;
+    }
+
+    #addressModal.open .dropdown-trigger i {
+      transform: rotate(180deg);
+    }
+
+    #deliveryModal .delivery-pill,
+    #addressModal .delivery-pill {
       width: 100%;
       border: 1px solid #e5e7eb;
       background: #fff;
@@ -352,7 +399,8 @@
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
     }
 
-    #deliveryModal .delivery-pill .icon {
+    #deliveryModal .delivery-pill .icon,
+    #addressModal .delivery-pill .icon {
       width: 34px;
       height: 34px;
       border-radius: 999px;
@@ -364,55 +412,64 @@
       flex-shrink: 0;
     }
 
-    #deliveryModal .delivery-pill .text {
+    #deliveryModal .delivery-pill .text,
+    #addressModal .delivery-pill .text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    #deliveryModal .delivery-pill .title {
+    #deliveryModal .delivery-pill .title,
+    #addressModal .delivery-pill .title {
       font-weight: 600;
       font-size: 0.94rem;
       color: #111827;
     }
 
-    #deliveryModal .delivery-pill .subtitle {
+    #deliveryModal .delivery-pill .subtitle,
+    #addressModal .delivery-pill .subtitle {
       font-size: 0.8rem;
       color: #6b7280;
     }
 
-    #deliveryModal .delivery-pill.primary .icon {
+    #deliveryModal .delivery-pill.primary .icon,
+    #addressModal .delivery-pill.primary .icon {
       background: #ffe4ea;
       color: #ef4444;
     }
 
-    #deliveryModal .delivery-pill.primary .title {
+    #deliveryModal .delivery-pill.primary .title,
+    #addressModal .delivery-pill.primary .title {
       color: #b91c1c;
     }
 
-    #deliveryModal .delivery-pill:hover {
+    #deliveryModal .delivery-pill:hover,
+    #addressModal .delivery-pill:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(15, 23, 42, .15);
       border-color: #fecaca;
       background: #fff7f7;
     }
 
-    #deliveryModal .delivery-pill:active {
+    #deliveryModal .delivery-pill:active,
+    #addressModal .delivery-pill:active {
       transform: translateY(0);
       box-shadow: 0 4px 12px rgba(15, 23, 42, .18);
     }
 
     @media (max-width:480px) {
-      #deliveryModal .contact-modal {
+
+      #deliveryModal .contact-modal,
+      #addressModal .contact-modal {
         padding: 18px 16px;
       }
 
-      #deliveryModal .delivery-pill {
+      #deliveryModal .delivery-pill,
+      #addressModal .delivery-pill {
         border-radius: 16px;
       }
     }
 
-    /* animasi angka +1 saat masuk keranjang */
     .cart-burst {
       position: fixed;
       font-weight: 700;
@@ -436,6 +493,22 @@
       }
     }
 
+    .header-cart {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+
+    .header-cart i {
+      font-size: 18px;
+      color: var(--text-dark);
+    }
+
+    .header-cart:hover i {
+      color: var(--accent);
+    }
   </style>
 
 </head>
@@ -445,7 +518,7 @@
   <?php
   $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
-  $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone)); 
+  $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
   $waMessage = rawurlencode("Halo KantinKamu, saya ingin memesan.");
   $telDisplay = $contactPhone;
   ?>
@@ -460,9 +533,9 @@
 
         <li><a href="#">About Us</a></li>
         <li><a href="<?= site_url('p/orders'); ?>" class="btn header-cart" aria-label="Keranjang">
-              <i class="fas fa-shopping-bag"></i>
-              <span class="cart-count" style="display:none">0</span>
-            </a></li>
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-count" style="display:none">0</span>
+          </a></li>
       </ul>
     </nav>
   </header>
@@ -497,7 +570,6 @@
       </div>
     </div>
   </div>
-    <!-- Modal pilihan metode pengambilan pesanan -->
   <div class="contact-modal-backdrop" id="deliveryModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="deliveryModalTitle">
       <h3 id="deliveryModalTitle" style="margin-bottom:4px;">Pilih Metode Pengambilan</h3>
@@ -529,15 +601,64 @@
     </div>
   </div>
 
+  <div class="contact-modal-backdrop" id="addressModal" aria-hidden="true">
+    <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle">
+      <h3 id="addressModalTitle" style="margin-bottom:4px;">Pilih Ruangan Pengantaran</h3>
+      <p style="margin:4px 0 14px;color:#6b7280;font-size:0.92rem;">
+        Pilih ruangan / lokasi tempat pesanan akan diantar.
+      </p>
+
+      <?php if (!empty($addresses ?? [])): ?>
+
+        <div class="dropdown-trigger" id="addressDropdownTrigger">
+          Pilih Ruangan
+          <i class="fas fa-chevron-down"></i>
+        </div>
+
+        <div class="delivery-options">
+          <?php foreach (($addresses ?? []) as $addr): ?>
+            <button type="button"
+              class="delivery-pill address-pill"
+              data-address-id="<?= esc($addr['id']); ?>">
+              <div class="icon">
+                <i class="fas fa-location-dot"></i>
+              </div>
+              <div class="text">
+                <span class="title">
+                  <?= esc($addr['building']); ?>
+                  <?php if (!empty($addr['room'])): ?>
+                    - <?= esc($addr['room']); ?>
+                  <?php endif; ?>
+                </span>
+                <?php if (!empty($addr['note'])): ?>
+                  <span class="subtitle"><?= esc($addr['note']); ?></span>
+                <?php endif; ?>
+              </div>
+            </button>
+          <?php endforeach; ?>
+        </div>
+
+      <?php else: ?>
+        <p style="margin:4px 0 0;color:#ef4444;font-size:0.9rem;">
+          Kamu belum menyimpan ruangan/alamat. Silakan atur dulu di profil atau informasikan ke kasir.
+        </p>
+        <div class="actions">
+          <button type="button" id="addressModalClose" class="btn">Tutup</button>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
   <script>
     (function() {
       const grid = document.getElementById('menuGrid');
       const tabs = Array.from(document.querySelectorAll('#tabs .tab'));
 
       const app = {
-        api: '<?= rtrim(site_url(),  '/'); ?>',
+        api: '<?= rtrim(base_url(),  '/'); ?>', // <<< PAKAI base_url, bukan site_url
         asset: '<?= rtrim(base_url(), '/'); ?>'
       };
+
       const prettyBase = '<?= rtrim(base_url(), '/'); ?>';
       const activeInitial = '<?= esc($activeSlug ?? ''); ?>';
 
@@ -558,9 +679,9 @@
             <div class="thumb">
               <img src="${img}" alt="${m.name}">
               ${disabled
-                ? `<button class="fab" disabled title="Habis"><i class="fas fa-times"></i></button>`
-                : `<button class="fab add-to-cart" data-id="${m.id}" title="Tambah ke keranjang"><i class="fas fa-plus"></i></button>`
-              }
+              ? `<button class="fab" disabled title="Habis"><i class="fas fa-times"></i></button>`
+              : `<button class="fab add-to-cart" data-id="${m.id}" title="Tambah ke keranjang"><i class="fas fa-plus"></i></button>`
+            }
             </div>
 
             <div class="card-body">
@@ -590,21 +711,23 @@
         bindAddButtons();
       }
 
-            function bindAddButtons() {
+      function bindAddButtons() {
         document.querySelectorAll('.add-to-cart').forEach(btn => {
           btn.addEventListener('click', (ev) => {
-            // simpan posisi klik SEKARANG (event nanti sudah tidak valid)
             const clickX = ev.clientX;
             const clickY = ev.clientY;
 
-            // buka modal delivery, tunggu user memilih
-            openDeliveryModal(async (deliveryMethod) => {
+            openDeliveryModal(async (deliveryMethod, addressId) => {
               const payload = new URLSearchParams();
               payload.append('id', btn.dataset.id);
               payload.append('qty', '1');
               payload.append('delivery_method', deliveryMethod);
 
-              const res = await fetch(`${app.api}/cart/add`, {
+              if (deliveryMethod === 'delivery' && addressId) {
+                payload.append('delivery_address_id', addressId);
+              }
+
+              const res = await fetch('<?= base_url('cart/add'); ?>', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/x-www-form-urlencoded'
@@ -623,10 +746,13 @@
               }));
 
               if (data.ok) {
-                // 1) animasi +1 di posisi klik
+                /* if (data.redirect) {
+                   window.location.href = data.redirect;
+                   return;
+                 } */
+
                 showCartBurst(clickX, clickY);
 
-                // 2) update badge jumlah keranjang di header
                 const countEl = document.querySelector('.cart-count');
                 if (countEl) {
                   let next;
@@ -642,13 +768,11 @@
                     countEl.style.display = 'inline-block';
                   }
                 }
-
-                // kalau mau, boleh pakai alert / toast, tapi ini tidak wajib
-                // alert('✅ Pesanan ditambahkan ke keranjang!');
               } else {
                 alert(data.msg || 'Gagal menambahkan item.');
               }
-            }); // end openDeliveryModal
+
+            });
           });
         });
       }
@@ -726,15 +850,13 @@
         setTimeout(() => dot.remove(), 650);
       }
 
-
-      // ===== Helper modal delivery (ambil sendiri / diantar) =====
       let pendingAddToCartCallback = null;
+      let pendingAddressCallback = null;
 
       function openDeliveryModal(onChoice) {
         const dm = document.getElementById('deliveryModal');
         if (!dm) {
-          // fallback kalau modal tidak ada → anggap pickup
-          onChoice('pickup');
+          onChoice('pickup', null);
           return;
         }
         pendingAddToCartCallback = onChoice;
@@ -752,45 +874,115 @@
 
         dm.classList.remove('show');
         dm.setAttribute('aria-hidden', 'true');
-        pendingAddToCartCallback = null;
 
         setTimeout(() => {
           dm.style.display = 'none';
         }, 220);
       }
 
-      // binding tombol di modal delivery
+      function openAddressModal(onSelect) {
+        const am = document.getElementById('addressModal');
+        if (!am) {
+          onSelect(null);
+          return;
+        }
+        const hasButtons = am.querySelectorAll('.address-pill').length > 0;
+        if (!hasButtons) {
+          onSelect(null);
+          return;
+        }
+
+        pendingAddressCallback = onSelect;
+        am.style.display = 'flex';
+        am.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => am.classList.add('show'));
+      }
+
+      function closeAddressModal() {
+        const am = document.getElementById('addressModal');
+        if (!am) return;
+
+        am.classList.remove('show');
+        am.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          am.style.display = 'none';
+        }, 220);
+      }
+
       (function initDeliveryModal() {
         const dm = document.getElementById('deliveryModal');
-        if (!dm) return;
+        if (dm) {
+          const btnPickup = document.getElementById('deliveryPickupBtn');
+          const btnDelivery = document.getElementById('deliveryDeliveryBtn');
 
-        const btnPickup = document.getElementById('deliveryPickupBtn');
-        const btnDelivery = document.getElementById('deliveryDeliveryBtn');
-
-        if (btnPickup) {
-          btnPickup.addEventListener('click', () => {
-            if (pendingAddToCartCallback) pendingAddToCartCallback('pickup');
-            closeDeliveryModal();
-          });
-        }
-
-        if (btnDelivery) {
-          btnDelivery.addEventListener('click', () => {
-            if (pendingAddToCartCallback) pendingAddToCartCallback('delivery');
-            closeDeliveryModal();
-          });
-        }
-
-        // klik area gelap untuk menutup
-        dm.addEventListener('click', (e) => {
-          if (e.target === dm) {
-            closeDeliveryModal();
+          if (btnPickup) {
+            btnPickup.addEventListener('click', () => {
+              if (pendingAddToCartCallback) pendingAddToCartCallback('pickup', null);
+              pendingAddToCartCallback = null;
+              closeDeliveryModal();
+            });
           }
-        });
+
+          if (btnDelivery) {
+            btnDelivery.addEventListener('click', () => {
+              closeDeliveryModal();
+              openAddressModal((addressId) => {
+                if (pendingAddToCartCallback) pendingAddToCartCallback('delivery', addressId);
+                pendingAddToCartCallback = null;
+              });
+            });
+          }
+
+          dm.addEventListener('click', (e) => {
+            if (e.target === dm) {
+              closeDeliveryModal();
+            }
+          });
+        }
+
+        const am = document.getElementById('addressModal');
+        if (am) {
+          am.addEventListener('click', (e) => {
+            if (e.target === am) {
+              closeAddressModal();
+              pendingAddressCallback = null;
+            }
+          });
+
+          am.addEventListener('click', (e) => {
+            const btn = e.target.closest('.address-pill');
+            if (!btn) return;
+
+            const id = btn.getAttribute('data-address-id') || null;
+
+            if (pendingAddressCallback) {
+              pendingAddressCallback(id);
+            }
+
+            pendingAddressCallback = null;
+            closeAddressModal();
+          });
+
+          const closeBtn = document.getElementById('addressModalClose');
+          if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+              closeAddressModal();
+              pendingAddressCallback = null;
+            });
+          }
+        }
       })();
+
+      const addressModalEl = document.getElementById('addressModal');
+      const addressTrigger = document.getElementById('addressDropdownTrigger');
+
+      if (addressModalEl && addressTrigger) {
+        addressTrigger.addEventListener('click', () => {
+          addressModalEl.classList.toggle('open');
+        });
+      }
 
     })();
   </script>
 </body>
-
 </html>

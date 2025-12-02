@@ -32,14 +32,16 @@ class Cart extends BaseController
     {
         $id  = (int) $this->request->getPost('id');
         $qty = (int) $this->request->getPost('qty');
-
-        // normalisasi metode pengiriman
         $deliveryMethod = $this->request->getPost('delivery_method');
         if (! in_array($deliveryMethod, ['pickup', 'delivery'], true)) {
             $deliveryMethod = 'pickup';
         }
-        // simpan ke session supaya bisa dipakai di tempat lain juga
         session()->set('delivery_method', $deliveryMethod);
+
+        $deliveryAddressId = (int) $this->request->getPost('delivery_address_id');
+        if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+            session()->set('delivery_address_id', $deliveryAddressId);
+        }
 
         $u = session('user');
         if (!$u) {
@@ -51,7 +53,6 @@ class Cart extends BaseController
                 ]);
         }
 
-        // larang admin melakukan pemesanan
         if (isset($u['role']) && $u['role'] === 'admin') {
             return $this->response
                 ->setStatusCode(403)
@@ -81,32 +82,40 @@ class Cart extends BaseController
 
         try {
             $total = (int) $menu['price'] * $qty;
-
-            // 1) Cek apakah sudah ada pesanan "pending/menunggu" milik user ini
             $existingOrder = $orderModel->getPendingByUser((int) $u['id']);
 
             if ($existingOrder) {
-                // Pakai order lama → update total_amount + delivery_method
                 $orderId = (int) $existingOrder['id'];
-                $orderModel->update($orderId, [
-                    'total_amount'     => (int) $existingOrder['total_amount'] + $total,
-                    'delivery_method'  => $deliveryMethod,
-                    // JANGAN pakai updated_at karena kolomnya tidak ada
-                ]);
+
+                $updateData = [
+                    'total_amount'    => (int) $existingOrder['total_amount'] + $total,
+                    'delivery_method' => $deliveryMethod,
+                ];
+
+                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+                    $updateData['delivery_address_id'] = $deliveryAddressId;
+                }
+
+                $orderModel->update($orderId, $updateData);
             } else {
-                // Belum ada → buat order baru
                 $orderCode = 'ORD' . date('ymdHis');
-                $orderId   = $orderModel->insert([
+
+                $insertData = [
                     'user_id'         => (int) $u['id'],
                     'code'            => $orderCode,
                     'total_amount'    => $total,
-                    'status'          => 'pending', // konsisten
+                    'status'          => 'pending', 
                     'delivery_method' => $deliveryMethod,
                     'created_at'      => date('Y-m-d H:i:s'),
-                    // tidak ada updated_at
-                ]);
+                ];
+
+                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+                    $insertData['delivery_address_id'] = $deliveryAddressId;
+                }
+
+                $orderId   = $orderModel->insert($insertData);
             }
-            // 2) Tambah item ke order_items (SELALU INSERT BARU)
+
             $itemModel->insert([
                 'order_id' => $orderId,
                 'menu_id'  => $menu['id'],
@@ -116,13 +125,62 @@ class Cart extends BaseController
                 'subtotal' => $total,
             ]);
 
-            // 3) Kurangi stok
             $db->query(
                 "UPDATE menus SET stock = stock - ? WHERE id = ? AND stock >= ?",
                 [$qty, $menu['id'], $qty]
             );
             if ($db->affectedRows() === 0) {
                 throw new \RuntimeException('Stok berubah, gagal menyimpan pesanan.');
+            }
+
+                        if ($existingOrder) {
+                $orderId = (int) $existingOrder['id'];
+
+                $updateData = [
+                    'total_amount'    => (int) $existingOrder['total_amount'] + $total,
+                    'delivery_method' => $deliveryMethod,
+                ];
+
+                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+                    $updateData['delivery_address_id'] = $deliveryAddressId;
+                }
+
+                $orderModel->update($orderId, $updateData);
+            } else {
+                $orderCode = 'ORD' . date('ymdHis');
+
+                $insertData = [
+                    'user_id'         => (int) $u['id'],
+                    'code'            => $orderCode,
+                    'total_amount'    => $total,
+                    'status'          => 'pending', 
+                    'delivery_method' => $deliveryMethod,
+                    'created_at'      => date('Y-m-d H:i:s'),
+                ];
+
+                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+                    $insertData['delivery_address_id'] = $deliveryAddressId;
+                }
+
+                $orderId   = $orderModel->insert($insertData);
+            }
+
+            if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
+                $addr = $db->table('user_addresses')
+                    ->where('id', $deliveryAddressId)
+                    ->get()
+                    ->getRowArray();
+
+                if ($addr) {
+                    $label = $addr['building'] ?? '';
+                    if (!empty($addr['room'])) {
+                        $label .= ' - ' . $addr['room'];
+                    }
+                    if (!empty($addr['note'])) {
+                        $label .= ' (' . $addr['note'] . ')';
+                    }
+                    session()->set('delivery_display', $label);
+                }
             }
 
             $db->transCommit();
@@ -136,7 +194,6 @@ class Cart extends BaseController
             $db->transRollback();
             return $this->response->setJSON([
                 'ok'  => false,
-                // kalau mau lihat detail error, sementara bisa kirim $e->getMessage()
                 'msg' => 'Gagal menambahkan item: ' . $e->getMessage(),
             ]);
         }
@@ -213,10 +270,8 @@ class Cart extends BaseController
             $orderModel = model(OrderModel::class);
             $itemModel  = model(OrderItemModel::class);
 
-            // hitung total & cek stok
             $total = 0;
             foreach ($cart as $row) {
-                // lock row stok (optimis)
                 $menu = $menuModel->where('id', $row['id'])->first();
                 if (!$menu) throw new \RuntimeException('Menu tidak ditemukan.');
                 if ((int)$menu['stock'] < (int)$row['qty']) {
@@ -225,7 +280,6 @@ class Cart extends BaseController
                 $total += ((int)$row['price'] * (int)$row['qty']);
             }
 
-            // buat order
             $code = 'ORD' . date('ymdHis');
             $orderId = $orderModel->insert([
                 'user_id'      => (int)$u['id'],
@@ -235,7 +289,6 @@ class Cart extends BaseController
                 'created_at'   => date('Y-m-d H:i:s'),
             ]);
 
-            // insert items & kurangi stok
             foreach ($cart as $row) {
                 $itemModel->insert([
                     'order_id' => $orderId,
@@ -246,7 +299,6 @@ class Cart extends BaseController
                     'subtotal' => (int)$row['price'] * (int)$row['qty'],
                 ]);
 
-                // kurangi stok
                 $db->query(
                     "UPDATE menus SET stock = stock - ? WHERE id = ? AND stock >= ?",
                     [(int)$row['qty'], (int)$row['id'], (int)$row['qty']]

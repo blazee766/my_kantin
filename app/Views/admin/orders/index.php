@@ -4,6 +4,14 @@ include APPPATH . 'Views/admin/partials/head.php';
 ?>
 
 <style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .order-card {
         max-width: 1200px;
         margin: 28px auto;
@@ -142,7 +150,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                 <?php
                 $statusLabelMap = [
                     'pending'    => 'Menunggu',
-                    'menunggu'   => 'Menunggu',  
+                    'menunggu'   => 'Menunggu',
                     'processing' => 'Diproses',
                     'diproses'   => 'Diproses',
                     'completed'  => 'Selesai',

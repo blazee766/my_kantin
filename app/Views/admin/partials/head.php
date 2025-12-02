@@ -12,6 +12,14 @@
       --primary: #ff6a00
     }
 
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       font-family: Poppins, system-ui, Arial;
       background: #fff6f1;

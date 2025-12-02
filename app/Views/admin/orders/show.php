@@ -4,6 +4,14 @@ include APPPATH . 'Views/admin/partials/head.php';
 ?>
 
 <style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .page-wrap {
         max-width: 1200px;
         margin: 24px auto 32px;
@@ -183,13 +191,19 @@ include APPPATH . 'Views/admin/partials/head.php';
         } elseif ($dm === 'delivery') {
             $deliveryLabel = 'Diantar';
         }
+        $locBuilding = $order['address_building'] ?? ($order['building'] ?? '-');
+        $locRoom     = $order['address_room'] ?? ($order['room'] ?? '');
+        $locNote     = $order['address_note'] ?? '';
         ?>
         <p class="muted">
             Tanggal: <?= esc(date('d M Y H:i', strtotime($order['created_at']))); ?><br>
             Pemesan: <?= esc($order['customer_name'] ?? '-'); ?><br>
             Total: <strong>Rp <?= number_format((int)$order['total_amount'], 0, ',', '.'); ?></strong><br>
             Metode: <strong><?= esc($deliveryLabel); ?></strong><br>
-            Lokasi: <?= esc(($order['building'] ?? '-') . ' ' . ($order['room'] ?? '')); ?><br>
+            Lokasi: <?= esc(trim($locBuilding . ' ' . $locRoom)); ?><br>
+            <?php if (!empty($locNote)): ?>
+                Catatan: <?= esc($locNote); ?><br>
+            <?php endif; ?>
             Status:
             <span class="badge <?= $badgeClass; ?>"><?= $label; ?></span>
         </p>

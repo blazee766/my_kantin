@@ -20,6 +20,14 @@
       --ghost-border: #eee;
     }
 
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       background: var(--bg-page);
       margin: 0;
@@ -181,12 +189,10 @@
 
   $statusLabel = $labelMap[$status]  ?? ucfirst($status);
   $statusClass = $classMap[$status] ?? 'pending';
-
-  // --- teks metode delivery (baru) ---
-  $deliveryRaw  = $order['delivery_method'] ?? 'pickup';      // pickup / delivery
+  $deliveryRaw  = $order['delivery_method'] ?? 'pickup';
   $deliveryText = $deliveryRaw === 'delivery'
-      ? 'Diantar'
-      : 'Ambil Sendiri';
+    ? 'Diantar'
+    : 'Ambil Sendiri';
   ?>
 
   <div class="container">
@@ -194,11 +200,32 @@
       <h2>Detail Pesanan #<?= esc($order['code'] ?? $order['id']); ?></h2>
       <p>Tanggal: <?= date('d M Y H:i', strtotime($order['created_at'] ?? 'now')); ?></p>
       <p>Total: <b>Rp <?= number_format((int)($order['total_amount'] ?? 0), 0, ',', '.'); ?></b></p>
-      <!-- Metode pengambilan / pengantaran (baru) -->
       <p>Metode: <b><?= esc($deliveryText); ?></b></p>
+
+      <?php if ($deliveryRaw === 'delivery'): ?>
+        <?php
+        $loc = trim(
+          (string)($order['address_building'] ?? '') .
+            (!empty($order['address_room']) ? ' - ' . $order['address_room'] : '')
+        );
+        ?>
+        <?php if ($loc !== ''): ?>
+          <p>Lokasi: <b><?= esc($loc); ?></b></p>
+        <?php endif; ?>
+
+        <?php if (!empty($order['address_note'])): ?>
+          <p style="font-size: .9rem; color:#666;">
+            Catatan: <?= esc($order['address_note']); ?>
+          </p>
+        <?php endif; ?>
+      <?php endif; ?>
+      <p>Status: <span class="badge <?= $statusClass; ?>"><?= esc($statusLabel); ?></span>
+      </p>
       <p>
-        Status:
-        <span class="badge <?= $statusClass; ?>"><?= esc($statusLabel); ?></span>
+        Status Pembayaran:
+        <b>
+          <?= $paymentStatus === 'paid' ? 'Sudah Dibayar' : 'Belum Dibayar'; ?>
+        </b>
       </p>
     </div>
 
@@ -241,7 +268,15 @@
         <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Tambah Pesanan</a>
 
         <?php
-        if (!in_array($status, ['completed', 'selesai', 'canceled', 'batal'], true)): ?>
+        // tombol BAYAR SEKARANG hanya kalau order masih pending & belum paid
+        $paymentStatus = $order['payment_status'] ?? 'unpaid';
+        if (in_array($status, ['pending', 'menunggu'], true) && $paymentStatus !== 'paid'): ?>
+          <a href="<?= site_url('p/payment/' . $order['id']); ?>" class="btn btn-primary">
+            Bayar Sekarang
+          </a>
+        <?php endif; ?>
+
+        <?php if (!in_array($status, ['completed', 'selesai', 'canceled', 'batal'], true)): ?>
           <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
             method="post"
             onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"

@@ -15,9 +15,12 @@ class OrderModel extends Model
         'total_amount',
         'status',
         'notes',
-        'delivery_method',      
-        'delivery_address_id',  
+        'delivery_method',
+        'delivery_address_id',
         'delivery_fee',
+        'payment_status',   
+        'payment_method',   
+        'payment_type',
         'created_at',
         'updated_at',
     ];
@@ -48,15 +51,67 @@ class OrderModel extends Model
         return $order;
     }
 
-    /**
-     * Ambil 1 pesanan yang masih "menunggu/pending" milik user.
-     * Ini yang akan kita gabung kalau user pesan lagi.
-     */
+    public function getOneWithItemsWithAddress(int $orderId, int $userId): ?array
+    {
+        $order = $this->select(
+            'orders.*, ua.building AS address_building, ua.room AS address_room, ua.note AS address_note'
+        )
+            ->join('user_addresses ua', 'ua.id = orders.delivery_address_id', 'left')
+            ->where('orders.id', $orderId)
+            ->where('orders.user_id', $userId)
+            ->first();
+
+        if (!$order) {
+            return null;
+        }
+
+        $items = model(\App\Models\OrderItemModel::class)
+            ->where('order_id', $order['id'])
+            ->findAll();
+
+        $order['items'] = $items;
+
+        return $order;
+    }
+
+    public function getAdminOneWithItemsWithAddress(int $orderId): ?array
+    {
+        $order = $this->select(
+            'orders.*, ua.building AS address_building, ua.room AS address_room, ua.note AS address_note'
+        )
+            ->join('user_addresses ua', 'ua.id = orders.delivery_address_id', 'left')
+            ->where('orders.id', $orderId)
+            ->first();
+
+        if (!$order) {
+            return null;
+        }
+
+        $items = model(\App\Models\OrderItemModel::class)
+            ->where('order_id', $order['id'])
+            ->findAll();
+
+        $order['items'] = $items;
+
+        return $order;
+    }
+
     public function getPendingByUser(int $userId): ?array
     {
         return $this->where('user_id', $userId)
             ->whereIn('status', ['pending', 'menunggu'])
             ->orderBy('id', 'DESC')
             ->first();
+    }
+
+    public function getByUserWithAddress(int $userId): array
+    {
+        return $this->select(
+            'orders.*, ua.building AS address_building, ua.room AS address_room, ua.note AS address_note'
+        )
+            ->join('user_addresses ua', 'ua.id = orders.delivery_address_id', 'left')
+            ->where('orders.user_id', $userId)
+            ->orderBy('id', 'DESC')
+            ->findAll();
     }
 }

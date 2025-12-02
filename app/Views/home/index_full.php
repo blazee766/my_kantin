@@ -15,6 +15,14 @@
       --nav-text: #0b2130;
     }
 
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
     header nav a {
       color: var(--nav-text);
       text-decoration: none;
@@ -168,18 +176,20 @@
       }
     }
 
-        /* === Styling khusus modal delivery === */
-    #deliveryModal {
+    #deliveryModal,
+    #addressModal {
       backdrop-filter: blur(3px);
       opacity: 0;
       transition: opacity .25s ease, background .25s ease;
     }
 
-    #deliveryModal.show {
+    #deliveryModal.show,
+    #addressModal.show {
       opacity: 1;
     }
 
-    #deliveryModal .contact-modal {
+    #deliveryModal .contact-modal,
+    #addressModal .contact-modal {
       max-width: 480px;
       border-radius: 20px;
       padding: 20px 22px;
@@ -189,7 +199,8 @@
       transition: transform .25s ease, opacity .25s ease;
     }
 
-    #deliveryModal.show .contact-modal {
+    #deliveryModal.show .contact-modal,
+    #addressModal.show .contact-modal {
       transform: translateY(0) scale(1);
       opacity: 1;
     }
@@ -201,7 +212,12 @@
       margin-top: 4px;
     }
 
-    #deliveryModal .delivery-pill {
+    #addressModal .delivery-options::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    #deliveryModal .delivery-pill,
+    #addressModal .delivery-pill {
       width: 100%;
       border: 1px solid #e5e7eb;
       background: #fff;
@@ -215,7 +231,8 @@
       transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
     }
 
-    #deliveryModal .delivery-pill .icon {
+    #deliveryModal .delivery-pill .icon,
+    #addressModal .delivery-pill .icon {
       width: 34px;
       height: 34px;
       border-radius: 999px;
@@ -227,52 +244,98 @@
       flex-shrink: 0;
     }
 
-    #deliveryModal .delivery-pill .text {
+    #deliveryModal .delivery-pill .text,
+    #addressModal .delivery-pill .text {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
 
-    #deliveryModal .delivery-pill .title {
+    #deliveryModal .delivery-pill .title,
+    #addressModal .delivery-pill .title {
       font-weight: 600;
       font-size: 0.94rem;
       color: #111827;
     }
 
-    #deliveryModal .delivery-pill .subtitle {
+    #deliveryModal .delivery-pill .subtitle,
+    #addressModal .delivery-pill .subtitle {
       font-size: 0.8rem;
       color: #6b7280;
     }
 
-    #deliveryModal .delivery-pill.primary .icon {
+    #deliveryModal .delivery-pill.primary .icon,
+    #addressModal .delivery-pill.primary .icon {
       background: #ffe4ea;
       color: #ef4444;
     }
 
-    #deliveryModal .delivery-pill.primary .title {
+    #deliveryModal .delivery-pill.primary .title,
+    #addressModal .delivery-pill.primary .title {
       color: #b91c1c;
     }
 
-    #deliveryModal .delivery-pill:hover {
+    #deliveryModal .delivery-pill:hover,
+    #addressModal .delivery-pill:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(15, 23, 42, .15);
       border-color: #fecaca;
       background: #fff7f7;
     }
 
-    #deliveryModal .delivery-pill:active {
+    #deliveryModal .delivery-pill:active,
+    #addressModal .delivery-pill:active {
       transform: translateY(0);
       box-shadow: 0 4px 12px rgba(15, 23, 42, .18);
     }
 
     @media (max-width:480px) {
-      #deliveryModal .contact-modal {
+
+      #deliveryModal .contact-modal,
+      #addressModal .contact-modal {
         padding: 18px 16px;
       }
 
-      #deliveryModal .delivery-pill {
+      #deliveryModal .delivery-pill,
+      #addressModal .delivery-pill {
         border-radius: 16px;
       }
+    }
+
+    #addressModal .delivery-options {
+      display: none;
+      margin-top: 8px;
+    }
+
+    #addressModal.open .delivery-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .dropdown-trigger {
+      border: 1px solid #e5e7eb;
+      padding: 12px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: #fff;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .dropdown-trigger i {
+      font-size: 18px;
+      color: #555;
+      transition: transform .25s;
+    }
+
+    #addressModal.open .dropdown-trigger i {
+      transform: rotate(180deg);
     }
   </style>
 </head>
@@ -392,8 +455,19 @@
         <div class="address-pill" title="Lokasi pengantaran kamu">
           <i class="fas fa-location-dot"></i>
           <span>
-            <?= esc(session('user.building') ?? 'Gedung belum diatur'); ?>
-            <?= esc(session('user.room') ? ' - ' . session('user.room') : ''); ?>
+            <?php
+            if (session('delivery_display')) {
+              echo esc(session('delivery_display'));
+            } elseif (session('user.building')) {
+              $txt = session('user.building');
+              if (session('user.room')) {
+                $txt .= ' - ' . session('user.room');
+              }
+              echo esc($txt);
+            } else {
+              echo 'Gedung belum diatur';
+            }
+            ?>
           </span>
         </div>
       <?php endif; ?>
@@ -486,7 +560,6 @@
       </div>
     </div>
   </div>
-    <!-- Modal pilihan metode pengambilan pesanan -->
   <div class="contact-modal-backdrop" id="deliveryModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="deliveryModalTitle">
       <h3 id="deliveryModalTitle" style="margin-bottom:4px;">Pilih Metode Pengambilan</h3>
@@ -515,6 +588,46 @@
           </div>
         </button>
       </div>
+    </div>
+  </div>
+  <div class="contact-modal-backdrop" id="addressModal" aria-hidden="true">
+    <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle">
+      <h3 id="addressModalTitle" style="margin-bottom:4px;">Pilih Ruangan Pengantaran</h3>
+      <p style="margin:4px 0 14px;color:#6b7280;font-size:0.92rem;">
+        Pilih ruangan / lokasi tempat pesanan akan diantar.
+      </p>
+
+      <?php if (!empty($addresses ?? [])): ?>
+        <div class="dropdown-trigger" id="addressDropdownTrigger">
+          Pilih Ruangan
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="delivery-options">
+          <?php foreach (($addresses ?? []) as $addr): ?>
+            <button type="button"
+              class="delivery-pill address-pill"
+              data-address-id="<?= esc($addr['id']); ?>">
+              <div class="icon">
+                <i class="fas fa-location-dot"></i>
+              </div>
+              <div class="text">
+                <span class="title">
+                  <?= esc($addr['building']); ?>
+                  <?php if (!empty($addr['room'])): ?> - <?= esc($addr['room']); ?><?php endif; ?>
+                </span>
+              </div>
+            </button>
+          <?php endforeach; ?>
+        </div>
+
+      <?php else: ?>
+        <p style="margin:4px 0 0;color:#ef4444;font-size:0.9rem;">
+          Kamu belum menyimpan ruangan/alamat. Silakan atur dulu di profil atau informasikan ke kasir.
+        </p>
+        <div class="actions">
+          <button type="button" id="addressModalClose" class="btn">Tutup</button>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -606,13 +719,15 @@
   <script>
     document.querySelectorAll('.add-to-cart').forEach(btn => {
       btn.addEventListener('click', () => {
-
-        // buka modal di tengah, tunggu user pilih
-        openDeliveryModal(async (deliveryMethod) => {
+        openDeliveryModal(async (deliveryMethod, addressId) => {
           const payload = new URLSearchParams();
           payload.append('id', btn.dataset.id);
           payload.append('qty', '1');
-          payload.append('delivery_method', deliveryMethod); // <─ kirim ke backend
+          payload.append('delivery_method', deliveryMethod);
+
+          if (deliveryMethod === 'delivery' && addressId) {
+            payload.append('delivery_address_id', addressId);
+          }
 
           try {
             const res = await fetch('<?= base_url('cart/add'); ?>', {
@@ -622,8 +737,6 @@
               },
               body: payload.toString()
             });
-
-            // Belum login → paksa ke halaman login
             if (res.status === 401 || res.redirected || res.status === 302) {
               const go = confirm('Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?');
               if (go) window.location.href = '<?= site_url('login'); ?>';
@@ -640,12 +753,9 @@
 
               if (countEl) {
                 let next;
-
-                // Kalau API sudah kirim total keranjang, pakai itu
                 if (typeof data.cart_count !== 'undefined') {
                   next = parseInt(data.cart_count, 10);
                 } else {
-                  // Kalau tidak, naikkan 1 dari angka saat ini
                   next = parseInt(countEl.textContent || '0', 10);
                   if (isNaN(next)) next = 0;
                   next += 1;
@@ -656,8 +766,6 @@
                   countEl.style.display = 'inline-block';
                 }
               }
-
-              //alert('Pesanan ditambahkan ke keranjang!');
             } else {
               const msg = (data.msg || '').toLowerCase();
               if (msg.includes('login') || msg.includes('unauth') || msg.includes('silakan login')) {
@@ -674,27 +782,24 @@
             alert('Terjadi kesalahan jaringan. Coba lagi.');
           }
 
-        }); // end openDeliveryModal
+        });
       });
     });
   </script>
 
   <script>
-    // ===== Helper modal delivery (di tengah) =====
     let pendingAddToCartCallback = null;
+    let pendingAddressCallback = null;
 
-        function openDeliveryModal(onChoice) {
+    function openDeliveryModal(onChoice) {
       const dm = document.getElementById('deliveryModal');
       if (!dm) {
-        // fallback kalau modal tidak ada → anggap pickup
-        onChoice('pickup');
+        onChoice('pickup', null);
         return;
       }
       pendingAddToCartCallback = onChoice;
       dm.style.display = 'flex';
       dm.setAttribute('aria-hidden', 'false');
-
-      // kecil animasi smooth
       requestAnimationFrame(() => {
         dm.classList.add('show');
       });
@@ -706,51 +811,114 @@
 
       dm.classList.remove('show');
       dm.setAttribute('aria-hidden', 'true');
-      pendingAddToCartCallback = null;
-
-      // tunggu animasi selesai baru hide
       setTimeout(() => {
         dm.style.display = 'none';
+      }, 220);
+    }
+
+    function openAddressModal(onSelect) {
+      const am = document.getElementById('addressModal');
+      if (!am) {
+        onSelect(null);
+        return;
+      }
+
+      const hasButtons = am.querySelectorAll('.address-pill').length > 0;
+      if (!hasButtons) {
+        onSelect(null);
+        return;
+      }
+
+      pendingAddressCallback = onSelect;
+      am.style.display = 'flex';
+      am.setAttribute('aria-hidden', 'false');
+      requestAnimationFrame(() => {
+        am.classList.add('show');
+      });
+    }
+
+    function closeAddressModal() {
+      const am = document.getElementById('addressModal');
+      if (!am) return;
+
+      am.classList.remove('show');
+      am.setAttribute('aria-hidden', 'true');
+
+      setTimeout(() => {
+        am.style.display = 'none';
       }, 220);
     }
 
 
     document.addEventListener('DOMContentLoaded', () => {
       const dm = document.getElementById('deliveryModal');
-      if (!dm) return;
+      if (dm) {
+        const btnPickup = document.getElementById('deliveryPickupBtn');
+        const btnDelivery = document.getElementById('deliveryDeliveryBtn');
 
-      const btnPickup = document.getElementById('deliveryPickupBtn');
-      const btnDelivery = document.getElementById('deliveryDeliveryBtn');
+        if (btnPickup) {
+          btnPickup.addEventListener('click', () => {
+            if (pendingAddToCartCallback) pendingAddToCartCallback('pickup', null);
+            pendingAddToCartCallback = null;
+            closeDeliveryModal();
+          });
+        }
 
-      if (btnPickup) {
-        btnPickup.addEventListener('click', () => {
-          if (pendingAddToCartCallback) pendingAddToCartCallback('pickup');
-          closeDeliveryModal();
+        if (btnDelivery) {
+          btnDelivery.addEventListener('click', () => {
+            closeDeliveryModal();
+            openAddressModal((addressId) => {
+              if (pendingAddToCartCallback) {
+                pendingAddToCartCallback('delivery', addressId);
+              }
+              pendingAddToCartCallback = null;
+            });
+          });
+        }
+        dm.addEventListener('click', (e) => {
+          if (e.target === dm) closeDeliveryModal();
         });
       }
-
-      if (btnDelivery) {
-        btnDelivery.addEventListener('click', () => {
-          if (pendingAddToCartCallback) pendingAddToCartCallback('delivery');
-          closeDeliveryModal();
+      const am = document.getElementById('addressModal');
+      if (am) {
+        am.addEventListener('click', (e) => {
+          if (e.target === am) {
+            closeAddressModal();
+            pendingAddressCallback = null;
+          }
         });
-      }
 
-      // klik area gelap untuk tutup
-      dm.addEventListener('click', (e) => {
-        if (e.target === dm) closeDeliveryModal();
-      });
+        am.querySelectorAll('.address-pill').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-address-id') || null;
+            if (pendingAddressCallback) pendingAddressCallback(id);
+            pendingAddressCallback = null;
+            closeAddressModal();
+          });
+        });
+
+        const closeBtn = document.getElementById('addressModalClose');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            closeAddressModal();
+            pendingAddressCallback = null;
+          });
+        }
+      }
     });
   </script>
 
   <script>
     async function addToCart(id) {
-      // buka modal, tunggu user pilih
-      openDeliveryModal(async (deliveryMethod) => {
+      openDeliveryModal(async (deliveryMethod, addressId) => {
         const payload = new URLSearchParams();
+        console.log("PAYLOAD:", deliveryMethod, addressId);
         payload.append('id', id);
         payload.append('qty', '1');
         payload.append('delivery_method', deliveryMethod);
+        if (deliveryMethod === 'delivery' && addressId) {
+          payload.append('delivery_address_id', addressId);
+        }
 
         const res = await fetch('<?= site_url('cart/add'); ?>', {
           method: 'POST',
@@ -774,7 +942,16 @@
     }
     if (typeof refreshCartCount === 'function') refreshCartCount();
   </script>
+  <script>
+    const addressModalEl = document.getElementById('addressModal');
+    const addressTrigger = document.getElementById('addressDropdownTrigger');
 
+    if (addressModalEl && addressTrigger) {
+      addressTrigger.addEventListener('click', () => {
+        addressModalEl.classList.toggle('open');
+      });
+    }
+  </script>
 </body>
 
 </html>
