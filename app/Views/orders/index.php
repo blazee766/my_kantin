@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pesanan Saya - KantinKamu</title>
+  <title>Pesanan Saya - Kantin G'penk</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,16 +55,17 @@
     }
 
     header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 20px 50px;
       background: var(--bg-page);
-      box-shadow: 0 2px 8px rgba(10, 25, 40, 0.03);
-      position: static;
-      top: auto;
-      border-bottom: none;
-      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      z-index: 999;
     }
 
     header .logo {
@@ -110,7 +111,7 @@
     .container {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 28px 16px;
+      padding: 120px 16px 28px;
       box-sizing: border-box;
     }
 
@@ -226,11 +227,11 @@
 
     @media (max-width: 720px) {
       header {
-        padding: 16px;
+        padding: 14px 20px;
       }
 
       .container {
-        padding: 18px 12px;
+        padding-top: 100px;
       }
 
       .orders {
@@ -246,7 +247,7 @@
 
   <header>
     <div class="logo">
-      <i class="fas fa-utensils"></i> KantinKamu
+      <i class="fas fa-utensils"></i> Kantin G'penk
     </div>
     <nav>
       <ul>
@@ -305,7 +306,7 @@
           $label  = $statusLabelMap[$status] ?? ucfirst($status);
           $cls    = $statusClassMap[$status] ?? 'pending';
 
-          $deliveryRaw  = $o['delivery_method'] ?? 'pickup';         
+          $deliveryRaw  = $o['delivery_method'] ?? 'pickup';
           $deliveryText = $deliveryRaw === 'delivery'
             ? 'Diantar'
             : 'Ambil Sendiri';

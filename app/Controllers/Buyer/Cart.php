@@ -82,7 +82,7 @@ class Cart extends BaseController
 
         try {
             $total = (int) $menu['price'] * $qty;
-            $existingOrder = $orderModel->getPendingByUser((int) $u['id']);
+            $existingOrder = $orderModel->getPendingByUser((int) $u['id'], $deliveryMethod);
 
             if ($existingOrder) {
                 $orderId = (int) $existingOrder['id'];
@@ -104,7 +104,7 @@ class Cart extends BaseController
                     'user_id'         => (int) $u['id'],
                     'code'            => $orderCode,
                     'total_amount'    => $total,
-                    'status'          => 'pending', 
+                    'status'          => 'pending',
                     'delivery_method' => $deliveryMethod,
                     'created_at'      => date('Y-m-d H:i:s'),
                 ];
@@ -133,7 +133,7 @@ class Cart extends BaseController
                 throw new \RuntimeException('Stok berubah, gagal menyimpan pesanan.');
             }
 
-                        if ($existingOrder) {
+            if ($existingOrder) {
                 $orderId = (int) $existingOrder['id'];
 
                 $updateData = [
@@ -153,7 +153,7 @@ class Cart extends BaseController
                     'user_id'         => (int) $u['id'],
                     'code'            => $orderCode,
                     'total_amount'    => $total,
-                    'status'          => 'pending', 
+                    'status'          => 'pending',
                     'delivery_method' => $deliveryMethod,
                     'created_at'      => date('Y-m-d H:i:s'),
                 ];

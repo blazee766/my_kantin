@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detail Pesanan - KantinKamu</title>
+  <title>Detail Pesanan - Kantin G'penk</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <style>
     :root {
@@ -265,7 +265,10 @@
 
       <div class="btn-inline" style="margin-top:12px">
         <a href="<?= site_url('/'); ?>" class="btn btn-ghost">Kembali</a>
-        <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Tambah Pesanan</a>
+        <?php if (in_array($status, ['pending', 'menunggu'], true)): ?>
+          <!-- HANYA tampil kalau status masih menunggu -->
+          <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Tambah Pesanan</a>
+        <?php endif; ?>
 
         <?php
         // tombol BAYAR SEKARANG hanya kalau order masih pending & belum paid

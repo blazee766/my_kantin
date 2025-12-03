@@ -180,6 +180,27 @@ include APPPATH . 'Views/admin/partials/head.php';
     $label      = $labelMap[$status] ?? ucfirst($status);
     $badgeClass = $badgeMap[$status] ?? 'badge';
     ?>
+
+    <?php
+    // ==== Status PEMBAYARAN  ====
+    $paymentStatus = $order['payment_status'] ?? 'unpaid';
+
+    $payLabelMap = [
+        'unpaid' => 'Belum Dibayar',
+        'paid'   => 'Sudah Dibayar',
+        'failed' => 'Gagal / Kadaluarsa',
+    ];
+
+    $payBadgeMap = [
+        'unpaid' => 'badge wait',
+        'paid'   => 'badge done',
+        'failed' => 'badge cancel',
+    ];
+
+    $paymentLabel      = $payLabelMap[$paymentStatus] ?? ucfirst($paymentStatus);
+    $paymentBadgeClass = $payBadgeMap[$paymentStatus] ?? 'badge';
+    ?>
+
     <div class="card">
         <h2>Detail Pesanan #<?= esc($order['code']); ?></h2>
         <?php
@@ -205,7 +226,9 @@ include APPPATH . 'Views/admin/partials/head.php';
                 Catatan: <?= esc($locNote); ?><br>
             <?php endif; ?>
             Status:
-            <span class="badge <?= $badgeClass; ?>"><?= $label; ?></span>
+            <span class="badge <?= $badgeClass; ?>"><?= $label; ?></span><br>
+            Status Pembayaran:
+            <span class="badge <?= $paymentBadgeClass; ?>"><?= $paymentLabel; ?></span>
         </p>
 
         <form action="<?= base_url('admin/orders/' . $order['id'] . '/status'); ?>" method="post" style="margin-top:12px;">

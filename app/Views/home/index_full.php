@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KantinKamu - Delightful Food Experience</title>
+  <title>KantinG'penk - Delightful Food Experience</title>
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -337,6 +337,25 @@
     #addressModal.open .dropdown-trigger i {
       transform: rotate(180deg);
     }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+    }
+
+    .container {
+      padding-top: 110px;
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        padding-top: 95px;
+      }
+      
+    }
   </style>
 </head>
 
@@ -348,15 +367,6 @@
   $waMessage = rawurlencode("Halo Admin KantinKamu, saya ingin memesan.");
   $telDisplay = $contactPhone;
   ?>
-
-  <section class="quick-search">
-    <div class="searchbar">
-      <i class="fas fa-magnifying-glass"></i>
-      <input id="qsearch" type="text" placeholder="Lagi mau mamam apa?" aria-label="Cari menu">
-      <i class="fas fa-filter"></i>
-    </div>
-
-  </section>
 
   <?php if ($wel = session()->getFlashdata('welcome')): ?>
     <style>
@@ -440,7 +450,7 @@
   <div class="container">
 
     <header>
-      <div class="logo"><i class="fas fa-utensils"></i> KantinKamu</div>
+      <div class="logo"><i class="fas fa-utensils"></i> Kantin G'penk</div>
 
       <nav id="nav">
         <ul>
@@ -519,7 +529,7 @@
       </section>
 
       <section class="popular-dishes" id="menu">
-        <h2>Popular Menu</h2>
+        <h2>Menu Terlaris</h2>
 
         <div class="dishes">
           <?php foreach ($menus as $m): ?>
@@ -543,7 +553,7 @@
 
   <div class="contact-modal-backdrop" id="contactModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
-      <h3 id="contactModalTitle">Hubungi KantinKamu</h3>
+      <h3 id="contactModalTitle">Hubungi KantinG'penk</h3>
       <div>Anda akan dihubungkan ke nomor berikut:</div>
       <div class="phone" id="modalPhone"><?= esc($telDisplay); ?></div>
 
@@ -622,7 +632,7 @@
 
       <?php else: ?>
         <p style="margin:4px 0 0;color:#ef4444;font-size:0.9rem;">
-          Kamu belum menyimpan ruangan/alamat. Silakan atur dulu di profil atau informasikan ke kasir.
+          Kamu belum menyimpan ruangan/alamat. Silakan atur dulu di profil.
         </p>
         <div class="actions">
           <button type="button" id="addressModalClose" class="btn">Tutup</button>

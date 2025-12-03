@@ -18,8 +18,8 @@ class OrderModel extends Model
         'delivery_method',
         'delivery_address_id',
         'delivery_fee',
-        'payment_status',   
-        'payment_method',   
+        'payment_status',
+        'payment_method',
         'payment_type',
         'created_at',
         'updated_at',
@@ -96,13 +96,18 @@ class OrderModel extends Model
         return $order;
     }
 
-    public function getPendingByUser(int $userId): ?array
+    public function getPendingByUser(int $userId, ?string $deliveryMethod = null): ?array
     {
-        return $this->where('user_id', $userId)
-            ->whereIn('status', ['pending', 'menunggu'])
-            ->orderBy('id', 'DESC')
-            ->first();
+        $builder = $this->where('user_id', $userId)
+            ->whereIn('status', ['pending', 'menunggu']);
+            
+        if ($deliveryMethod !== null) {
+            $builder->where('delivery_method', $deliveryMethod);
+        }
+
+        return $builder->orderBy('id', 'DESC')->first();
     }
+
 
     public function getByUserWithAddress(int $userId): array
     {
