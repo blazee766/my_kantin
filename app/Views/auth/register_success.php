@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pendaftaran Berhasil - KantinKamu</title>
+  <title>Pendaftaran Berhasil - Kantin G'penk</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
  <style>
   :root {
-    --bg-page: #fdeff0;        /* pink lembut */
+    --bg-page: #fdeff0;       
     --card-bg: #ffffff;
-    --text-dark: #0b2130;      /* navy gelap */
+    --text-dark: #0b2130;      
     --muted: #6b7280;
-    --accent: #ff4766;         /* coral/pink */
+    --accent: #ff4766;        
     --accent-dark: #e03f5d;
     --success-bg: #e8ffe8;
     --success-border: #bdf5bd;

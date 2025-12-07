@@ -344,6 +344,25 @@
       left: 0;
       width: 100%;
       z-index: 999;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 50px;
+      background: #ffffff;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .logo i {
+      font-size: 22px;
+      color: #ff4766;
     }
 
     .container {
@@ -354,7 +373,7 @@
       .container {
         padding-top: 95px;
       }
-      
+
     }
   </style>
 </head>
@@ -364,7 +383,7 @@
   $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
   $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
-  $waMessage = rawurlencode("Halo Admin KantinKamu, saya ingin memesan.");
+  $waMessage = rawurlencode("Halo Admin Kantin G'penk, saya ingin memesan.");
   $telDisplay = $contactPhone;
   ?>
 
@@ -457,7 +476,7 @@
           <li><a href="<?= base_url('/'); ?>">Home</a></li>
           <li><a href="<?= base_url('menu'); ?>">Menu</a></li>
           <li><a href="https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>" id="contactLink">Contact</a></li>
-          <li><a href="#">About Us</a></li>
+          <li><a href="<?= base_url('about'); ?>">About Us</a></li>
         </ul>
       </nav>
 
@@ -553,7 +572,7 @@
 
   <div class="contact-modal-backdrop" id="contactModal" aria-hidden="true">
     <div class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
-      <h3 id="contactModalTitle">Hubungi KantinG'penk</h3>
+      <h3 id="contactModalTitle">Hubungi Kantin G'penk</h3>
       <div>Anda akan dihubungkan ke nomor berikut:</div>
       <div class="phone" id="modalPhone"><?= esc($telDisplay); ?></div>
 

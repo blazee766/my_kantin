@@ -83,4 +83,31 @@ class Orders extends BaseController
 
         return redirect()->back()->with('success', 'Status pesanan diperbarui.');
     }
+    public function markPaid($id)
+    {
+        $id = (int) $id;
+
+        $orderModel = model(OrderModel::class);
+        $order      = $orderModel->find($id);
+
+        if (! $order) {
+            return redirect()->to('/admin/orders')
+                ->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        if ($order['status'] === 'canceled') {
+            return redirect()->back()
+                ->with('error', 'Pesanan yang dibatalkan tidak bisa ditandai sudah dibayar.');
+        }
+
+        $orderModel->update($id, [
+            'payment_status' => 'paid',
+            // kalau di tabel ada kolom ini, boleh diisi juga:
+            // 'payment_method' => 'cash',
+            // 'paid_at'        => date('Y-m-d H:i:s'),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Pembayaran ditandai sudah dibayar (tunai).');
+    }
 }

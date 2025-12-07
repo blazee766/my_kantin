@@ -6,7 +6,6 @@ use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
-    /* ---------- VIEWS ---------- */
     public function login()
     {
         return view('auth/login');
@@ -22,36 +21,32 @@ class AuthController extends BaseController
         return view('auth/register_success');
     }
 
-    /* ---------- AUTH: LOGIN (email ATAU no_hp) ---------- */
     public function attempt()
     {
         $email    = trim((string) $this->request->getPost('email'));
         $no_hp    = trim((string) $this->request->getPost('no_hp'));
         $password = (string) $this->request->getPost('password');
 
+        if ($email === '') {
+            if ($no_hp === '' || !preg_match('/^08[0-9]{10}$/', $no_hp)) {
+                return redirect()->back()
+                    ->with('error', 'Nomor HP tidak valid. Gunakan nomor HP yang diawali 08 dan terdiri dari 12 digit angka.')
+                    ->withInput();
+            }
+        }
+
         $users = new UserModel();
 
-        // Mode login: kalau email diisi, pakai email; kalau tidak, pakai no_hp
         if ($email !== '') {
             $user = $users->where('email', $email)->first();
         } else {
             $user = $users->where('no_hp', $no_hp)->first();
         }
 
-        // Validasi user & password (selalu pakai kolom password_hash)
-        $hash = $user['password_hash'] ?? null;
-        if (!$user || !$hash || !password_verify($password, $hash)) {
-            return redirect()->back()
-                ->with('error', ($email ? 'Email' : 'Nomor HP') . ' atau password salah.')
-                ->withInput();
-        }
-
-        // Jika ada flag is_active
         if (array_key_exists('is_active', $user) && !(int) $user['is_active']) {
             return redirect()->back()->with('error', 'Akun nonaktif.')->withInput();
         }
 
-        // Ambil nama role dari tabel roles (via role_id)
         $roleName = 'pembeli';
         if (!empty($user['role_id'])) {
             $roleRow  = db_connect()
@@ -63,7 +58,6 @@ class AuthController extends BaseController
             $roleName = $roleRow['name'] ?? 'pembeli';
         }
 
-        // --- KEAMANAN SESSION ---
         session()->regenerate();
 
         $safeUser = [
@@ -77,18 +71,15 @@ class AuthController extends BaseController
         ];
         session()->set('user', $safeUser);
 
-        // salam sambutan
         $first = trim(explode(' ', $safeUser['name'])[0] ?? $safeUser['name']);
-        session()->setFlashdata('welcome', "Halo, {$first}! Selamat datang di KantinKamu 🎉");
+        session()->setFlashdata('welcome', "Halo, {$first}! Selamat datang di Kantin G'penk 🎉");
 
-        // arahkan per role
         if ($roleName === 'admin') {
             return redirect()->to('/admin/menus');
         }
         return redirect()->to('/');
     }
 
-    /* ---------- AUTH: LOGOUT ---------- */
     public function logout()
     {
         session()->remove('user');
@@ -96,12 +87,10 @@ class AuthController extends BaseController
         return redirect()->to('/')->with('success', 'Berhasil logout.');
     }
 
-    /* ---------- REGISTER ---------- */
     public function attemptRegister()
     {
         $users = new UserModel();
 
-        // ambil id role "pembeli" bila ada di tabel roles
         $roles = db_connect()
             ->table('roles')
             ->where('name', 'pembeli')
@@ -110,23 +99,22 @@ class AuthController extends BaseController
 
         $name    = trim((string) $this->request->getPost('name'));
         $no_hp   = trim((string) $this->request->getPost('no_hp'));
-        $email   = trim((string) $this->request->getPost('email')); // opsional
+        $email   = trim((string) $this->request->getPost('email')); 
         $pass    = (string) $this->request->getPost('password');
         $confirm = (string) $this->request->getPost('password_confirm');
 
-        // ---- Validasi ----
         if ($name === '' || $no_hp === '' || $pass === '') {
             return redirect()->back()
                 ->with('error', 'Nama, Nomor HP, dan password wajib diisi.')
                 ->withInput();
         }
 
-        // 12 digit angka (disesuaikan dengan kolom VARCHAR(12))
-        if (!preg_match('/^\d{12}$/', $no_hp)) {
+        if (!preg_match('/^08[0-9]{10}$/', $no_hp)) {
             return redirect()->back()
-                ->with('error', 'Nomor HP harus 12 digit angka.')
+                ->with('error', 'Nomor HP harus diawali 08 dan terdiri dari 12 digit angka.')
                 ->withInput();
         }
+
 
         if ($pass !== $confirm) {
             return redirect()->back()
@@ -146,7 +134,6 @@ class AuthController extends BaseController
                 ->withInput();
         }
 
-        // ---- Simpan user baru ----
         $data = [
             'role_id'       => $roles['id'] ?? null,
             'name'          => $name,

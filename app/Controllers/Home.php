@@ -14,7 +14,6 @@ class Home extends BaseController
             ->orderBy('name', 'ASC')
             ->findAll();
 
-        // === Ambil daftar RUANGAN global (bukan per user) ===
         $addresses = [];
         $user = session('user');
 
@@ -22,9 +21,8 @@ class Home extends BaseController
             $addresses = (new \App\Models\UserAddressModel())
                 ->orderBy('is_default', 'DESC')
                 ->orderBy('id', 'ASC')
-                ->findAll();   // <--- TANPA where('user_id', ...)
+                ->findAll();   
         }
-        // ====================================================
 
         return view('home/index_full', [
             'menus'     => $menus,
@@ -35,7 +33,7 @@ class Home extends BaseController
 
     public function about()
     {
-        return view('home/about');
+        return view('about');
     }
 
     public function menu()
@@ -45,7 +43,6 @@ class Home extends BaseController
             ->orderBy('name', 'ASC')
             ->findAll();
 
-        // === Ambil daftar RUANGAN global (bukan per user) ===
         $addresses = [];
         $user = session('user');
 
@@ -53,9 +50,8 @@ class Home extends BaseController
             $addresses = (new \App\Models\UserAddressModel())
                 ->orderBy('is_default', 'DESC')
                 ->orderBy('id', 'ASC')
-                ->findAll();   // <--- TANPA where('user_id', ...)
+                ->findAll();   
         }
-        // ====================================================
 
         return view('home/menu', [
             'categories' => $categories,

@@ -8,329 +8,162 @@ include APPPATH . 'Views/admin/partials/head.php';
 ?>
 
 <style>
-  :root {
-    --bg-page: #fdeff0;
-    --card-bg: #fff;
-    --text-dark: #0b2130;
-    --muted: #6b7280;
-    --accent: #ff4766;
-    --accent-dark: #e03f5d;
-    --border: #e9e6e8;
-    --shadow: rgba(10, 25, 40, 0.06);
-    --success: #1f7d1f;
-  }
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  html,
-  body {
-    height: 100%;
-    margin: 0
-  }
-
-  body {
-    min-height: 100vh;
-    background: var(--bg-page);
-    font-family: 'Poppins', sans-serif;
-    color: var(--text-dark);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .card {
-    max-width: 1100px;
-    margin: 28px auto;
-    background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: 0 12px 30px var(--shadow);
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-  .page-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 4px 0 18px;
-  }
-
-  .page-head h1 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: var(--text-dark)
-  }
-
-  .page-head .btn {
-    padding: 8px 12px;
-    border-radius: 10px;
-    background: #fff;
-    border: 1px solid var(--border);
-    color: var(--text-dark);
-    text-decoration: none
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1.1fr .9fr;
-    gap: 28px
-  }
-
-  @media (max-width:900px) {
-    .form-grid {
-      grid-template-columns: 1fr
-    }
-  }
-
-  .field {
-    margin-bottom: 14px
-  }
-
-  .field label {
-    display: block;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-dark)
-  }
-
-  .help {
-    font-size: .88rem;
-    color: var(--muted);
-    margin-top: 6px
-  }
-
-  input[type="text"],
-  input[type="number"],
-  input[type="file"],
-  select,
-  textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: #fff;
-    color: var(--text-dark);
-    font-size: 0.95rem;
-    box-sizing: border-box;
-    transition: box-shadow .18s, border-color .18s;
-  }
-
-  input:focus,
-  textarea:focus,
-  select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 6px 18px rgba(255, 71, 102, 0.08);
-  }
-
-  textarea {
-    min-height: 120px;
-    resize: vertical;
-    padding-top: 10px
-  }
-
-  .thumb {
-    display: block;
+  .img-thumb-preview {
     width: 180px;
     height: 180px;
     object-fit: cover;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(10, 25, 40, 0.06);
-    border: 1px solid var(--border);
-    margin-top: 10px;
-    background: #fff;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 180px;
-    gap: 12px
-  }
-
-  @media (max-width:900px) {
-    .row {
-      grid-template-columns: 1fr
-    }
-  }
-
-  .switch {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px
-  }
-
-  .switch input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent)
-  }
-
-  .actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 18px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(14, 14, 14, 0.03);
-  }
-
-  .actions .btn {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: #fff;
-    color: var(--text-dark);
-    text-decoration: none;
-    font-weight: 600
-  }
-
-  .actions .btn.btn-primary {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    box-shadow: 0 8px 20px rgba(224, 63, 93, 0.08)
-  }
-
-  .actions .btn.btn-primary:hover {
-    background: var(--accent-dark)
-  }
-
-  .alert {
-    padding: 12px 14px;
-    border-radius: 10px;
-    background: #fff6f5;
-    border: 1px solid #ffdede;
-    color: #8a2b2b;
-    font-weight: 600
-  }
-
-  .help.small {
-    font-size: .82rem;
-    color: var(--muted)
-  }
-
-  .field small {
-    color: var(--muted)
-  }
-
-  @media (max-width:520px) {
-    .card {
-      padding: 14px;
-      margin: 14px
-    }
-
-    .thumb {
-      width: 140px;
-      height: 140px
-    }
-
-    .row {
-      grid-template-columns: 1fr
-    }
-
-    .form-grid {
-      gap: 18px
-    }
+    border-radius: .35rem;
   }
 </style>
 
+<h1 class="h3 mb-4 text-gray-800"><?= esc($title); ?></h1>
 
-<div class="card">
-  <div class="page-head">
-    <h1 style="margin:0"><?= esc($title); ?></h1>
-    <a class="btn" href="<?= base_url('admin/menus'); ?>">Kembali</a>
+<?php if (session('error')): ?>
+  <div class="alert alert-danger" role="alert">
+    <?= esc(session('error')); ?>
+  </div>
+<?php endif; ?>
+
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex justify-content-between align-items-center">
+    <h6 class="m-0 font-weight-bold text-primary"><?= esc($title); ?></h6>
+    <a href="<?= base_url('admin/menus'); ?>" class="btn btn-sm btn-secondary">
+      <i class="fas fa-arrow-left"></i> Kembali
+    </a>
   </div>
 
-  <?php if (session('error')): ?>
-    <div class="alert alert-error"><?= esc(session('error')); ?></div>
-  <?php endif; ?>
+  <div class="card-body">
+    <form
+      action="<?= $mode === 'create'
+                ? base_url('admin/menus/store')
+                : base_url('admin/menus/' . $menu['id'] . '/update'); ?>"
+      method="post" enctype="multipart/form-data">
 
-  <form
-    action="<?= $mode === 'create'
-              ? base_url('admin/menus/store')
-              : base_url('admin/menus/' . $menu['id'] . '/update'); ?>"
-    method="post" enctype="multipart/form-data">
-    <?= csrf_field(); ?>
+      <?= csrf_field(); ?>
 
-    <div class="form-grid">
+      <div class="row">
+        <div class="col-lg-7">
 
-      <div>
-        <div class="field">
-          <label>Nama Menu</label>
-          <input type="text" name="name" required
-            value="<?= old('name', $menu['name'] ?? ''); ?>">
-        </div>
+          <div class="form-group">
+            <label for="name">Nama Menu</label>
+            <input type="text"
+                   class="form-control"
+                   id="name"
+                   name="name"
+                   required
+                   value="<?= old('name', $menu['name'] ?? ''); ?>">
+          </div>
 
-        <div class="field">
-          <label>Kategori &nbsp;<span class="help">/ Harga (Rp)</span></label>
-          <div class="row">
-            <select name="category_id" required>
-              <option value="">-- Pilih Kategori --</option>
-              <?php foreach ($cats as $c): ?>
-                <option value="<?= $c['id']; ?>"
-                  <?= (int)old('category_id', $menu['category_id'] ?? 0) === (int)$c['id'] ? 'selected' : ''; ?>>
-                  <?= esc($c['name']); ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-            <input type="number" name="price" min="0" step="1" required
-              value="<?= old('price', $menu['price'] ?? ''); ?>">
+          <div class="form-group">
+            <label>Kategori / Harga (Rp)</label>
+            <div class="form-row">
+              <div class="col-md-7 mb-2 mb-md-0">
+                <select name="category_id" class="form-control" required>
+                  <option value="">-- Pilih Kategori --</option>
+                  <?php foreach ($cats as $c): ?>
+                    <option value="<?= $c['id']; ?>"
+                      <?= (int)old('category_id', $menu['category_id'] ?? 0) === (int)$c['id'] ? 'selected' : ''; ?>>
+                      <?= esc($c['name']); ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <input type="number"
+                       class="form-control"
+                       name="price"
+                       min="0"
+                       step="1"
+                       required
+                       value="<?= old('price', $menu['price'] ?? ''); ?>">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">Stok</label>
+            <input type="number"
+                   class="form-control"
+                   id="stock"
+                   name="stock"
+                   min="0"
+                   value="<?= old('stock', $menu['stock'] ?? 0); ?>">
+            <small class="form-text text-muted">
+              Stok akan otomatis berkurang saat ada pesanan.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Deskripsi</label>
+            <textarea class="form-control"
+                      id="description"
+                      name="description"
+                      rows="4"
+                      placeholder="Tulis deskripsi singkat menu (opsional)"><?= old('description', $menu['description'] ?? ''); ?></textarea>
           </div>
         </div>
 
-        <div class="field">
-          <label>Stok</label>
-          <input type="number" name="stock" min="0"
-            value="<?= old('stock', $menu['stock'] ?? 0); ?>">
-          <div class="help">Stok akan otomatis berkurang saat ada pesanan.</div>
-        </div>
+        <div class="col-lg-5">
 
-        <div class="field">
-          <label>Deskripsi</label>
-          <textarea name="description" rows="5"
-            placeholder="Tulis deskripsi singkat menu (opsional)"><?= old('description', $menu['description'] ?? ''); ?></textarea>
+          <div class="form-group">
+            <label for="imgInput">Gambar</label>
+            <input type="file"
+                   class="form-control-file"
+                   name="image"
+                   accept="image/*"
+                   id="imgInput">
+            <?php
+            $currentImg = old('image', $menu['image'] ?? '');
+            $src = $currentImg ? base_url('assets/img/' . $currentImg) : '';
+            ?>
+            <div class="mt-2">
+              <img id="imgPreview"
+                   class="img-thumbnail img-thumb-preview"
+                   src="<?= $src; ?>"
+                   alt="<?= $src ? 'Preview' : ''; ?>"
+                   style="<?= $src ? '' : 'display:none'; ?>">
+            </div>
+            <small class="form-text text-muted">
+              Format disarankan: JPG/PNG, rasio persegi.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox"
+                     class="custom-control-input"
+                     id="is_active"
+                     name="is_active"
+                     value="1"
+                     <?= old('is_active', $menu['is_active'] ?? 1) ? 'checked' : ''; ?>>
+              <label class="custom-control-label" for="is_active">Aktif</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox"
+                     class="custom-control-input"
+                     id="is_popular"
+                     name="is_popular"
+                     value="1"
+                     <?= old('is_popular', $menu['is_popular'] ?? 0) ? 'checked' : ''; ?>>
+              <label class="custom-control-label" for="is_popular">Tandai sebagai Populer</label>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div>
-        <div class="field">
-          <label>Gambar</label>
-          <input type="file" name="image" accept="image/*" id="imgInput">
-          <?php
-          $currentImg = old('image', $menu['image'] ?? '');
-          $src = $currentImg ? base_url('assets/img/' . $currentImg) : '';
-          ?>
-          <img id="imgPreview" class="thumb" src="<?= $src; ?>" alt="<?= $src ? 'Preview' : ''; ?>"
-            style="<?= $src ? '' : 'display:none'; ?>">
-          <div class="help">Format disarankan: JPG/PNG, rasio persegi.</div>
-        </div>
-
-        <div class="switch">
-          <label><input type="checkbox" name="is_active" value="1"
-              <?= old('is_active', $menu['is_active'] ?? 1) ? 'checked' : ''; ?>> Aktif</label>
-        </div>
-        <div class="switch">
-          <label><input type="checkbox" name="is_popular" value="1"
-              <?= old('is_popular', $menu['is_popular'] ?? 0) ? 'checked' : ''; ?>> Tandai sebagai Populer</label>
-        </div>
+      <div class="mt-4 text-right">
+        <a class="btn btn-light border" href="<?= base_url('admin/menus'); ?>">Batal</a>
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-check"></i> Simpan
+        </button>
       </div>
 
-    </div>
-
-    <div class="actions">
-      <a class="btn" href="<?= base_url('admin/menus'); ?>">Batal</a>
-      <button class="btn btn-primary" type="submit">
-        <i class="fa fa-check"></i> Simpan
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -338,7 +171,7 @@ include APPPATH . 'Views/admin/partials/head.php';
   const imgPreview = document.getElementById('imgPreview');
   if (imgInput) {
     imgInput.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
       const url = URL.createObjectURL(file);
       imgPreview.src = url;
@@ -346,5 +179,4 @@ include APPPATH . 'Views/admin/partials/head.php';
     });
   }
 </script>
-</body>
-</html>
+<?php include APPPATH . 'Views/admin/partials/foot.php'; ?>

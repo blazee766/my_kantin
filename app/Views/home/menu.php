@@ -42,12 +42,10 @@
 
     header {
       position: fixed;
-      /* ⬅ bikin nempel di atas */
       top: 0;
       left: 0;
       width: 100%;
       z-index: 999;
-      /* biar di atas konten lain */
 
       display: flex;
       justify-content: space-between;
@@ -56,8 +54,6 @@
       background: var(--bg-page);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     }
-
-
 
     nav ul {
       list-style: none;
@@ -152,6 +148,9 @@
       position: relative;
       border-radius: 12px;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: linear-gradient(180deg, #fff 0%, #fff 60%, #faf6f8 100%)
     }
 
@@ -540,9 +539,7 @@
       <ul>
         <li><a href="<?= site_url('/'); ?>">Home</a></li>
         <li><a href="<?= site_url('menu'); ?>" class="active">Menu</a></li>
-        <li><a href="https://wa.me/<?= esc($waNormalized); ?>?text=<?= esc($waMessage); ?>" id="contactLink">Contact</a></li>
-
-        <li><a href="#">About Us</a></li>
+        <li><a href="<?= site_url('about'); ?>">About Us</a></li>
         <li><a href="<?= site_url('p/orders'); ?>" class="btn header-cart" aria-label="Keranjang">
             <i class="fas fa-shopping-bag"></i>
             <span class="cart-count" style="display:none">0</span>
@@ -996,4 +993,5 @@
     })();
   </script>
 </body>
+
 </html>

@@ -199,6 +199,7 @@
     <div class="section">
       <h2>Detail Pesanan #<?= esc($order['code'] ?? $order['id']); ?></h2>
       <p>Tanggal: <?= date('d M Y H:i', strtotime($order['created_at'] ?? 'now')); ?></p>
+      <p>Nama: <b><?= esc($order['customer_name'] ?? ($user['name'] ?? '-')); ?></b></p>
       <p>Total: <b>Rp <?= number_format((int)($order['total_amount'] ?? 0), 0, ',', '.'); ?></b></p>
       <p>Metode: <b><?= esc($deliveryText); ?></b></p>
 
@@ -242,18 +243,40 @@
         </thead>
         <tbody>
           <?php
+          $grouped = [];
+
+          foreach (($order['items'] ?? []) as $it) {
+            $key = $it['menu_id'] ?? $it['id'] ?? $it['name'];
+
+            $qty   = (int)($it['qty'] ?? 0);
+            $price = (int)($it['price'] ?? 0);
+            $sub   = (int)($it['subtotal'] ?? ($price * $qty));
+
+            if (!isset($grouped[$key])) {
+              $grouped[$key] = [
+                'name'     => $it['name'] ?? '',
+                'qty'      => $qty,
+                'price'    => $price,
+                'subtotal' => $sub,
+              ];
+            } else {
+              $grouped[$key]['qty']      += $qty;
+              $grouped[$key]['subtotal']  = $grouped[$key]['qty'] * $grouped[$key]['price'];
+            }
+          }
+
           $grandTotal = 0;
-          foreach (($order['items'] ?? []) as $it):
-            $lineTotal = (int)($it['subtotal'] ?? ((int)($it['price'] ?? 0) * (int)($it['qty'] ?? 0)));
-            $grandTotal += $lineTotal;
+          foreach ($grouped as $row):
+            $grandTotal += $row['subtotal'];
           ?>
             <tr>
-              <td><?= esc($it['name'] ?? ''); ?></td>
-              <td><?= (int)($it['qty'] ?? 0); ?></td>
-              <td>Rp <?= number_format((int)($it['price'] ?? 0), 0, ',', '.'); ?></td>
-              <td>Rp <?= number_format($lineTotal, 0, ',', '.'); ?></td>
+              <td><?= esc($row['name']); ?></td>
+              <td><?= $row['qty']; ?></td>
+              <td>Rp <?= number_format($row['price'], 0, ',', '.'); ?></td>
+              <td>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
             </tr>
           <?php endforeach; ?>
+
           <tr>
             <td style="font-weight:bold;">Total</td>
             <td></td>
@@ -266,20 +289,18 @@
       <div class="btn-inline" style="margin-top:12px">
         <a href="<?= site_url('/'); ?>" class="btn btn-ghost">Kembali</a>
         <?php if (in_array($status, ['pending', 'menunggu'], true)): ?>
-          <!-- HANYA tampil kalau status masih menunggu -->
           <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Tambah Pesanan</a>
         <?php endif; ?>
 
         <?php
-        // tombol BAYAR SEKARANG hanya kalau order masih pending & belum paid
-        $paymentStatus = $order['payment_status'] ?? 'unpaid';
         if (in_array($status, ['pending', 'menunggu'], true) && $paymentStatus !== 'paid'): ?>
           <a href="<?= site_url('p/payment/' . $order['id']); ?>" class="btn btn-primary">
             Bayar Sekarang
           </a>
         <?php endif; ?>
 
-        <?php if (!in_array($status, ['completed', 'selesai', 'canceled', 'batal'], true)): ?>
+        <?php
+        if (in_array($status, ['pending', 'menunggu'], true)): ?>
           <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
             method="post"
             onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"

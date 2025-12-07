@@ -318,6 +318,10 @@
               <?= date('d M Y H:i', strtotime($o['created_at'] ?? 'now')); ?>
             </div>
             <div class="meta">
+              Nama:
+              <b><?= esc($o['customer_name'] ?? ($user['name'] ?? '-')); ?></b>
+            </div>
+            <div class="meta">
               Total:
               <b>Rp <?= number_format((int)($o['total_amount'] ?? 0), 0, ',', '.'); ?></b>
             </div>

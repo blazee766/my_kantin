@@ -41,20 +41,21 @@ class Orders extends BaseController
         $orderModel   = new OrderModel();
         $paymentModel = new PaymentModel();
 
-        // pakai method yang sudah kamu buat: getOneWithItemsWithAddress
         $order = $orderModel->getOneWithItemsWithAddress((int)$id, (int)$user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        // ambil payment terakhir (kalau ada)
+        $paymentStatus = $order['payment_status'] ?? 'unpaid';
+
         $payment = $paymentModel
             ->where('order_id', $order['id'])
             ->orderBy('id', 'DESC')
             ->first();
 
-        // status pembayaran: default "unpaid" kalau belum ada
-        $paymentStatus = $payment['status'] ?? 'unpaid';
+        if ($payment && $paymentStatus !== 'paid') {
+            $paymentStatus = $payment['status'] ?? $paymentStatus;
+        }
 
         return view('orders/show', [
             'order'         => $order,
@@ -72,13 +73,11 @@ class Orders extends BaseController
 
         $orderModel = new \App\Models\OrderModel();
 
-        // ambil order + items
         $order = $orderModel->getOneWithItems($id, (int)$user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        // jika sudah dibayar → tolak hapus
         if (($order['status'] ?? '') === 'paid') {
             return redirect()->to(site_url('p/orders/' . $id))->with('error', 'Pesanan sudah dibayar dan tidak bisa dihapus.');
         }
@@ -86,7 +85,6 @@ class Orders extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // 1) restock
         foreach ($order['items'] ?? [] as $item) {
             $menuId = (int) ($item['menu_id'] ?? 0);
             $qty    = (int) ($item['qty'] ?? 0);
@@ -95,15 +93,9 @@ class Orders extends BaseController
             }
         }
 
-        // 2) hapus order_items
         $db->table('order_items')->where('order_id', $id)->delete();
-
-        // 3) hapus payments
         $db->table('payments')->where('order_id', $id)->delete();
-
-        // 4) hapus orders
         $db->table('orders')->where('id', $id)->delete();
-
         $db->transComplete();
 
         if ($db->transStatus() === false) {

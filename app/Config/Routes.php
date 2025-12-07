@@ -5,24 +5,22 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('menu', 'Home::menu');
 $routes->get('menu/json', 'Home::menuJson');
+$routes->get('about', 'Home::about');
 
-// Auth
 $routes->get('login', 'AuthController::login', ['filter' => 'guest']);
 $routes->post('login', 'AuthController::attempt');
 $routes->get('logout', 'AuthController::logout');
-// Auth (lanjutan)
 $routes->get('register', 'AuthController::register');
 $routes->post('register/save', 'AuthController::attemptRegister');
-$routes->get('register/success', 'AuthController::registerSuccess'); // ← tambahkan ini
+$routes->get('register/success', 'AuthController::registerSuccess'); 
 
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
-    $routes->get('menus', 'Admin\Menus::index'); // tahap 3-4 nanti CRUD
+    $routes->get('menus', 'Admin\Menus::index'); 
 });
 
-// --- ADMIN: MENU CRUD + LAPORAN ---
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
-    // MENUS CRUD
+
     $routes->get('/', 'Admin\Menus::index');
     $routes->get('menus', 'Admin\Menus::index');
     $routes->get('menus/create', 'Admin\Menus::create');
@@ -31,9 +29,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('menus/(:num)/update', 'Admin\Menus::update/$1');
     $routes->post('menus/(:num)/delete', 'Admin\Menus::delete/$1');
 
-    // REPORTS
     $routes->get('reports', 'Admin\Reports::index');
-    $routes->get('reports/export', 'Admin\Reports::exportCsv'); // ?from=YYYY-MM-DD&to=YYYY-MM-DD
+    $routes->get('reports/export', 'Admin\Reports::exportCsv'); 
 });
 
 $routes->group('cart', function ($routes) {
@@ -47,12 +44,13 @@ $routes->group('cart', function ($routes) {
     $routes->post('checkout', 'Buyer\Cart::checkout');
 });
 
-// Admin: status order
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('/', 'Admin\Menus::index');
     $routes->get('orders', 'Admin\Orders::index');
     $routes->get('orders/(:num)', 'Admin\Orders::show/$1');
     $routes->post('orders/(:num)/status', 'Admin\Orders::updateStatus/$1');
+
+    $routes->post('orders/(:num)/paid', 'Admin\Orders::markPaid/$1');
 });
 
 $routes->group('p', ['filter' => 'role:pembeli'], function ($routes) {
