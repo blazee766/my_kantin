@@ -86,7 +86,6 @@
       padding: 120px 16px 20px;
     }
 
-
     h2 {
       text-align: center;
       margin: 10px 0 18px;
@@ -122,6 +121,53 @@
       border-color: var(--accent)
     }
 
+    .nav-search-btn {
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-search-btn i {
+      font-size: 16px;
+      color: var(--text-dark);
+    }
+
+    .nav-search-btn:hover i {
+      color: var(--accent);
+    }
+
+    .nav-search-btn:focus {
+      outline: none;
+    }
+
+    .search-wrapper {
+      display: none;
+    }
+
+    body.search-open .search-wrapper {
+      display: block;
+    }
+
+    .search-wrapper input[type="search"] {
+      width: 190px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    .search-wrapper input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 6px 16px rgba(255, 71, 102, 0.15);
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -141,7 +187,7 @@
 
     .card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 14px 30px rgba(10, 25, 40, 0.08);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
     }
 
     .thumb {
@@ -537,6 +583,16 @@
     <div class="logo"><i class="fas fa-utensils"></i> Kantin G'penk</div>
     <nav>
       <ul>
+        <li>
+          <div class="search-wrapper">
+            <input type="search" id="menuSearch" placeholder="Cari menu...">
+          </div>
+        </li>
+        <li>
+          <button type="button" id="searchToggle" class="nav-search-btn" aria-label="Cari menu">
+            <i class="fas fa-search"></i>
+          </button>
+        </li>
         <li><a href="<?= site_url('/'); ?>">Home</a></li>
         <li><a href="<?= site_url('menu'); ?>" class="active">Menu</a></li>
         <li><a href="<?= site_url('about'); ?>">About Us</a></li>
@@ -547,7 +603,6 @@
       </ul>
     </nav>
   </header>
-
   <div class="container">
     <h2>Daftar Menu Lengkap</h2>
 
@@ -661,16 +716,33 @@
     (function() {
       const grid = document.getElementById('menuGrid');
       const tabs = Array.from(document.querySelectorAll('#tabs .tab'));
+      const searchInput = document.getElementById('menuSearch');
+      const searchToggle = document.getElementById('searchToggle');
 
       const app = {
-        api: '<?= rtrim(base_url(),  '/'); ?>', // <<< PAKAI base_url, bukan site_url
+        api: '<?= rtrim(base_url(),  '/'); ?>', 
         asset: '<?= rtrim(base_url(), '/'); ?>'
       };
 
       const prettyBase = '<?= rtrim(base_url(), '/'); ?>';
       const activeInitial = '<?= esc($activeSlug ?? ''); ?>';
 
+      let currentSlug = activeInitial || '';
+      let currentQuery = '';
+
+      if (searchToggle && searchInput) {
+        searchToggle.addEventListener('click', () => {
+          const opened = document.body.classList.toggle('search-open');
+          if (opened) {
+            searchInput.focus();
+          } else {
+          
+          }
+        });
+      }
+
       function setActive(slug) {
+        currentSlug = slug;
         tabs.forEach(a => a.classList.toggle('active', a.dataset.slug === slug));
       }
 
@@ -703,19 +775,31 @@
       }
 
       function showSkeleton(n = 8) {
-        grid.innerHTML = Array.from({
-          length: n
-        }).map(() => `<div class="skeleton"></div>`).join('');
+        grid.innerHTML = Array.from({ length: n })
+          .map(() => `<div class="skeleton"></div>`).join('');
       }
 
-      async function loadMenus(slug = '') {
+      async function loadMenus(slug = '', q = '') {
         setActive(slug);
         showSkeleton();
         const url = slug ? `${app.api}/menu/json?cat=${encodeURIComponent(slug)}` : `${app.api}/menu/json`;
         const res = await fetch(url);
         const js = await res.json();
-        const rows = js.data || [];
-        grid.innerHTML = rows.map(cardTemplate).join('') || '<p style="text-align:center;color:#777">Belum ada menu.</p>';
+        let rows = js.data || [];
+
+        if (q) {
+          const qLower = q.toLowerCase();
+          rows = rows.filter(m => {
+            const name = (m.name || '').toLowerCase();
+            const desc = (m.description || '').toLowerCase();
+            return name.includes(qLower) || desc.includes(qLower);
+          });
+        }
+
+        grid.innerHTML = rows.length
+          ? rows.map(cardTemplate).join('')
+          : '<p style="text-align:center;color:#777">Menu tidak ditemukan.</p>';
+
         bindAddButtons();
       }
 
@@ -749,16 +833,9 @@
                 return;
               }
 
-              const data = await res.json().catch(() => ({
-                ok: false
-              }));
+              const data = await res.json().catch(() => ({ ok: false }));
 
               if (data.ok) {
-                /* if (data.redirect) {
-                   window.location.href = data.redirect;
-                   return;
-                 } */
-
                 showCartBurst(clickX, clickY);
 
                 const countEl = document.querySelector('.cart-count');
@@ -789,12 +866,30 @@
         a.addEventListener('click', e => {
           e.preventDefault();
           const slug = a.dataset.slug || '';
-          loadMenus(slug);
+          currentSlug = slug;
+          loadMenus(slug, currentQuery);
           history.replaceState(null, '', slug ? `${prettyBase}/menu?cat=${slug}` : `${prettyBase}/menu`);
         });
       });
 
-      loadMenus(activeInitial);
+      if (searchInput) {
+        const debounce = (fn, delay = 300) => {
+          let t;
+          return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(null, args), delay);
+          };
+        };
+
+        const handleSearch = debounce(() => {
+          currentQuery = searchInput.value.trim();
+          loadMenus(currentSlug, currentQuery);
+        }, 300);
+
+        searchInput.addEventListener('input', handleSearch);
+      }
+
+      loadMenus(activeInitial, currentQuery);
 
       const contactLink = document.getElementById('contactLink');
       const contactModal = document.getElementById('contactModal');

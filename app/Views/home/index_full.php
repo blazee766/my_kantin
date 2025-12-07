@@ -543,7 +543,7 @@
         </div>
 
         <div class="hero-image">
-          <img src="<?= base_url('assets/img/1.png'); ?>" alt="Gourmet Food Selection" id="heroImage">
+          <img src="<?= base_url('assets/img/13-1765122057.png'); ?>" alt="Gourmet Food Selection" id="heroImage">
         </div>
       </section>
 
