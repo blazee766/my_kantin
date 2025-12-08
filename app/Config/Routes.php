@@ -57,6 +57,8 @@ $routes->group('p', ['filter' => 'role:pembeli'], function ($routes) {
     $routes->get('orders', 'Buyer\Orders::index', ['filter' => 'role:pembeli']);
     $routes->get('orders/(:num)', 'Buyer\Orders::show/$1', ['filter' => 'role:pembeli']);
 
+    $routes->get('orders/(:num)/check', 'Buyer\Orders::checkStatus/$1');
+    
     $routes->post('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
     $routes->delete('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
 

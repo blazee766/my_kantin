@@ -15,12 +15,12 @@ class AuthController extends BaseController
     {
         return view('auth/register');
     }
-
+    /*
     public function registerSuccess()
     {
         return view('auth/register_success');
     }
-
+    */
     public function attempt()
     {
         $email    = trim((string) $this->request->getPost('email'));
@@ -145,7 +145,7 @@ class AuthController extends BaseController
 
         $users->insert($data);
 
-        return redirect()->to('/register/success')
-            ->with('success', 'Pendaftaran berhasil! Silakan masuk untuk melanjutkan.');
+        session()->setFlashdata('success', 'Pendaftaran berhasil! Silakan masuk untuk melanjutkan.');
+        return redirect()->to('/register');
     }
 }

@@ -18,11 +18,30 @@ class Orders extends BaseController
         return $user;
     }
 
+    private function autoUpdatePendingToProcessing(): void
+    {
+        $db = \Config\Database::connect();
+
+        $limitTime = date('Y-m-d H:i:s', time() - (5 * 60));
+
+        // UPDATE orders
+        // SET status = 'processing'
+        // WHERE status IN ('pending','menunggu')
+        //   AND created_at <= $limitTime
+        $db->table('orders')
+            ->set('status', 'processing')
+            ->whereIn('status', ['pending', 'menunggu'])
+            ->where('created_at <=', $limitTime)
+            ->update();
+    }
+
     public function index()
     {
         $check = $this->mustLogin();
         if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
         $user = $check;
+
+        $this->autoUpdatePendingToProcessing();
 
         $orders = (new OrderModel())->getByUserWithAddress((int)$user['id']);
 
@@ -37,6 +56,8 @@ class Orders extends BaseController
         $check = $this->mustLogin();
         if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
         $user = $check;
+
+        $this->autoUpdatePendingToProcessing();
 
         $orderModel   = new OrderModel();
         $paymentModel = new PaymentModel();

@@ -29,15 +29,13 @@
     body {
       margin: 0;
       padding: 0;
-      max-width: 100%;
-      overflow-x: hidden;
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg-page) !important;
     }
 
-    body {
-      background: var(--bg-page) !important;
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      color: var(--text-dark);
+    * {
+      background-color: transparent;
     }
 
     header {
@@ -720,7 +718,7 @@
       const searchToggle = document.getElementById('searchToggle');
 
       const app = {
-        api: '<?= rtrim(base_url(),  '/'); ?>', 
+        api: '<?= rtrim(base_url(),  '/'); ?>',
         asset: '<?= rtrim(base_url(), '/'); ?>'
       };
 
@@ -736,7 +734,7 @@
           if (opened) {
             searchInput.focus();
           } else {
-          
+
           }
         });
       }
@@ -775,7 +773,9 @@
       }
 
       function showSkeleton(n = 8) {
-        grid.innerHTML = Array.from({ length: n })
+        grid.innerHTML = Array.from({
+            length: n
+          })
           .map(() => `<div class="skeleton"></div>`).join('');
       }
 
@@ -796,9 +796,9 @@
           });
         }
 
-        grid.innerHTML = rows.length
-          ? rows.map(cardTemplate).join('')
-          : '<p style="text-align:center;color:#777">Menu tidak ditemukan.</p>';
+        grid.innerHTML = rows.length ?
+          rows.map(cardTemplate).join('') :
+          '<p style="text-align:center;color:#777">Menu tidak ditemukan.</p>';
 
         bindAddButtons();
       }
@@ -833,7 +833,9 @@
                 return;
               }
 
-              const data = await res.json().catch(() => ({ ok: false }));
+              const data = await res.json().catch(() => ({
+                ok: false
+              }));
 
               if (data.ok) {
                 showCartBurst(clickX, clickY);

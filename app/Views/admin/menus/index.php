@@ -11,6 +11,26 @@ include APPPATH . 'Views/admin/partials/head.php';
     border-radius: .35rem;
     border: 1px solid #e3e6f0;
   }
+
+  .pagination li {
+    display: inline-block;
+    margin: 0 3px;
+  }
+
+  .pagination li a,
+  .pagination li span {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #555;
+  }
+
+  .pagination li.active span {
+    background: #ff4766;
+    color: #fff;
+    border-color: #ff4766;
+  }
 </style>
 
 <h1 class="h3 mb-4 text-gray-800">Kelola Menu</h1>
@@ -90,9 +110,9 @@ include APPPATH . 'Views/admin/partials/head.php';
                 </a>
 
                 <form action="<?= base_url('admin/menus/' . $m['id'] . '/delete'); ?>"
-                      method="post"
-                      style="display:inline"
-                      onsubmit="return confirm('Hapus menu ini?')">
+                  method="post"
+                  style="display:inline"
+                  onsubmit="return confirm('Hapus menu ini?')">
                   <?= csrf_field(); ?>
                   <button type="submit" class="btn btn-sm btn-danger">
                     <i class="fas fa-trash"></i> Hapus
@@ -103,6 +123,11 @@ include APPPATH . 'Views/admin/partials/head.php';
           <?php endforeach; ?>
         </tbody>
       </table>
+      <?php if (isset($pager)): ?>
+        <div class="d-flex justify-content-center mt-3">
+          <?= $pager->links(); ?>
+        </div>
+      <?php endif; ?>
     </div>
 
   </div>

@@ -333,7 +333,7 @@
               <?php
               $loc = trim(
                 (string)($o['address_building'] ?? '') .
-                  (!empty($o['address_room']) ? ' - ' . $o['address_room'] : '')
+                (!empty($o['address_room']) ? ' - ' . $o['address_room'] : '')
               );
               ?>
               <?php if ($loc !== ''): ?>
@@ -350,7 +350,14 @@
             <?php endif; ?>
             <div class="meta">
               Status:
-              <span class="badge <?= $cls; ?>"><?= esc($label); ?></span>
+              <span
+                class="badge <?= $cls; ?> order-status-badge"
+                data-order-id="<?= (int)$o['id']; ?>"
+                data-status="<?= esc($status); ?>"
+                data-check-url="<?= site_url('p/orders/' . $o['id'] . '/check'); ?>"
+              >
+                <?= esc($label); ?>
+              </span>
             </div>
             <a class="btn-link" href="<?= site_url('p/orders/' . $o['id']); ?>">
               Lihat Detail
@@ -360,6 +367,52 @@
       </div>
     <?php endif; ?>
   </div>
+
+  <script>
+    (function () {
+      const badges = document.querySelectorAll('.order-status-badge');
+      if (!badges.length) return;
+
+      function updateBadge(badge, data) {
+        const oldStatus = badge.dataset.status || '';
+        const newStatus = data.status || '';
+
+        if (oldStatus === newStatus) return;
+
+        badge.dataset.status = newStatus;
+        badge.textContent = data.statusLabel || newStatus;
+        badge.className = 'badge order-status-badge ' + (data.statusClass || '');
+
+        badge.style.transition = 'transform .2s ease, box-shadow .2s ease';
+        badge.style.transform = 'scale(1.08)';
+        badge.style.boxShadow = '0 0 0 4px rgba(255, 200, 150, 0.5)';
+        setTimeout(() => {
+          badge.style.transform = 'scale(1)';
+          badge.style.boxShadow = 'none';
+        }, 220);
+      }
+
+      function pollAll() {
+        badges.forEach(badge => {
+          const url = badge.dataset.checkUrl;
+          if (!url) return;
+
+          fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+              if (!data || !data.ok) return;
+              updateBadge(badge, data);
+            })
+            .catch(() => {
+            });
+        });
+      }
+
+      pollAll();
+      setInterval(pollAll, 30000);
+    })();
+  </script>
+
 </body>
 
 </html>

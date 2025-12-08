@@ -220,7 +220,13 @@
           </p>
         <?php endif; ?>
       <?php endif; ?>
-      <p>Status: <span class="badge <?= $statusClass; ?>"><?= esc($statusLabel); ?></span>
+      <p>Status:
+        <span
+          id="orderStatusBadge"
+          class="badge <?= $statusClass; ?>"
+          data-status="<?= esc($status); ?>">
+          <?= esc($statusLabel); ?>
+        </span>
       </p>
       <p>
         Status Pembayaran:
@@ -312,6 +318,52 @@
       </div>
     </div>
   </div>
-</body>
+  <script>
+    (function() {
+      const badge = document.getElementById('orderStatusBadge');
+      if (!badge) return;
 
+      const orderId = <?= (int) $order['id']; ?>;
+      const checkUrl = "<?= site_url('p/orders/' . $order['id'] . '/check'); ?>";
+
+      function pollStatus() {
+        fetch(checkUrl, {
+            headers: {
+              'Accept': 'application/json'
+            }
+          })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (!data || !data.ok) return;
+
+            const oldStatus = badge.dataset.status || '';
+            const newStatus = data.status || '';
+
+            if (oldStatus !== newStatus) {
+              badge.dataset.status = newStatus;
+              badge.textContent = data.statusLabel || newStatus;
+
+              badge.className = 'badge ' + (data.statusClass || '');
+
+              badge.style.transition = 'transform .2s ease, box-shadow .2s ease';
+              badge.style.transform = 'scale(1.08)';
+              badge.style.boxShadow = '0 0 0 4px rgba(255, 200, 150, 0.5)';
+
+              setTimeout(() => {
+                badge.style.transform = 'scale(1)';
+                badge.style.boxShadow = 'none';
+              }, 220);
+            }
+          })
+          .catch(() => {
+          });
+      }
+
+      pollStatus();
+      setInterval(pollStatus, 30000);
+    })();
+  </script>
+</body>
+</html>
+</body>
 </html>

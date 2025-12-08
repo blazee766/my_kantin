@@ -28,6 +28,7 @@
       background-color: var(--bg-page);
       font-family: 'Poppins', sans-serif;
       color: var(--text-dark);
+      margin: 0;
     }
 
     .auth-card {
@@ -99,6 +100,97 @@
     a:hover {
       text-decoration: underline;
     }
+
+    .register-success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: successBackdrop .35s ease forwards;
+    }
+
+    .register-success-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 32px 40px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+      opacity: 0;
+      transform: translateY(30px) scale(0.96);
+      animation: successPopup .45s ease forwards .1s;
+    }
+
+    .register-success-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #22c55e;
+      font-size: 30px;
+    }
+
+    .register-success-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ff4766;
+      margin-bottom: 12px;
+    }
+
+    .register-success-msg {
+      background: #dcfce7;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 0.96rem;
+      color: #166534;
+      margin-bottom: 20px;
+    }
+
+    .register-success-btn {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 999px;
+      background: #ff4766;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .register-success-btn:hover {
+      background: #e03f5d;
+    }
+
+    @keyframes successBackdrop {
+      from {
+        background: rgba(0, 0, 0, 0);
+      }
+
+      to {
+        background: rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    @keyframes successPopup {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   </style>
 
 </head>
@@ -110,12 +202,10 @@
     <?php if (session()->getFlashdata('error')): ?>
       <p style="color:red;"><?= esc(session('error')); ?></p>
     <?php endif; ?>
-    <?php if (session()->getFlashdata('success')): ?>
-      <p style="color:green;"><?= esc(session('success')); ?></p>
-    <?php endif; ?>
 
     <form method="post" action="<?= base_url('register/save'); ?>">
       <?= csrf_field(); ?>
+
       <label>Nama Lengkap</label>
       <input type="text" name="name" required value="<?= old('name'); ?>">
 
@@ -131,7 +221,6 @@
         placeholder="Masukkan Nomor HP Anda"
         value="<?= old('no_hp'); ?>">
 
-
       <label>Password</label>
       <input type="password" name="password" required>
 
@@ -143,6 +232,22 @@
 
     <p>Sudah punya akun? <a href="<?= base_url('login'); ?>">Sign In di sini</a></p>
   </div>
+
+  <?php if ($msg = session()->getFlashdata('success')): ?>
+    <div class="register-success-overlay">
+      <div class="register-success-card">
+        <div class="register-success-icon">✓</div>
+        <div class="register-success-title">Pendaftaran Berhasil</div>
+        <div class="register-success-msg">
+          <?= esc($msg); ?>
+        </div>
+        <a href="<?= site_url('login'); ?>" class="register-success-btn">
+          Masuk Sekarang
+        </a>
+      </div>
+    </div>
+  <?php endif; ?>
+
 </body>
 
 </html>

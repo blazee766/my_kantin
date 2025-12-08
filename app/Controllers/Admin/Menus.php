@@ -15,9 +15,11 @@ class Menus extends BaseController
             ->select('menus.*, categories.name AS category_name')
             ->join('categories', 'categories.id = menus.category_id', 'left')
             ->orderBy('menus.id', 'DESC')
-            ->findAll();
+            ->paginate(10);
 
-        return view('admin/menus/index', compact('menus'));
+            $pager = $menuModel->pager;
+
+        return view('admin/menus/index', compact('menus', 'pager'));
     }
 
     public function create()
