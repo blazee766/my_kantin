@@ -12,18 +12,32 @@ class Orders extends BaseController
     public function index()
     {
         $orderModel = model(OrderModel::class);
-        $userModel  = model(UserModel::class);
 
-        $orders = $orderModel
+        $payment = $this->request->getGet('payment');
+
+        $builder = $orderModel
             ->select('orders.*, users.name as customer_name')
-            ->join('users', 'users.id = orders.user_id', 'left')
+            ->join('users', 'users.id = orders.user_id', 'left');
+
+        if ($payment === 'lunas') {
+            $builder->where('orders.payment_status', 'paid');
+        } elseif ($payment === 'belum') {
+            $builder->where('orders.payment_status !=', 'paid');
+        }
+
+        $orders = $builder
             ->orderBy('orders.created_at', 'DESC')
-            ->findAll();
+            ->paginate(10);      
+
+        $pager = $orderModel->pager;
 
         return view('admin/orders/index', [
-            'orders' => $orders,
+            'orders'  => $orders,
+            'pager'   => $pager,
+            'payment' => $payment,
         ]);
     }
+
 
     public function show($id)
     {

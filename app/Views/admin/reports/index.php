@@ -184,7 +184,6 @@ include APPPATH . 'Views/admin/partials/head.php';
         <h3>Ringkasan</h3>
         <p>Total Transaksi: <b><?= (int)($sum['cnt'] ?? 0); ?></b></p>
         <p>Omzet (paid): <b>Rp <?= number_format((int)($sum['grand_total'] ?? 0), 0, ',', '.'); ?></b></p>
-        <small>Status dihitung dari order <b>paid</b>.</small>
       </div>
 
       <div class="card-inner">
@@ -243,5 +242,4 @@ include APPPATH . 'Views/admin/partials/head.php';
 
   </div>
 </div>
-
 <?php include APPPATH . 'Views/admin/partials/foot.php'; ?>

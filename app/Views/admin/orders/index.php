@@ -50,14 +50,44 @@ include APPPATH . 'Views/admin/partials/head.php';
         font-size: 0.8rem;
         font-weight: 600;
     }
+
+    .pagination li {
+        display: inline-block;
+        margin: 0 3px;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #555;
+    }
+
+    .pagination li.active span {
+        background: #ff4766;
+        color: #fff;
+        border-color: #ff4766;
+    }
 </style>
 
 <h1 class="h3 mb-4 text-gray-800">Proses Menu / Pesanan</h1>
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Daftar Pesanan</h6>
+
+        <form method="get" class="form-inline">
+            <label class="mr-2 mb-0 small text-muted">Pembayaran:</label>
+            <select name="payment" class="form-control form-control-sm" onchange="this.form.submit()">
+                <option value="">Semua</option>
+                <option value="lunas" <?= (isset($payment) && $payment === 'lunas') ? 'selected' : '' ?>>Lunas</option>
+                <option value="belum" <?= (isset($payment) && $payment === 'belum') ? 'selected' : '' ?>>Belum bayar</option>
+            </select>
+        </form>
     </div>
+
     <div class="card-body">
 
         <?php if (session('success')): ?>
@@ -65,6 +95,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                 <?= esc(session('success')); ?>
             </div>
         <?php endif; ?>
+
         <?php if (session('error')): ?>
             <div class="alert alert-danger" role="alert">
                 <?= esc(session('error')); ?>
@@ -149,7 +180,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                                 </td>
                                 <td>
                                     <a href="<?= base_url('admin/orders/' . $o['id']); ?>"
-                                        class="btn btn-sm btn-primary">
+                                       class="btn btn-sm btn-primary">
                                         Lihat Detail
                                     </a>
                                 </td>
@@ -164,10 +195,16 @@ include APPPATH . 'Views/admin/partials/head.php';
                         </tr>
                     <?php endif; ?>
                 </tbody>
-
             </table>
+
+            <?php if (isset($pager)): ?>
+                <div class="d-flex justify-content-center mt-3">
+                    <?= $pager->links('default', 'arrows'); ?>
+                </div>
+            <?php endif; ?>
         </div>
 
     </div>
 </div>
+
 <?php include APPPATH . 'Views/admin/partials/foot.php'; ?>

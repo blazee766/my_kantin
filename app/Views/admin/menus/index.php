@@ -123,9 +123,9 @@ include APPPATH . 'Views/admin/partials/head.php';
                 </a>
 
                 <form action="<?= base_url('admin/menus/' . $m['id'] . '/delete'); ?>"
-                      method="post"
-                      style="display:inline"
-                      onsubmit="return confirm('Hapus menu ini?')">
+                  method="post"
+                  style="display:inline"
+                  onsubmit="return confirm('Hapus menu ini?')">
                   <?= csrf_field(); ?>
                   <button type="submit" class="btn btn-sm btn-danger">
                     <i class="fas fa-trash"></i> Hapus
@@ -138,7 +138,7 @@ include APPPATH . 'Views/admin/partials/head.php';
       </table>
       <?php if (isset($pager)): ?>
         <div class="d-flex justify-content-center mt-3">
-          <?= $pager->links(); ?>
+          <?= $pager->links('default', 'arrows'); ?>
         </div>
       <?php endif; ?>
     </div>
