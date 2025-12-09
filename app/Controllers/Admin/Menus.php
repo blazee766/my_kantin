@@ -11,15 +11,25 @@ class Menus extends BaseController
     {
         $menuModel = new MenuModel();
 
-        $menus = $menuModel
+        $jenis = $this->request->getGet('jenis');
+
+        $builder = $menuModel
             ->select('menus.*, categories.name AS category_name')
-            ->join('categories', 'categories.id = menus.category_id', 'left')
+            ->join('categories', 'categories.id = menus.category_id', 'left');
+
+        if ($jenis === 'makanan') {
+            $builder->where('categories.name', 'Makanan');
+        } elseif ($jenis === 'minuman') {
+            $builder->where('categories.name', 'Minuman');
+        }
+
+        $menus = $builder
             ->orderBy('menus.id', 'DESC')
             ->paginate(10);
 
-            $pager = $menuModel->pager;
+        $pager = $menuModel->pager;
 
-        return view('admin/menus/index', compact('menus', 'pager'));
+        return view('admin/menus/index', compact('menus', 'pager', 'jenis'));
     }
 
     public function create()
@@ -41,10 +51,8 @@ class Menus extends BaseController
             'is_active' => $this->request->getPost('is_active') ? 1 : 0,
             'is_popular' => $this->request->getPost('is_popular') ? 1 : 0,
             'category_id' => (int)$this->request->getPost('category_id') ?: null,
-
-
-
         ];
+        
         if (!$m->save($data)) {
             return redirect()->back()->with('error', implode(' ', $m->errors()))->withInput();
         }
@@ -146,7 +154,7 @@ class Menus extends BaseController
                     'id'    => (int) $m['id'],
                     'name'  => (string) $m['name'],
                     'desc'  => (string) ($m['description'] ?? ''),
-                    'price' => (float) $m['price'],   
+                    'price' => (float) $m['price'],
                     'image' => (string) ($m['image'] ?? ''),
                 ];
             }, $menus),

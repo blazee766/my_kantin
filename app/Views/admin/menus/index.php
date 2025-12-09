@@ -36,11 +36,24 @@ include APPPATH . 'Views/admin/partials/head.php';
 <h1 class="h3 mb-4 text-gray-800">Kelola Menu</h1>
 
 <div class="card shadow mb-4">
+
   <div class="card-header py-3 d-flex justify-content-between align-items-center">
     <h6 class="m-0 font-weight-bold text-primary">Daftar Menu</h6>
-    <a class="btn btn-sm btn-primary" href="<?= base_url('admin/menus/create'); ?>">
-      <i class="fas fa-plus"></i> Tambah Menu
-    </a>
+
+    <div class="d-flex align-items-center">
+      <form method="get" class="form-inline mr-2">
+        <label class="mr-2 mb-0 small text-muted">Filter:</label>
+        <select name="jenis" class="form-control form-control-sm" onchange="this.form.submit()">
+          <option value="">Semua</option>
+          <option value="makanan" <?= isset($jenis) && $jenis === 'makanan' ? 'selected' : '' ?>>Makanan</option>
+          <option value="minuman" <?= isset($jenis) && $jenis === 'minuman' ? 'selected' : '' ?>>Minuman</option>
+        </select>
+      </form>
+
+      <a class="btn btn-sm btn-primary" href="<?= base_url('admin/menus/create'); ?>">
+        <i class="fas fa-plus"></i> Tambah Menu
+      </a>
+    </div>
   </div>
 
   <div class="card-body">
@@ -110,9 +123,9 @@ include APPPATH . 'Views/admin/partials/head.php';
                 </a>
 
                 <form action="<?= base_url('admin/menus/' . $m['id'] . '/delete'); ?>"
-                  method="post"
-                  style="display:inline"
-                  onsubmit="return confirm('Hapus menu ini?')">
+                      method="post"
+                      style="display:inline"
+                      onsubmit="return confirm('Hapus menu ini?')">
                   <?= csrf_field(); ?>
                   <button type="submit" class="btn btn-sm btn-danger">
                     <i class="fas fa-trash"></i> Hapus
@@ -132,4 +145,5 @@ include APPPATH . 'Views/admin/partials/head.php';
 
   </div>
 </div>
+
 <?php include APPPATH . 'Views/admin/partials/foot.php'; ?>
