@@ -12,11 +12,11 @@ $routes->post('login', 'AuthController::attempt');
 $routes->get('logout', 'AuthController::logout');
 $routes->get('register', 'AuthController::register');
 $routes->post('register/save', 'AuthController::attemptRegister');
-$routes->get('register/success', 'AuthController::registerSuccess'); 
+$routes->get('register/success', 'AuthController::registerSuccess');
 
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
-    $routes->get('menus', 'Admin\Menus::index'); 
+    $routes->get('menus', 'Admin\Menus::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
@@ -30,7 +30,10 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('menus/(:num)/delete', 'Admin\Menus::delete/$1');
 
     $routes->get('reports', 'Admin\Reports::index');
-    $routes->get('reports/export', 'Admin\Reports::exportCsv'); 
+    $routes->get('reports/export', 'Admin\Reports::exportCsv');
+
+    $routes->get('orders/(:num)/nota', 'Admin\Orders::nota/$1');
+    $routes->get('orders/(:num)/nota/pdf', 'Admin\Orders::notaPdf/$1');
 });
 
 $routes->group('cart', function ($routes) {
@@ -58,7 +61,7 @@ $routes->group('p', ['filter' => 'role:pembeli'], function ($routes) {
     $routes->get('orders/(:num)', 'Buyer\Orders::show/$1', ['filter' => 'role:pembeli']);
 
     $routes->get('orders/(:num)/check', 'Buyer\Orders::checkStatus/$1');
-    
+
     $routes->post('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
     $routes->delete('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
 

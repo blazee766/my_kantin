@@ -20,6 +20,7 @@ class Orders extends BaseController
 
     private function autoUpdatePendingToProcessing(): void
     {
+        /*
         $db = \Config\Database::connect();
 
         $limitTime = date('Y-m-d H:i:s', time() - (5 * 60));
@@ -33,6 +34,7 @@ class Orders extends BaseController
             ->whereIn('status', ['pending', 'menunggu'])
             ->where('created_at <=', $limitTime)
             ->update();
+            */
     }
 
     public function index()
@@ -41,7 +43,7 @@ class Orders extends BaseController
         if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
         $user = $check;
 
-        $this->autoUpdatePendingToProcessing();
+        //$this->autoUpdatePendingToProcessing();
 
         $orders = (new OrderModel())->getByUserWithAddress((int)$user['id']);
 
@@ -57,7 +59,7 @@ class Orders extends BaseController
         if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
         $user = $check;
 
-        $this->autoUpdatePendingToProcessing();
+        //$this->autoUpdatePendingToProcessing();
 
         $orderModel   = new OrderModel();
         $paymentModel = new PaymentModel();

@@ -319,6 +319,7 @@
     </div>
   </div>
   <script>
+    /*
     (function() {
       const badge = document.getElementById('orderStatusBadge');
       if (!badge) return;
@@ -362,6 +363,7 @@
       pollStatus();
       setInterval(pollStatus, 30000);
     })();
+    */
   </script>
 </body>
 </html>

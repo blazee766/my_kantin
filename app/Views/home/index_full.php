@@ -535,11 +535,11 @@
 
       <section class="hero">
         <div class="hero-text">
-          <h1>Temukan Keunggulan Kuliner</h1>
-          <p>Rasakan pilihan hidangan terbaik yang dibuat dengan sepenuh hati. Dari bahan-bahan segar dari peternakan hingga kreasi yang menggugah selera.</p>
+          <h1>Temukan Kelezatan Sehari-hari Anak Kampus</h1>
+          <p>Rasakan hidangan favorit mahasiswa dengan cita rasa rumahan yang selalu ngangenin.
+            Dari menu simpel penyelamat tanggal tua hingga pilihan kenyang sebelum kelas, semua dibuat dengan penuh kehangatan dan harga yang tetap bersahabat untuk kantong mahasiswa.</p>
           <a href="<?= site_url('menu'); ?>" class="btn btn-primary">Explore Menu</a>
           <button id="orderNowBtn" class="btn btn-secondary"><i class="fas fa-phone"></i> Order Now</button>
-
         </div>
 
         <div class="hero-image">

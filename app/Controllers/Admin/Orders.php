@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\OrderModel;
 use App\Models\OrderItemModel;
 use App\Models\UserModel;
+use Dompdf\Dompdf;
 
 class Orders extends BaseController
 {
@@ -27,7 +28,7 @@ class Orders extends BaseController
 
         $orders = $builder
             ->orderBy('orders.created_at', 'DESC')
-            ->paginate(10);      
+            ->paginate(10);
 
         $pager = $orderModel->pager;
 
@@ -73,7 +74,6 @@ class Orders extends BaseController
             'items' => $items,
         ]);
     }
-
 
     public function updateStatus($id)
     {
@@ -123,5 +123,61 @@ class Orders extends BaseController
 
         return redirect()->back()
             ->with('success', 'Pembayaran ditandai sudah dibayar (tunai).');
+    }
+    public function nota($id)
+    {
+        $id = (int)$id;
+        $orderModel = model(\App\Models\OrderModel::class);
+
+        $order = $orderModel
+            ->select('orders.*, users.name AS customer_name')
+            ->join('users', 'users.id = orders.user_id', 'left')
+            ->where('orders.id', $id)
+            ->first();
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        $items = model(\App\Models\OrderItemModel::class)->where('order_id', $id)->findAll();
+
+        $order['items'] = $items;
+
+        return view('orders/nota', [
+            'order' => $order,
+            'user'  => ['name' => $order['customer_name']],
+        ]);
+    }
+
+    public function notaPdf($id)
+    {
+        $id = (int)$id;
+        $orderModel = model(\App\Models\OrderModel::class);
+
+        $order = $orderModel
+            ->select('orders.*, users.name AS customer_name')
+            ->join('users', 'users.id = orders.user_id', 'left')
+            ->where('orders.id', $id)
+            ->first();
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        $items = model(\App\Models\OrderItemModel::class)->where('order_id', $id)->findAll();
+        $order['items'] = $items;
+
+        $html = view('orders/nota_pdf', ['order' => $order, 'user' => ['name' => $order['customer_name']]]);
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper([0, 0, 210, 600]); 
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', "inline; filename=nota_{$order['code']}.pdf")
+            ->setBody($output);
     }
 }

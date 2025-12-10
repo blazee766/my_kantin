@@ -180,9 +180,8 @@ include APPPATH . 'Views/admin/partials/head.php';
                                 </td>
                                 <td>
                                     <a href="<?= base_url('admin/orders/' . $o['id']); ?>"
-                                       class="btn btn-sm btn-primary">
+                                        class="btn btn-sm btn-primary">
                                         Lihat Detail
-                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

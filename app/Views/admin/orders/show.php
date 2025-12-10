@@ -224,6 +224,12 @@ $paymentBadgeClass = $payBadgeMap[$paymentStatus] ?? 'badge';
                     <a href="<?= base_url('admin/orders'); ?>" class="btn btn-light border">
                         Kembali
                     </a>
+                    <a class="btn btn-primary" target="_blank" href="<?= base_url('admin/orders/' . $order['id'] . '/nota'); ?>">
+                        Cetak Nota
+                    </a>
+                    <a class="btn btn-outline-secondary" target="_blank" href="<?= base_url('admin/orders/' . $order['id'] . '/nota/pdf'); ?>">
+                        Download PDF
+                    </a>
                 </div>
 
             </div>
