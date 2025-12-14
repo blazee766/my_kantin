@@ -5,6 +5,7 @@ namespace App\Controllers\Buyer;
 use App\Controllers\BaseController;
 use App\Models\OrderModel;
 use App\Models\PaymentModel;
+use Dompdf\Dompdf;
 
 class Orders extends BaseController
 {
@@ -20,7 +21,7 @@ class Orders extends BaseController
 
     private function autoUpdatePendingToProcessing(): void
     {
-        /*
+        
         $db = \Config\Database::connect();
 
         $limitTime = date('Y-m-d H:i:s', time() - (5 * 60));
@@ -34,37 +35,39 @@ class Orders extends BaseController
             ->whereIn('status', ['pending', 'menunggu'])
             ->where('created_at <=', $limitTime)
             ->update();
-            */
+            
     }
 
     public function index()
     {
         $check = $this->mustLogin();
-        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse)
+            return $check;
         $user = $check;
 
-        //$this->autoUpdatePendingToProcessing();
+        $this->autoUpdatePendingToProcessing();
 
-        $orders = (new OrderModel())->getByUserWithAddress((int)$user['id']);
+        $orders = (new OrderModel())->getByUserWithAddress((int) $user['id']);
 
         return view('orders/index', [
             'orders' => $orders,
-            'user'   => $user,
+            'user' => $user,
         ]);
     }
 
     public function show($id)
     {
         $check = $this->mustLogin();
-        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse)
+            return $check;
         $user = $check;
 
-        //$this->autoUpdatePendingToProcessing();
+        $this->autoUpdatePendingToProcessing();
 
-        $orderModel   = new OrderModel();
+        $orderModel = new OrderModel();
         $paymentModel = new PaymentModel();
 
-        $order = $orderModel->getOneWithItemsWithAddress((int)$id, (int)$user['id']);
+        $order = $orderModel->getOneWithItemsWithAddress((int) $id, (int) $user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
         }
@@ -81,9 +84,9 @@ class Orders extends BaseController
         }
 
         return view('orders/show', [
-            'order'         => $order,
-            'user'          => $user,
-            'payment'       => $payment,
+            'order' => $order,
+            'user' => $user,
+            'payment' => $payment,
             'paymentStatus' => $paymentStatus,
         ]);
     }
@@ -91,12 +94,13 @@ class Orders extends BaseController
     public function delete(int $id)
     {
         $check = $this->mustLogin();
-        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) return $check;
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse)
+            return $check;
         $user = $check;
 
         $orderModel = new \App\Models\OrderModel();
 
-        $order = $orderModel->getOneWithItems($id, (int)$user['id']);
+        $order = $orderModel->getOneWithItems($id, (int) $user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
         }
@@ -110,7 +114,7 @@ class Orders extends BaseController
 
         foreach ($order['items'] ?? [] as $item) {
             $menuId = (int) ($item['menu_id'] ?? 0);
-            $qty    = (int) ($item['qty'] ?? 0);
+            $qty = (int) ($item['qty'] ?? 0);
             if ($menuId > 0 && $qty > 0) {
                 $db->table('menus')->set('stock', "stock + {$qty}", false)->where('id', $menuId)->update();
             }
@@ -126,5 +130,52 @@ class Orders extends BaseController
         }
 
         return redirect()->to(site_url('p/orders'))->with('success', 'Pesanan berhasil dihapus.');
+    }
+    public function nota(int $id)
+    {
+        $check = $this->mustLogin();
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse)
+            return $check;
+        $user = $check;
+
+        $orderModel = new \App\Models\OrderModel();
+        $order = $orderModel->getOneWithItemsWithAddress($id, (int) $user['id']);
+        if (!$order) {
+            return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        return view('orders/nota', [
+            'order' => $order,
+            'user' => $user,
+        ]);
+    }
+
+    public function notaPdf(int $id)
+    {
+        // kalau ga mau PDF, hapus method ini atau biarkan tapi jangan pakai Dompdf
+        $check = $this->mustLogin();
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse)
+            return $check;
+        $user = $check;
+
+        $orderModel = new \App\Models\OrderModel();
+        $order = $orderModel->getOneWithItemsWithAddress($id, (int) $user['id']);
+        if (!$order) {
+            return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        // require dompdf via composer
+        $html = view('orders/nota_pdf', ['order' => $order, 'user' => $user]);
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A7', 'portrait'); // sesuaikan ukuran untuk thermal jika perlu
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', "inline; filename=nota_{$order['code']}.pdf")
+            ->setBody($output);
     }
 }

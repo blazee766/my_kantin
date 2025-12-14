@@ -299,15 +299,15 @@
         <?php endif; ?>
 
         <?php
-        if (in_array($status, ['pending', 'menunggu'], true) && $paymentStatus !== 'paid'): ?>
-          <a href="<?= site_url('p/payment/' . $order['id']); ?>" class="btn btn-primary">
+        if (in_array(needle: $status, haystack: ['pending', 'menunggu'], strict: true) && $paymentStatus !== 'paid'): ?>
+          <a href="<?= site_url(relativePath: 'p/payment/' . $order['id']); ?>" class="btn btn-primary">
             Bayar Sekarang
           </a>
         <?php endif; ?>
 
         <?php
-        if (in_array($status, ['pending', 'menunggu'], true)): ?>
-          <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
+        if (in_array(needle: $status, haystack: ['pending', 'menunggu'], strict: true)): ?>
+          <form action="<?= site_url(relativePath: 'p/orders/' . $order['id'] . '/delete'); ?>"
             method="post"
             onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"
             style="display:inline">
@@ -319,7 +319,7 @@
     </div>
   </div>
   <script>
-    /*
+    
     (function() {
       const badge = document.getElementById('orderStatusBadge');
       if (!badge) return;
@@ -363,7 +363,7 @@
       pollStatus();
       setInterval(pollStatus, 30000);
     })();
-    */
+    
   </script>
 </body>
 </html>

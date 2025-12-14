@@ -8,6 +8,6 @@ class Dashboard extends BaseController
 {
     public function index()
     {
-        return view('admin');
+        return redirect()->to(site_url('admin/menus'));
     }
 }

@@ -19,6 +19,10 @@
     .bold { font-weight:bold; }
     .mt { margin-top:10px; }
 
+    td.name { text-align:left; padding-right:8px; }
+    td.qty { text-align:center; width:40px; }
+    td.price { text-align:right; width:90px; }
+
     @media print { .btn-print { display:none; } }
   </style>
 </head>
@@ -27,18 +31,31 @@
 <div class="wrap">
 
   <div class="center bold">Kantin G'penk</div>
-  <div class="center"><?= date('d M Y H:i', strtotime($order['created_at'])) ?></div>
-  <div class="center">Nota: <?= esc($order['code']) ?></div>
+  <div class="center"><?= date('d M Y H:i', strtotime($order['created_at'] ?? 'now')) ?></div>
+  <div class="center">Nota: <?= esc($order['code'] ?? $order['id']) ?></div>
+
+  <?php
+  $storeAddress = getenv('STORE_ADDRESS') 
+  ?>
+  <div class="center"><?= esc($storeAddress) ?></div>
 
   <div class="line"></div>
 
   <?php
   $group = [];
-  foreach ($order['items'] as $i) {
+  foreach ($order['items'] ?? [] as $i) {
       $key = $i['menu_id'] ?? $i['name'];
-      $qty = (int)$i['qty'];
-      $price = (int)$i['price'];
-      $sub = $qty * $price;
+      $qty = (int)($i['qty'] ?? 0);
+
+      if (isset($i['price'])) {
+          $price = (int)$i['price'];
+      } elseif (!empty($i['subtotal']) && $qty > 0) {
+          $price = (int) round((int)$i['subtotal'] / $qty);
+      } else {
+          $price = 0;
+      }
+
+      $sub = isset($i['subtotal']) ? (int)$i['subtotal'] : ($price * $qty);
 
       if (!isset($group[$key])) {
           $group[$key] = [
@@ -59,8 +76,8 @@
 
     <table>
       <tr class="subline">
-        <td><?= $row['qty'] ?> x @ <?= number_format($row['price'],0,',','.') ?></td>
-        <td class="right"><?= number_format($row['sub'],0,',','.') ?></td>
+        <td class="qty"><?= $row['qty'] ?> x @ <?= number_format($row['price'],0,',','.') ?></td>
+        <td class="price"><?= number_format($row['sub'],0,',','.') ?></td>
       </tr>
     </table>
   <?php endforeach; ?>
@@ -70,18 +87,22 @@
   <table>
     <tr>
       <td>Subtotal</td>
-      <td class="right"><?= number_format($order['total_amount'],0,',','.') ?></td>
+      <td class="right"><?= number_format($order['total_amount'] ?? array_sum(array_column($group,'sub')),0,',','.') ?></td>
     </tr>
     <tr class="bold">
       <td>TOTAL</td>
-      <td class="right"><?= number_format($order['total_amount'],0,',','.') ?></td>
+      <td class="right"><?= number_format($order['total_amount'] ?? array_sum(array_column($group,'sub')),0,',','.') ?></td>
     </tr>
   </table>
 
   <div class="line"></div>
 
-  <div>Metode : <?= esc($order['delivery_method'] === 'delivery' ? 'Diantar' : 'Ambil Sendiri') ?></div>
-  <div>Nama   : <?= esc($order['customer_name']) ?></div>
+  <div class="center">Metode : <?= esc(($order['delivery_method'] ?? 'pickup') === 'delivery' ? 'Diantar' : 'Ambil Sendiri') ?></div>
+
+  <div class="center mt">
+    <div class="bold">Terima Kasih</div>
+    <div>Selamat Datang Kembali</div>
+  </div>
 
   <div class="center mt btn-print">
     <button onclick="window.print()">Cetak / Print</button>

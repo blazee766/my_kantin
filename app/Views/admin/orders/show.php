@@ -71,6 +71,23 @@ $payBadgeMap = [
 $paymentLabel      = $payLabelMap[$paymentStatus] ?? ucfirst($paymentStatus);
 $paymentBadgeClass = $payBadgeMap[$paymentStatus] ?? 'badge';
 ?>
+<?php
+$waLink = null;
+
+if (!empty($order['no_hp'])) {
+    $waPhone = preg_replace('/^0/', '62', $order['no_hp']);
+
+    $message = 
+    "Halo {$order['customer_name']},\n" .
+    "Pesanan Anda dengan kode {$order['code']} sudah *SELESAI*\n" .
+    "Silakan diambil / ditunggu ya.\n" .
+    "Terima kasih";
+
+$waMessage = urlencode($message);
+
+$waLink = "https://wa.me/{$waPhone}?text={$waMessage}";
+}
+?>
 
 <div class="row">
     <div class="col-lg-6">
@@ -157,6 +174,15 @@ $paymentBadgeClass = $payBadgeMap[$paymentStatus] ?? 'badge';
                         </button>
                     </div>
                 </form>
+                <?php if ($status === 'completed' && $waLink): ?>
+                    <div class="mt-3">
+                        <a href="<?= $waLink ?>"
+                            target="_blank"
+                            class="btn btn-success">
+                            📲 Kirim WhatsApp ke Pembeli
+                        </a>
+                    </div>
+                <?php endif; ?>
 
             </div>
         </div>

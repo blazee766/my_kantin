@@ -51,6 +51,7 @@ class Orders extends BaseController
             ->select(
                 'orders.*,
              users.name AS customer_name,
+             users.no_hp AS no_hp,
              ua.building AS address_building,
              ua.room     AS address_room,
              ua.note     AS address_note'
@@ -171,7 +172,7 @@ class Orders extends BaseController
 
         $dompdf = new Dompdf();
         $dompdf->loadHtml($html);
-        $dompdf->setPaper([0, 0, 210, 600]); 
+        $dompdf->setPaper([0, 0, 210, 600]);
         $dompdf->render();
         $output = $dompdf->output();
 

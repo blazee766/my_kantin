@@ -369,7 +369,7 @@
   </div>
 
   <script>
-    /*
+    
     (function () {
       const badges = document.querySelectorAll('.order-status-badge');
       if (!badges.length) return;
@@ -412,7 +412,7 @@
       pollAll();
       setInterval(pollAll, 30000);
     })();
-    */
+    
   </script>
 
 </body>

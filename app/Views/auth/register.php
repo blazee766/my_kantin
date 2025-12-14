@@ -197,9 +197,15 @@
 
 <body>
   <div class="auth-card">
-    <h2>Daftar Akun Baru</h2>
+    <h2>Daftar Akun</h2>
 
-    <?php if (session()->getFlashdata('error')): ?>
+    <?php if ($errors = session()->getFlashdata('errors')): ?>
+      <div style="color:#c0392b;margin-bottom:12px;">
+        <?php foreach ($errors as $e): ?>
+          <div><?= esc($e) ?></div>
+        <?php endforeach; ?>
+      </div>
+    <?php elseif (session()->getFlashdata('error')): ?>
       <p style="color:red;"><?= esc(session('error')); ?></p>
     <?php endif; ?>
 
@@ -207,46 +213,74 @@
       <?= csrf_field(); ?>
 
       <label>Nama Lengkap</label>
-      <input type="text" name="name" required value="<?= old('name'); ?>">
+      <input type="text" name="name" required placeholder="Masukkan Nama Anda" value="<?= old('name'); ?>">
 
       <label for="no_hp">Nomor HP</label>
       <input
         type="tel"
         name="no_hp"
         id="no_hp"
-        pattern="\d{12}"
-        maxlength="12"
+        pattern="08\d{10,11}"
+        maxlength="13"
         inputmode="numeric"
         required
         placeholder="Masukkan Nomor HP Anda"
         value="<?= old('no_hp'); ?>">
 
       <label>Password</label>
-      <input type="password" name="password" required>
+      <input type="password" name="password" required placeholder="Password">
 
       <label>Konfirmasi Password</label>
-      <input type="password" name="password_confirm" required>
+      <input type="password" name="password_confirm" required placeholder="Konfirmasi Password">
 
       <button type="submit">Daftar</button>
     </form>
 
     <p>Sudah punya akun? <a href="<?= base_url('login'); ?>">Sign In di sini</a></p>
   </div>
-
-  <?php if ($msg = session()->getFlashdata('success')): ?>
+  <?php if ($data = session()->getFlashdata('verify_popup')): ?>
     <div class="register-success-overlay">
       <div class="register-success-card">
-        <div class="register-success-icon">✓</div>
-        <div class="register-success-title">Pendaftaran Berhasil</div>
-        <div class="register-success-msg">
-          <?= esc($msg); ?>
-        </div>
-        <a href="<?= site_url('login'); ?>" class="register-success-btn">
-          Masuk Sekarang
+        <div class="register-success-title">Verifikasi WhatsApp</div>
+
+        <p>Silakan klik tombol di bawah untuk verifikasi akun Anda.</p>
+
+        <?php
+        $adminWa = '6285707559188'; // NOMOR ADMIN
+        $msg = urlencode(
+          "Halo Admin,\n"
+            . "Saya ingin verifikasi akun Kantin G'penk\n\n"
+            . "Nama: {$data['name']}\n"
+            . "No HP: {$data['no_hp']}"
+        );
+        ?>
+
+        <a href="https://wa.me/<?= $adminWa ?>?text=<?= $msg ?>"
+          target="_blank"
+          class="register-success-btn"
+          onclick="setTimeout(() => window.location.href='<?= site_url('login') ?>', 2000)">
+          📲 Verifikasi via WhatsApp
         </a>
+
+        <small style="display:block;margin-top:10px;color:#666">
+          Setelah mengirim pesan, silakan login.
+        </small>
       </div>
     </div>
   <?php endif; ?>
+  <script>
+    document.getElementById('no_hp')?.addEventListener('input', function() {
+      this.value = (this.value || '').replace(/\D/g, '').slice(0, 13);
+    });
+
+    document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+      const phone = document.getElementById('no_hp').value.trim();
+      if (!/^08\d{10,11}$/.test(phone)) {
+        e.preventDefault();
+        alert('Nomor HP harus diawali 08 dan terdiri dari 12 atau 13 angka.');
+      }
+    });
+  </script>
 
 </body>
 

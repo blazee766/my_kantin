@@ -15,41 +15,52 @@ class AuthController extends BaseController
     {
         return view('auth/register');
     }
-    /*
-    public function registerSuccess()
-    {
-        return view('auth/register_success');
-    }
-    */
+
+    /* =========================
+     * LOGIN
+     * ========================= */
     public function attempt()
     {
-        $email    = trim((string) $this->request->getPost('email'));
         $no_hp    = trim((string) $this->request->getPost('no_hp'));
         $password = (string) $this->request->getPost('password');
 
-        if ($email === '') {
-            if ($no_hp === '' || !preg_match('/^08[0-9]{10}$/', $no_hp)) {
-                return redirect()->back()
-                    ->with('error', 'Nomor HP tidak valid. Gunakan nomor HP yang diawali 08 dan terdiri dari 12 digit angka.')
-                    ->withInput();
-            }
+        if ($no_hp === '' || $password === '') {
+            return redirect()->back()->with('error', 'Nomor HP dan password wajib diisi.');
+        }
+
+        if (!preg_match('/^08\d{10,11}$/', $no_hp)) {
+            return redirect()->back()->with('error', 'Nomor HP tidak valid.');
         }
 
         $users = new UserModel();
+        $user  = $users->where('no_hp', $no_hp)->first();
 
-        if ($email !== '') {
-            $user = $users->where('email', $email)->first();
-        } else {
-            $user = $users->where('no_hp', $no_hp)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Akun tidak ditemukan.');
         }
 
-        if (array_key_exists('is_active', $user) && !(int) $user['is_active']) {
-            return redirect()->back()->with('error', 'Akun nonaktif.')->withInput();
+        if (!password_verify($password, $user['password_hash'])) {
+            return redirect()->back()->with('error', 'Password salah.');
         }
 
+        /* =====================================
+     * ✅ AUTO VERIFIKASI LOGIN PERTAMA
+     * ===================================== */
+        if ((int)($user['wa_verified'] ?? 0) !== 1) {
+            db_connect()->table('users')
+                ->where('id', $user['id'])
+                ->update([
+                    'wa_verified'    => 1,
+                    'wa_verified_at' => date('Y-m-d H:i:s')
+                ]);
+
+            $user['wa_verified'] = 1;
+        }
+
+        /* ROLE */
         $roleName = 'pembeli';
         if (!empty($user['role_id'])) {
-            $roleRow  = db_connect()
+            $roleRow = db_connect()
                 ->table('roles')
                 ->where('id', $user['role_id'])
                 ->get()
@@ -59,93 +70,81 @@ class AuthController extends BaseController
         }
 
         session()->regenerate();
+        session()->set('user', [
+            'id'          => (int) $user['id'],
+            'name'        => $user['name'],
+            'no_hp'       => $user['no_hp'],
+            'role'        => $roleName,
+            'wa_verified' => 1,
+            'logged_in'   => true,
+        ]);
 
-        $safeUser = [
-            'id'         => (int) ($user['id'] ?? 0),
-            'name'       => esc($user['name'] ?? ''),
-            'no_hp'      => esc($user['no_hp'] ?? ''),
-            'email'      => esc($user['email'] ?? ''),
-            'role'       => esc($roleName),
-            'logged_in'  => true,
-            'last_login' => date('Y-m-d H:i:s'),
-        ];
-        session()->set('user', $safeUser);
+        session()->setFlashdata(
+            'welcome',
+            'Halo, ' . explode(' ', $user['name'])[0] . '! Selamat datang 👋'
+        );
 
-        $first = trim(explode(' ', $safeUser['name'])[0] ?? $safeUser['name']);
-        session()->setFlashdata('welcome', "Halo, {$first}! Selamat datang di Kantin G'penk 🎉");
-
-        if ($roleName === 'admin') {
-            return redirect()->to('/admin/menus');
-        }
-        return redirect()->to('/');
+        return $roleName === 'admin'
+            ? redirect()->to('/admin/menus')
+            : redirect()->to('/');
     }
-
+    
+    /* =========================
+     * LOGOUT
+     * ========================= */
     public function logout()
     {
-        session()->remove('user');
         session()->destroy();
-        return redirect()->to('/')->with('success', 'Berhasil logout.');
+        return redirect()->to('/login')->with('success', 'Berhasil logout.');
     }
 
+    /* =========================
+     * REGISTER
+     * ========================= */
     public function attemptRegister()
     {
         $users = new UserModel();
 
-        $roles = db_connect()
+        $name    = trim($this->request->getPost('name'));
+        $no_hp   = trim($this->request->getPost('no_hp'));
+        $pass    = $this->request->getPost('password');
+        $confirm = $this->request->getPost('password_confirm');
+
+        if ($name === '' || $no_hp === '' || $pass === '') {
+            return redirect()->back()->with('error', 'Semua field wajib diisi.');
+        }
+
+        if (!preg_match('/^08\d{10,11}$/', $no_hp)) {
+            return redirect()->back()->with('error', 'Nomor HP tidak valid.');
+        }
+
+        if ($pass !== $confirm) {
+            return redirect()->back()->with('error', 'Konfirmasi password tidak sama.');
+        }
+
+        if ($users->where('no_hp', $no_hp)->first()) {
+            return redirect()->back()->with('error', 'Nomor HP sudah terdaftar.');
+        }
+
+        $role = db_connect()
             ->table('roles')
             ->where('name', 'pembeli')
             ->get()
             ->getRowArray();
 
-        $name    = trim((string) $this->request->getPost('name'));
-        $no_hp   = trim((string) $this->request->getPost('no_hp'));
-        $email   = trim((string) $this->request->getPost('email')); 
-        $pass    = (string) $this->request->getPost('password');
-        $confirm = (string) $this->request->getPost('password_confirm');
-
-        if ($name === '' || $no_hp === '' || $pass === '') {
-            return redirect()->back()
-                ->with('error', 'Nama, Nomor HP, dan password wajib diisi.')
-                ->withInput();
-        }
-
-        if (!preg_match('/^08[0-9]{10}$/', $no_hp)) {
-            return redirect()->back()
-                ->with('error', 'Nomor HP harus diawali 08 dan terdiri dari 12 digit angka.')
-                ->withInput();
-        }
-
-
-        if ($pass !== $confirm) {
-            return redirect()->back()
-                ->with('error', 'Konfirmasi password tidak sama.')
-                ->withInput();
-        }
-
-        if ($users->where('no_hp', $no_hp)->first()) {
-            return redirect()->back()
-                ->with('error', 'Nomor HP sudah terdaftar.')
-                ->withInput();
-        }
-
-        if ($email && $users->where('email', $email)->first()) {
-            return redirect()->back()
-                ->with('error', 'Email sudah terdaftar.')
-                ->withInput();
-        }
-
-        $data = [
-            'role_id'       => $roles['id'] ?? null,
+        $users->insert([
+            'role_id'       => $role['id'],
             'name'          => $name,
             'no_hp'         => $no_hp,
-            'email'         => $email ?: null,
             'password_hash' => password_hash($pass, PASSWORD_DEFAULT),
+            'wa_verified'   => 0,
             'created_at'    => date('Y-m-d H:i:s'),
-        ];
+        ]);
 
-        $users->insert($data);
-
-        session()->setFlashdata('success', 'Pendaftaran berhasil! Silakan masuk untuk melanjutkan.');
-        return redirect()->to('/register');
+        /* POPUP VERIFIKASI WA */
+        return redirect()->back()->with('verify_popup', [
+            'name'  => $name,
+            'no_hp' => $no_hp
+        ]);
     }
 }

@@ -25,6 +25,12 @@
       --whatsapp: #25D366;
     }
 
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
     html,
     body {
       margin: 0;
@@ -32,25 +38,67 @@
       width: 100%;
       min-height: 100vh;
       background: var(--bg-page) !important;
-    }
-
-    * {
-      background-color: transparent;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      font-family: 'Poppins', sans-serif;
     }
 
     header {
       position: fixed;
       top: 0;
       left: 0;
+      right: 0;
       width: 100%;
       z-index: 999;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 50px;
+      padding: 14px 20px;
       background: var(--bg-page);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 110px 16px 20px;
+      box-sizing: border-box;
+    }
+
+    .thumb img,
+    .hero-image img,
+    .dishes .dish img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+
+    .fab {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        padding: 12px 14px;
+      }
+
+      .container {
+        padding-top: 100px;
+      }
+
+      .thumb img {
+        height: 160px;
+      }
     }
 
     nav ul {

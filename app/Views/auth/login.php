@@ -118,8 +118,8 @@
         type="tel"
         name="no_hp"
         id="no_hp"
-        maxlength="12"
-        pattern="\d{12}"
+        maxlength="13"
+        pattern="\d{12,13}"
         inputmode="numeric"
         placeholder="Masukkan Nomor HP Anda"
         required
@@ -133,6 +133,19 @@
 
     <p>Belum punya akun? <a href="<?= base_url('register'); ?>">Daftar di sini</a></p>
   </div>
+  <script>
+    document.getElementById('no_hp')?.addEventListener('input', function() {
+      this.value = (this.value || '').replace(/\D/g, '').slice(0, 13);
+    });
+
+    document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+      const phone = document.getElementById('no_hp').value.trim();
+      if (!/^\d{12,13}$/.test(phone)) {
+        e.preventDefault();
+        alert('Nomor HP harus 12 atau 13 angka.');
+      }
+    });
+  </script>
 </body>
 
 </html>

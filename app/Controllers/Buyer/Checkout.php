@@ -29,6 +29,11 @@ class Checkout extends BaseController
 
     public function placeOrder()
     {
+        if (empty($user['wa_verified'])) {
+            return redirect()->to('/register')
+                ->with('error', 'Silakan verifikasi nomor WhatsApp terlebih dahulu sebelum melakukan pemesanan.');
+        }
+
         $user = session('user');
         $cart = $this->getCart();
 
@@ -39,21 +44,17 @@ class Checkout extends BaseController
             return redirect()->to('/cart/')->with('error', 'Keranjang kosong.');
         }
 
-        // --- TOTAL dari keranjang sekarang ---
         $cartTotal = (int) array_sum(array_column($cart, 'total'));
 
-        // ambil pilihan metode pengambilan
         $deliveryMethod = $this->request->getPost('delivery_method');
 
         if (! in_array($deliveryMethod, ['pickup', 'delivery'], true)) {
-            // kalau tidak ada di POST, pakai yang tersimpan di session (dari Cart::add)
             $deliveryMethod = session('delivery_method') ?? 'pickup';
         }
 
         $db     = db_connect();
         $orders = new OrderModel();
 
-        // ===== 1. Cari order pending dari SESSION dulu =====
         $pendingId     = (int) (session()->get('current_pending_order_id') ?? 0);
         $existingOrder = null;
 
@@ -64,14 +65,12 @@ class Checkout extends BaseController
                 ->first();
         }
 
-        // ===== 2. Kalau nggak ketemu di session → cek DB biasa =====
         if (!$existingOrder) {
             $existingOrder = $orders->getPendingByUser((int) $user['id']);
         }
 
         $db->transStart();
 
-        // (A) Validasi & KURANGI STOK atomik
         foreach ($cart as $row) {
             $qty    = (int) $row['qty'];
             $menuId = (int) $row['id'];
@@ -90,36 +89,28 @@ class Checkout extends BaseController
             }
         }
 
-        // (B) BUAT / UPDATE ORDER
         if ($existingOrder) {
-            // === SUDAH ADA PESANAN MENUNGGU → GABUNGKAN ===
+
             $orderId = (int) $existingOrder['id'];
-
-            // Tambah total_amount dengan nilai dari keranjang baru
             $orders->increaseTotalAmount($orderId, $cartTotal);
-
-            // update updated_at + simpan metode pengantaran terbaru
-            $orders->update($orderId, [           // <-- diubah
+            $orders->update($orderId, [           
                 'updated_at'      => date('Y-m-d H:i:s'),
                 'delivery_method' => $deliveryMethod,
             ]);
         } else {
-            // === BELUM ADA → BUAT PESANAN BARU ===
             $orderId = $orders->insert([
                 'user_id'         => $user['id'],
-                'code'            => $orders->generateCode(),   // fungsi yang sudah kamu punya
-                'status'          => 'menunggu',                // konsisten: pakai "menunggu"
+                'code'            => $orders->generateCode(),   
+                'status'          => 'menunggu',               
                 'total_amount'    => $cartTotal,
-                'delivery_method' => $deliveryMethod,           // <-- tambahan
+                'delivery_method' => $deliveryMethod,           
                 'created_at'      => date('Y-m-d H:i:s'),
                 'updated_at'      => date('Y-m-d H:i:s'),
             ]);
         }
 
-        // Simpan id order pending di session supaya request berikutnya tahu harus digabung
         session()->set('current_pending_order_id', $orderId);
 
-        // (C) SIMPAN ITEM KE order_items (SELALU TAMBAH BARU)
         $items = [];
         foreach ($cart as $r) {
             $items[] = [
@@ -128,20 +119,13 @@ class Checkout extends BaseController
                 'name'     => $r['name'] ?? '',
                 'qty'      => $r['qty'],
                 'price'    => $r['price'],
-                'subtotal' => $r['total'],     // mapping ke kolom subtotal
+                'subtotal' => $r['total'],   
             ];
         }
         model(OrderItemModel::class)->insertBatch($items);
-
-        // (D) Tidak buat payment di sini → status tetap "menunggu",
-        //     nanti admin/kasir yang ubah.
-
         $db->transComplete();
-
-        // kosongkan keranjang
         session()->remove('cart');
 
-        // redirect ke detail pesanan (namespace Buyer, prefix "p")
         return redirect()->to(site_url('p/orders/' . $orderId))
             ->with('success', 'Pesanan berhasil dibuat / diperbarui!');
     }

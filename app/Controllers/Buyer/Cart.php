@@ -52,7 +52,7 @@ class Cart extends BaseController
                     'msg' => 'Anda harus login terlebih dahulu untuk memesan. Buka halaman login sekarang?',
                 ]);
         }
-
+        /*
         if (isset($u['role']) && $u['role'] === 'admin') {
             return $this->response
                 ->setStatusCode(403)
@@ -60,6 +60,22 @@ class Cart extends BaseController
                     'ok'  => false,
                     'msg' => 'Akun admin tidak diperbolehkan memesan.',
                 ]);
+        }
+        */
+        $u = session('user');
+        $userRow = db_connect()
+            ->table('users')
+            ->select('wa_verified')
+            ->where('id', $u['id'])
+            ->get()
+            ->getRowArray();
+
+        if ((int)($userRow['wa_verified'] ?? 0) !== 1) {
+            return $this->response->setJSON([
+                'ok'  => false,
+                'msg' => 'Nomor WhatsApp belum diverifikasi. Silakan verifikasi terlebih dahulu.',
+                'redirect' => site_url('verify-wa')
+            ]);
         }
 
         $id  = (int) $this->request->getPost('id');
@@ -253,8 +269,16 @@ class Cart extends BaseController
         $u = $this->userOrRedirect();
         if ($u instanceof \CodeIgniter\HTTP\RedirectResponse) return $u;
 
-        if (isset($u['role']) && $u['role'] === 'admin') {
-            return redirect()->to(site_url('cart'))->with('error', 'Admin tidak boleh membuat pesanan.');
+        $userRow = db_connect()
+            ->table('users')
+            ->select('wa_verified')
+            ->where('id', $u['id'])
+            ->get()
+            ->getRowArray();
+
+        if ((int)($userRow['wa_verified'] ?? 0) !== 1) {
+            return redirect()->to('/verify-wa')
+                ->with('error', 'Silakan verifikasi nomor WhatsApp sebelum melakukan checkout.');
         }
 
         $cart = session('cart') ?? [];

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
@@ -18,6 +19,8 @@ class UserModel extends Model
         'is_active',
         'created_at',
         'updated_at',
+        'wa_verified',
+        'wa_verified_at',
     ];
 
     public function findByNoHp($no_hp)

@@ -37,6 +37,7 @@ class Filters extends BaseFilters
         'role'  => \App\Filters\RoleFilter::class,
         'guest' => \App\Filters\GuestFilter::class,
         'auth' => \App\Filters\AuthFilter::class,
+        'verified' => \App\Filters\VerifiedFilter::class,
     ];
 
     /**
