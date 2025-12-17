@@ -75,10 +75,22 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 24px;
-      width: 100%;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
     }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
 
     .fab {
       position: absolute;
@@ -216,9 +228,22 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 24px
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
     }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
 
     .card {
       background: var(--card-bg);
@@ -611,6 +636,73 @@
     .header-cart:hover i {
       color: var(--accent);
     }
+
+    @media (max-width: 768px) {
+      nav {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .15);
+        width: 200px;
+        display: none;
+        z-index: 9999;
+      }
+
+      nav.active {
+        display: block;
+      }
+
+      nav ul {
+        flex-direction: column;
+        padding: 10px;
+        gap: 8px;
+      }
+
+      nav ul li a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+
+      .hamburger {
+        display: block;
+        font-size: 22px;
+        cursor: pointer;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .search-wrapper {
+      position: fixed;
+      top: 70px;
+      left: 70%;
+      transform: translateX(-50%);
+      z-index: 10000;
+      display: none;
+      width: min(90%, 420px);
+    }
+
+    body.search-open .search-wrapper {
+      display: block;
+    }
+
+    .search-wrapper input {
+      width: 200px;
+    }
+
+    @media (min-width: 769px) {
+      .search-wrapper {
+        position: static;
+      }
+    }
+    
   </style>
 
 </head>
@@ -626,26 +718,41 @@
   ?>
 
   <header>
-    <div class="logo"><i class="fas fa-utensils"></i> Kantin G'penk</div>
+    <div class="logo">
+      <i class="fas fa-utensils"></i> Kantin G'penk
+    </div>
+
+    <div class="header-actions">
+
+      <!-- SEARCH INPUT (WAJIB ADA) -->
+      <div class="search-wrapper">
+        <input type="search" id="menuSearch" placeholder="Cari menu...">
+      </div>
+
+      <!-- SEARCH ICON -->
+      <button type="button" id="searchToggle" class="nav-search-btn" aria-label="Cari menu">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- CART -->
+      <a href="<?= site_url('p/orders'); ?>" class="btn header-cart" aria-label="Keranjang">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cart-count" style="display:none">0</span>
+      </a>
+
+      <!-- HAMBURGER -->
+      <div class="hamburger">
+        <i class="fas fa-bars"></i>
+      </div>
+
+    </div>
+
+    <!-- NAV (HANYA MENU) -->
     <nav>
       <ul>
-        <li>
-          <div class="search-wrapper">
-            <input type="search" id="menuSearch" placeholder="Cari menu...">
-          </div>
-        </li>
-        <li>
-          <button type="button" id="searchToggle" class="nav-search-btn" aria-label="Cari menu">
-            <i class="fas fa-search"></i>
-          </button>
-        </li>
         <li><a href="<?= site_url('/'); ?>">Home</a></li>
         <li><a href="<?= site_url('menu'); ?>" class="active">Menu</a></li>
         <li><a href="<?= site_url('about'); ?>">About Us</a></li>
-        <li><a href="<?= site_url('p/orders'); ?>" class="btn header-cart" aria-label="Keranjang">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-count" style="display:none">0</span>
-          </a></li>
       </ul>
     </nav>
   </header>
@@ -1137,6 +1244,24 @@
 
     })();
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburger = document.querySelector('.hamburger');
+      const nav = document.querySelector('header nav');
+
+      if (!hamburger || !nav) return;
+
+      hamburger.addEventListener('click', () => {
+        nav.classList.toggle('active');
+
+        hamburger.innerHTML = nav.classList.contains('active') ?
+          '<i class="fas fa-times"></i>' // X
+          :
+          '<i class="fas fa-bars"></i>'; // ☰
+      });
+    });
+  </script>
+
 </body>
 
 </html>

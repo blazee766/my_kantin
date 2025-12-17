@@ -338,6 +338,7 @@
       transform: rotate(180deg);
     }
 
+    /*
     header {
       position: fixed;
       top: 0;
@@ -351,7 +352,7 @@
       padding: 18px 50px;
       background: #ffffff;
     }
-
+*/
     .logo {
       display: flex;
       align-items: center;
@@ -375,6 +376,129 @@
       }
 
     }
+
+    @media (max-width: 768px) {
+      nav {
+        position: absolute;
+        top: 70px;
+        right: 12px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, .15);
+        padding: 14px 18px;
+        display: none;
+        z-index: 9999;
+      }
+
+      nav.active {
+        display: block;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 14px;
+      }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    header .logo {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    .address-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #374151;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    header .buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    header .buttons .btn {
+      padding: 7px 12px;
+      font-size: 0.9rem;
+    }
+
+    .hamburger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
+    @media (min-width: 769px) {
+      .hamburger {
+        display: none;
+      }
+
+      nav {
+        position: static;
+        display: block !important;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      nav ul {
+        flex-direction: row;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .address-pill {
+        display: none;
+      }
+
+      nav {
+        top: 64px;
+        right: 12px;
+        min-width: 180px;
+      }
+
+      nav ul {
+        align-items: flex-start;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .address-pill {
+        max-width: none;
+        overflow: visible;
+        text-overflow: unset;
+        white-space: nowrap;
+      }
+    }
+    
   </style>
 </head>
 
@@ -519,7 +643,7 @@
           <a href="<?= base_url('register'); ?>" class="btn btn-primary">Sign Up</a>
         <?php endif; ?>
 
-        <div class="hamburger" id="hamburger">
+        <div class="hamburger" id="hamburger" tabindex="0">
           <i class="fas fa-bars"></i>
         </div>
 
@@ -981,6 +1105,33 @@
       });
     }
   </script>
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
+    const icon = hamburger.querySelector('i');
+
+    hamburger.addEventListener('click', () => {
+      nav.classList.toggle('active');
+
+      if (nav.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times'); // jadi X
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars'); // balik ☰
+      }
+    });
+
+    // auto close saat klik menu
+    document.querySelectorAll('#nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        nav.classList.remove('active');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      });
+    });
+  </script>
+
 </body>
 
 </html>

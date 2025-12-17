@@ -27,10 +27,11 @@ img{max-width:100%;display:block;height:auto}
 
 /* ====== Header ====== */
 header{
-  position:sticky; top:0; z-index:50; background:#fff;
+  position: fixed; top:0; left: 0; width: 100%; z-index:999; background:#fff;
   display:flex; align-items:center; justify-content:space-between;
-  gap:10px; padding:12px 0; border-bottom:1px solid #eee
+  padding: 18px 50px; 
 }
+ 
 .logo{font-weight:700;font-size:1.05rem;display:flex;gap:8px;align-items:center}
 .logo i{color:var(--brand)}
 nav{display:none}                 /* hidden on mobile */
@@ -98,7 +99,13 @@ nav a:hover{opacity:1}
 /* ====== Popular Dishes ====== */
 .popular-dishes{margin:6px 0 40px}
 .popular-dishes h2{margin:8px 0 12px}
-.dishes{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+/* MOBILE: 2 x 2 */
+.dishes{
+  display:grid;
+  gap:12px;
+  grid-template-columns:repeat(2, 1fr);
+}
+
 .dish{
   position:relative;background:#fff;border:1px solid #eee;border-radius:16px;padding:10px;
   box-shadow:var(--shadow);transition:transform .12s ease

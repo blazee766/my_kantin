@@ -141,17 +141,6 @@
       }
     }
 
-    @media(max-width: 600px) {
-      .about-images {
-        margin: 0 auto;
-      }
-
-      .makanan-img {
-        left: 10px;
-        top: 120px;
-      }
-    }
-
     header {
       position: fixed;
       top: 0;
@@ -164,6 +153,88 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
       z-index: 999;
     }
+     @media (max-width: 768px) {
+      nav {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .15);
+        width: 200px;
+        display: none;
+        z-index: 9999;
+      }
+
+      nav.active {
+        display: block;
+      }
+
+      nav ul {
+        flex-direction: column;
+        padding: 10px;
+        gap: 8px;
+      }
+
+      nav ul li a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+
+      .hamburger {
+        display: block;
+        font-size: 22px;
+        cursor: pointer;
+      }
+    }
+    /* ============================= */
+/* FIX ABOUT PAGE MOBILE LAYOUT */
+/* ============================= */
+@media (max-width: 768px) {
+
+  .about-wrapper {
+    padding: 100px 20px 60px;
+  }
+
+  .about-two-col {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .about-title {
+    font-size: 1.9rem;
+    line-height: 1.25;
+  }
+
+  .about-text p {
+    max-width: 100%;
+    font-size: .95rem;
+  }
+
+  /* ==== FIX IMAGE SECTION ==== */
+  .about-images {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .suasana-kantin-img {
+    width: 100%;
+  }
+
+  .makanan-img {
+    position: static;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .suasana-kantin-img img,
+  .makanan-img img {
+    border-radius: 16px;
+  }
+}
+
   </style>
 </head>
 
@@ -178,6 +249,9 @@
         <li><a href="<?= site_url('about'); ?>" class="active">About Us</a></li>
       </ul>
     </nav>
+    <div class="hamburger">
+      <i class="fas fa-bars"></i>
+    </div>
   </header>
 
   <main class="about-wrapper">
@@ -203,6 +277,36 @@
       </div>
     </section>
   </main>
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburger = document.querySelector('.hamburger');
+      const nav = document.querySelector('header nav');
+      const icon = hamburger.querySelector('i');
 
+      if (!hamburger || !nav) return;
+
+      hamburger.addEventListener('click', function() {
+        nav.classList.toggle('active');
+
+        // toggle icon ☰ ↔ X
+        if (nav.classList.contains('active')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+
+      // klik di luar menu → tutup
+      document.addEventListener('click', function(e) {
+        if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
+          nav.classList.remove('active');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

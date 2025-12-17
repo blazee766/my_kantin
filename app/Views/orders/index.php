@@ -239,6 +239,94 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 768px) {
+      nav {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .15);
+        width: 200px;
+        display: none;
+        z-index: 9999;
+      }
+
+      nav.active {
+        display: block;
+      }
+
+      nav ul {
+        flex-direction: column;
+        padding: 10px;
+        gap: 8px;
+      }
+
+      nav ul li a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+
+      .hamburger {
+        display: block;
+        font-size: 22px;
+        cursor: pointer;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .orders {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .card h3 {
+        font-size: 0.95rem;
+      }
+
+      .meta {
+        font-size: 0.85rem;
+      }
+
+      .btn-link {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header nav ul {
+        padding: 12px;
+        gap: 6px;
+      }
+
+      header nav ul li {
+        text-align: center;
+      }
+
+      header nav ul li a {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 600;
+        transition: all .2s ease;
+      }
+
+      header nav ul li a:hover {
+        background: #fff5f7;
+      }
+
+      header nav ul li a.active {
+        background: #ffe4ea;
+        color: var(--accent);
+      }
+    }
   </style>
 
 </head>
@@ -256,6 +344,9 @@
         <li><a href="<?= site_url('about'); ?>">About Us</a></li>
       </ul>
     </nav>
+    <div class="hamburger">
+      <i class="fas fa-bars"></i>
+    </div>
   </header>
 
   <div class="container">
@@ -333,7 +424,7 @@
               <?php
               $loc = trim(
                 (string)($o['address_building'] ?? '') .
-                (!empty($o['address_room']) ? ' - ' . $o['address_room'] : '')
+                  (!empty($o['address_room']) ? ' - ' . $o['address_room'] : '')
               );
               ?>
               <?php if ($loc !== ''): ?>
@@ -354,8 +445,7 @@
                 class="badge <?= $cls; ?> order-status-badge"
                 data-order-id="<?= (int)$o['id']; ?>"
                 data-status="<?= esc($status); ?>"
-                data-check-url="<?= site_url('p/orders/' . $o['id'] . '/check'); ?>"
-              >
+                data-check-url="<?= site_url('p/orders/' . $o['id'] . '/check'); ?>">
                 <?= esc($label); ?>
               </span>
             </div>
@@ -369,8 +459,7 @@
   </div>
 
   <script>
-    
-    (function () {
+    (function() {
       const badges = document.querySelectorAll('.order-status-badge');
       if (!badges.length) return;
 
@@ -398,21 +487,54 @@
           const url = badge.dataset.checkUrl;
           if (!url) return;
 
-          fetch(url, { headers: { 'Accept': 'application/json' } })
+          fetch(url, {
+              headers: {
+                'Accept': 'application/json'
+              }
+            })
             .then(res => res.ok ? res.json() : null)
             .then(data => {
               if (!data || !data.ok) return;
               updateBadge(badge, data);
             })
-            .catch(() => {
-            });
+            .catch(() => {});
         });
       }
 
       pollAll();
       setInterval(pollAll, 30000);
     })();
-    
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburger = document.querySelector('.hamburger');
+      const nav = document.querySelector('header nav');
+      const icon = hamburger.querySelector('i');
+
+      if (!hamburger || !nav) return;
+
+      hamburger.addEventListener('click', function() {
+        nav.classList.toggle('active');
+
+        // toggle icon ☰ ↔ X
+        if (nav.classList.contains('active')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+
+      // klik di luar menu → tutup
+      document.addEventListener('click', function(e) {
+        if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
+          nav.classList.remove('active');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
   </script>
 
 </body>
