@@ -11,7 +11,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Lc4Sh8vYObQf/jdNwWfLuWbD0/4K4sK1sFVI+EZ7D0kXh+ctSBEHfNXc2r4+No8x" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
-  
+
 </head>
 
 <body class="menu-page">
@@ -178,7 +178,7 @@
           <i class="fas fa-chevron-down"></i>
         </div>
 
-        <div class="delivery-options">
+        <div class="delivery-options hidden" id="addressDropdownMenu">
           <?php foreach (($addresses ?? []) as $addr): ?>
             <button type="button"
               class="delivery-pill address-pill"
@@ -244,7 +244,10 @@
 
       function renderTabs(categories, activeSlug = '') {
         if (!tabsContainer || !Array.isArray(categories)) return;
-        const allCategories = [{ slug: '', name: 'Semua' }, ...categories];
+        const allCategories = [{
+          slug: '',
+          name: 'Semua'
+        }, ...categories];
         tabsContainer.innerHTML = allCategories.map(cat => `
           <a href="#" data-slug="${cat.slug}" class="tab${cat.slug === activeSlug ? ' active' : ''}">${cat.name}</a>
         `).join('');
@@ -307,7 +310,9 @@
         const disabled = !(m.stock > 0);
         const ratingValue = typeof m.rating === 'number' ? m.rating : 4.8;
         const starCount = Math.min(5, Math.max(0, Math.round(ratingValue)));
-        const ratingStars = Array.from({ length: 5 }, (_, index) => `<i class="fas fa-star${index < starCount ? '' : ' text-muted'}"></i>`).join('');
+        const ratingStars = Array.from({
+          length: 5
+        }, (_, index) => `<i class="fas fa-star${index < starCount ? '' : ' text-muted'}"></i>`).join('');
         const soldCount = typeof m.sold === 'number' ? m.sold : Math.max(15, (m.stock || 5) * 6);
         const stockClass = disabled ? 'out' : (m.stock <= 5 ? 'low' : 'available');
 
@@ -337,7 +342,9 @@
       }
 
       function showSkeleton(n = 8) {
-        grid.innerHTML = Array.from({ length: n }).map(() => `<div class="skeleton"></div>`).join('');
+        grid.innerHTML = Array.from({
+          length: n
+        }).map(() => `<div class="skeleton"></div>`).join('');
       }
 
       async function loadMenus(slug = '', q = '') {
@@ -664,11 +671,22 @@
 
       const addressModalEl = document.getElementById('addressModal');
       const addressTrigger = document.getElementById('addressDropdownTrigger');
+      const addressDropdownMenu = document.getElementById('addressDropdownMenu');
 
-      if (addressModalEl && addressTrigger) {
+      if (addressTrigger && addressDropdownMenu) {
+
         addressTrigger.addEventListener('click', () => {
-          addressModalEl.classList.toggle('open');
+
+          addressDropdownMenu.classList.toggle('show');
+
+          const icon = addressTrigger.querySelector('i');
+
+          if (icon) {
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+          }
         });
+
       }
 
     })();

@@ -4,112 +4,177 @@
   <meta charset="utf-8">
   <title>Pembayaran QRIS</title>
   <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f6f0f4;
-      font-family: 'Poppins', sans-serif;
-      color: #2b2b34;
-    }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f0f4;
+    font-family: 'Poppins', sans-serif;
+    color: #2b2b34;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 430px;
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    box-sizing: border-box;
+  }
+
+  .card h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff4d6d;
+  }
+
+  .card p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: #5b5b68;
+  }
+
+  .meta {
+    display: grid;
+    gap: 16px;
+    margin: 26px 0;
+  }
+
+  .meta span {
+    display: block;
+    font-size: 0.95rem;
+    color: #666674;
+  }
+
+  .meta strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 1.1rem;
+    color: #1f1f27;
+    font-weight: 700;
+  }
+
+  .qr-box {
+    width: 100%;
+    padding: 24px;
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 24px;
+    background: #fafafa;
+    text-align: center;
+    margin-bottom: 28px;
+    box-sizing: border-box;
+  }
+
+  .qr-label {
+    margin-bottom: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4b5563;
+  }
+
+  .qr-code {
+    width: 240px;
+    height: 240px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .note {
+    margin-top: 18px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #71717a;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 999px;
+    padding: 14px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all .25s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #ff5f6d, #ff3d57);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.25);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(255, 77, 109, 0.35);
+  }
+
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #4b5563;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+  }
+
+  form {
+    margin: 0;
+  }
+
+  @media (max-width: 480px) {
     .card {
-      width: 100%;
-      max-width: 420px;
-      background: #ffffff;
+      padding: 24px;
       border-radius: 24px;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
-      padding: 28px;
-      box-sizing: border-box;
     }
-    .card h1 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 24px;
-      color: #e63950;
-    }
-    .card p {
-      margin: 8px 0;
-      line-height: 1.5;
-      color: #4a4a57;
-    }
-    .meta {
-      display: grid;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-    .meta span {
-      display: block;
-      font-size: 0.95rem;
-    }
-    .meta strong {
-      display: block;
-      margin-top: 4px;
-      font-size: 1rem;
-      color: #1f1f27;
-    }
-    .qr-box {
-      width: 100%;
-      padding: 18px;
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: 20px;
-      background: #fafafa;
-      text-align: center;
-      margin-bottom: 22px;
-    }
-    .qr-label {
-      margin-bottom: 14px;
-      font-size: 0.95rem;
-      color: #6b6b75;
-    }
-    .qr-code {
-      width: 260px;
-      height: 260px;
-      margin: 0 auto;
-      display: block;
-    }
-    .note {
-      margin-top: 10px;
-      font-size: 0.88rem;
-      color: #71717a;
-    }
+
     .btn-row {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      flex-direction: column;
     }
+
     .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 12px 18px;
-      font-weight: 600;
-      cursor: pointer;
+      width: 100%;
     }
-    .btn-primary {
-      background: #ff4866;
-      color: #fff;
+
+    .qr-code {
+      width: 210px;
+      height: 210px;
     }
-    .btn-secondary {
-      background: #f3f3f8;
-      color: #4a4a57;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <div class="card">
     <h1>QRIS Pembayaran</h1>
-    <p>Scan QR berikut untuk simulasi pembayaran pesanan.</p>
+    <p>Scan QR berikut untuk melakukan pembayaran pesanan.</p>
 
     <div class="meta">
       <span>Kode Pesanan <strong>#<?= esc($order['code']); ?></strong></span>
       <span>Total Tagihan <strong>Rp <?= number_format((int)$order['total_amount'], 0, ',', '.'); ?></strong></span>
-      <span>Metode <strong>QRIS (Simulasi)</strong></span>
+      <span>Metode <strong>QRIS</strong></span>
     </div>
 
     <div class="qr-box">
-      <div class="qr-label">QRIS Simulasi</div>
+      <div class="qr-label">QRIS</div>
       <svg class="qr-code" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QRIS Simulasi">
         <rect width="260" height="260" fill="#fff"/>
         <g fill="#111">

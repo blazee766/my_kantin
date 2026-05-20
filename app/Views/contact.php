@@ -290,7 +290,7 @@
 
 <body>
   <?php
-  $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
+  $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '085707559188');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
   $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
   $waMessage = rawurlencode("Halo Kantin G'penk, saya ingin menghubungi.");
@@ -329,8 +329,8 @@
             </a>
           <?php endif; ?>
         <?php else: ?>
-          <a href="<?= base_url('login'); ?>" class="btn">Sign In</a>
-          <a href="<?= base_url('register'); ?>" class="btn btn-primary">Sign Up</a>
+          <a href="<?= base_url('login'); ?>" class="btn btn-outline">Sign In</a>
+          <a href="<?= base_url('register'); ?>" class="btn btn-outline">Sign Up</a>
         <?php endif; ?>
 
         <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
