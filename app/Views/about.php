@@ -209,8 +209,10 @@
             </a>
           <?php endif; ?>
         <?php else: ?>
-          <a href="<?= base_url('login'); ?>" class="btn btn-outline">Sign In</a>
-          <a href="<?= base_url('register'); ?>" class="btn btn-outline">Sign Up</a>
+          <a href="<?= site_url('cart'); ?>" class="icon-btn header-cart" aria-label="Keranjang">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="badge cart-count">0</span>
+          </a>
         <?php endif; ?>
 
         <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
@@ -307,4 +309,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -329,8 +329,10 @@
             </a>
           <?php endif; ?>
         <?php else: ?>
-          <a href="<?= base_url('login'); ?>" class="btn btn-outline">Sign In</a>
-          <a href="<?= base_url('register'); ?>" class="btn btn-outline">Sign Up</a>
+          <a href="<?= site_url('cart'); ?>" class="icon-btn header-cart" aria-label="Keranjang">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="badge cart-count">0</span>
+          </a>
         <?php endif; ?>
 
         <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
@@ -380,7 +382,7 @@
             </h4>
             <p>
               Telepon: <a href="tel:<?= esc($telNormalized); ?>"><?= esc($telDisplay); ?></a><br>
-              Respons waktu: 09:00 - 17:00 WIB
+              Respons waktu: 08:00 - 16:00 WIB
             </p>
           </div>
 
@@ -402,7 +404,7 @@
             </h4>
             <p>
               Senin - Kamis: 08:00 - 15:00 WIB<br>
-              Sabtu - Minggu: Libur<br>
+              Jumat - Minggu: Libur<br>
               Libur Nasional: Tutup
             </p>
           </div>
@@ -517,4 +519,5 @@
     }
   </script>
 </body>
+
 </html>
