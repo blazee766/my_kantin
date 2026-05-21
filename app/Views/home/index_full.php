@@ -218,7 +218,7 @@
         <?php endif; ?>
 
         <?php if (session('user')): ?>
-          <a href="<?= base_url('logout'); ?>" class="btn">Logout</a>
+          <a href="<?= base_url('logout'); ?>" class="btn btn-outline">Logout</a>
           <?php if (session('user.role') === 'admin'): ?>
             <a href="<?= base_url('admin'); ?>" class="btn btn-primary">Dashboard</a>
           <?php else: ?>

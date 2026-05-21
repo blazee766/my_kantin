@@ -8,6 +8,10 @@ class AuthController extends BaseController
 {
     public function login()
     {
+        if ($this->request->getGet('registered')) {
+            session()->remove('verify_popup');
+        }
+
         return view('auth/login');
     }
 
@@ -142,9 +146,11 @@ class AuthController extends BaseController
         ]);
 
         /* POPUP VERIFIKASI WA */
-        return redirect()->back()->with('verify_popup', [
+        session()->setTempdata('verify_popup', [
             'name'  => $name,
             'no_hp' => $no_hp
-        ]);
+        ], 600);
+
+        return redirect()->to(site_url('register') . '?verify=1');
     }
 }

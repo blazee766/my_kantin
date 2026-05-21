@@ -513,7 +513,7 @@ main{padding-bottom:40px}
 
     .header-actions > a.btn[href$="logout"] {
       background: transparent;
-      border-color: transparent;
+      border: 1px solid #111;
       box-shadow: none;
       color: var(--text);
       padding: 0.8rem 1rem;
