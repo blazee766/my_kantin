@@ -285,10 +285,216 @@
         padding: 16px;
       }
     }
+    /* Premium responsive info page */
+    body.info-page {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 16% 8%, rgba(255, 77, 109, 0.09), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(255, 183, 3, 0.12), transparent 26%),
+        linear-gradient(180deg, #fffdf9 0%, #f8fafc 48%, #ffffff 100%);
+    }
+
+    .info-page .container {
+      max-width: 1220px;
+      padding-inline: clamp(1rem, 3vw, 1.75rem);
+    }
+
+    .info-page .page-header {
+      min-height: 76px;
+      padding: 0.8rem clamp(1rem, 3vw, 1.5rem);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.88);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+    }
+
+    .info-page .header-brand,
+    .info-page .header-actions {
+      min-width: 0;
+    }
+
+    .info-page .brand-title,
+    .info-page .brand-subtitle {
+      display: block;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+
+    .info-page main {
+      padding-top: 104px;
+      padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    }
+
+    .contact-header {
+      max-width: 720px;
+      margin-inline: auto;
+      margin-bottom: clamp(1.5rem, 5vw, 3rem);
+    }
+
+    .contact-header h1 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      color: #0f172a;
+    }
+
+    .contact-header p {
+      color: #55657e;
+      line-height: 1.75;
+    }
+
+    .contact-container {
+      max-width: 1120px;
+      gap: clamp(1.25rem, 4vw, 2.5rem);
+      align-items: stretch;
+    }
+
+    .contact-form,
+    .info-box,
+    .faq-section {
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 58px rgba(15, 23, 42, 0.08);
+    }
+
+    .contact-form {
+      border-radius: 28px;
+      padding: clamp(1.25rem, 3vw, 2rem);
+    }
+
+    .contact-form h3,
+    .faq-section h3 {
+      letter-spacing: 0;
+      color: #0f172a;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      min-height: 52px;
+      border-radius: 16px;
+      background: #ffffff;
+    }
+
+    .form-submit {
+      min-height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff4d6d, #ffb703);
+      box-shadow: 0 16px 34px rgba(255, 77, 109, 0.2);
+    }
+
+    .contact-info {
+      gap: 1rem;
+    }
+
+    .info-box {
+      border-radius: 22px;
+    }
+
+    .info-box .icon {
+      flex: 0 0 auto;
+      border-radius: 14px;
+      background: rgba(255, 77, 109, 0.1);
+    }
+
+    .faq-section {
+      max-width: 1120px;
+      margin-inline: auto;
+      margin-top: clamp(2.5rem, 6vw, 4.5rem);
+      border-radius: 28px;
+      padding: clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .faq-item {
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-left: 4px solid #ff4d6d;
+      border-radius: 18px;
+      background: #ffffff;
+    }
+
+    @media (max-width: 992px) {
+      .info-page header nav {
+        display: none;
+      }
+
+      .info-page header nav.active {
+        display: flex;
+        position: absolute;
+        top: calc(100% + 0.6rem);
+        right: 1rem;
+        left: 1rem;
+        padding: 0.75rem;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: 20px;
+        background: #ffffff;
+        box-shadow: 0 24px 58px rgba(15, 23, 42, 0.16);
+      }
+
+      .info-page header nav.active .nav-links {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.35rem;
+      }
+
+      .info-page header nav.active .nav-links a {
+        width: 100%;
+        padding: 0.85rem 1rem;
+      }
+
+      .info-page .hamburger {
+        display: inline-grid;
+        place-items: center;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .info-page .page-header {
+        min-height: 68px;
+        padding: 0.7rem 0.9rem;
+      }
+
+      .info-page .brand-subtitle {
+        display: none;
+      }
+
+      .info-page main {
+        padding-top: 86px;
+      }
+
+      .contact-header {
+        text-align: left;
+      }
+
+      .contact-container {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-form,
+      .faq-section {
+        border-radius: 24px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .info-page .container {
+        padding-inline: 0.75rem;
+      }
+
+      .info-page .brand-title {
+        max-width: 118px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .contact-form,
+      .info-box,
+      .faq-section {
+        padding: 1rem;
+      }
+    }
   </style>
 </head>
 
-<body>
+<body class="contact-page info-page">
   <?php
   $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '085707559188');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
@@ -303,7 +509,6 @@
         <div class="brand-icon"><i class="fas fa-utensils"></i></div>
         <div>
           <span class="brand-title">Kantin G'penk</span>
-          <span class="brand-subtitle">Pesan makanan & minuman modern</span>
         </div>
       </div>
 
@@ -480,13 +685,39 @@
   <script src="<?= base_url('assets/js/script.js'); ?>"></script>
 
   <script>
-    // Hamburger menu
-    document.getElementById('hamburger')?.addEventListener('click', function() {
-      const nav = this.closest('header').querySelector('nav');
-      if (nav) {
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.querySelector('header nav');
+    const icon = hamburger?.querySelector('i');
+
+    if (hamburger && nav && icon) {
+      hamburger.addEventListener('click', function() {
         nav.classList.toggle('active');
-      }
-    });
+
+        if (nav.classList.contains('active')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+
+      nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          nav.classList.remove('active');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        });
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
+          nav.classList.remove('active');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    }
 
     // FAQ toggle
     document.querySelectorAll('.faq-item h5').forEach(item => {

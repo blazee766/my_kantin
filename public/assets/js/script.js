@@ -1,13 +1,67 @@
-// ====== Mobile nav toggle ======
+// ====== Shared mobile nav toggle ======
 (function () {
-  const btn = document.getElementById('hamburger');
-  const nav = document.getElementById('nav');
-  if (btn && nav) {
-    btn.addEventListener('click', () => {
-      const show = getComputedStyle(nav).display === 'none';
-      nav.style.display = show ? 'block' : 'none';
-    });
+  function setIcon(button, opened) {
+    const icon = button?.querySelector('i');
+    if (!icon) return;
+
+    icon.classList.toggle('fa-bars', !opened);
+    icon.classList.toggle('fa-times', opened);
   }
+
+  function closeNav(nav, button) {
+    if (!nav) return;
+    nav.classList.remove('active');
+    if (button) {
+      button.setAttribute('aria-expanded', 'false');
+      setIcon(button, false);
+    }
+  }
+
+  function getNavFor(button) {
+    const header = button.closest('header');
+    return header?.querySelector('nav') || document.getElementById('nav');
+  }
+
+  document.addEventListener('click', function (event) {
+    const button = event.target.closest('.hamburger');
+    if (!button) return;
+
+    const nav = getNavFor(button);
+    if (!nav) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    document.querySelectorAll('header nav.active').forEach(openNav => {
+      if (openNav === nav) return;
+      const openButton = openNav.closest('header')?.querySelector('.hamburger');
+      closeNav(openNav, openButton);
+    });
+
+    const opened = nav.classList.toggle('active');
+    button.setAttribute('aria-expanded', opened ? 'true' : 'false');
+    setIcon(button, opened);
+  }, true);
+
+  document.addEventListener('click', function (event) {
+    document.querySelectorAll('header nav.active').forEach(nav => {
+      const header = nav.closest('header');
+      const button = header?.querySelector('.hamburger');
+
+      if (nav.contains(event.target) || button?.contains(event.target)) return;
+      closeNav(nav, button);
+    });
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+
+    document.querySelectorAll('header nav.active').forEach(nav => {
+      const button = nav.closest('header')?.querySelector('.hamburger');
+      closeNav(nav, button);
+    });
+  });
 })();
 
 // ====== Hero image swap ketika hover kartu menu ======

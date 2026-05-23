@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Lc4Sh8vYObQf/jdNwWfLuWbD0/4K4sK1sFVI+EZ7D0kXh+ctSBEHfNXc2r4+No8x" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/style.css?v=' . filemtime(FCPATH . 'assets/css/style.css')); ?>">
 
 </head>
 
@@ -29,7 +29,6 @@
       <div class="brand-icon"><i class="fas fa-utensils"></i></div>
       <div>
         <span class="brand-title">Kantin G'penk</span>
-        <span class="brand-subtitle">Pesan makanan & minuman modern</span>
       </div>
     </div>
 
@@ -279,6 +278,13 @@
         hamburger.addEventListener('click', () => {
           const opened = mobileNav.classList.toggle('active');
           hamburger.innerHTML = opened ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        mobileNav.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+          });
         });
       }
 
@@ -691,6 +697,7 @@
 
     })();
   </script>
+  <script src="<?= base_url('assets/js/script.js'); ?>"></script>
 </body>
 
 </html>

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pesanan Saya - Kantin G'penk</title>
-  <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/style.css?v=' . filemtime(FCPATH . 'assets/css/style.css')); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -375,7 +375,6 @@
       <div class="brand-icon"><i class="fas fa-utensils"></i></div>
       <div>
         <span class="brand-title">Kantin G'penk</span>
-        <span class="brand-subtitle">Pesan makanan & minuman modern</span>
       </div>
     </div>
 
@@ -391,7 +390,7 @@
         </nav>
       </div>
 
-      <button class="hamburger icon-btn d-md-none" aria-label="Toggle menu">
+      <button class="hamburger icon-btn d-md-none" aria-label="Toggle menu" aria-expanded="false">
         <i class="fas fa-bars"></i>
       </button>
     </div>
@@ -515,6 +514,10 @@
       </div>
     <?php endif; ?>
   </div>
+  <script>
+    window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
+  </script>
+  <script src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
 
   <script>
     (function() {

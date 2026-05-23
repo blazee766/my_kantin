@@ -149,38 +149,6 @@ class Cart extends BaseController
                 throw new \RuntimeException('Stok berubah, gagal menyimpan pesanan.');
             }
 
-            if ($existingOrder) {
-                $orderId = (int) $existingOrder['id'];
-
-                $updateData = [
-                    'total_amount'    => (int) $existingOrder['total_amount'] + $total,
-                    'delivery_method' => $deliveryMethod,
-                ];
-
-                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
-                    $updateData['delivery_address_id'] = $deliveryAddressId;
-                }
-
-                $orderModel->update($orderId, $updateData);
-            } else {
-                $orderCode = 'ORD' . date('ymdHis');
-
-                $insertData = [
-                    'user_id'         => (int) $u['id'],
-                    'code'            => $orderCode,
-                    'total_amount'    => $total,
-                    'status'          => 'pending',
-                    'delivery_method' => $deliveryMethod,
-                    'created_at'      => date('Y-m-d H:i:s'),
-                ];
-
-                if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
-                    $insertData['delivery_address_id'] = $deliveryAddressId;
-                }
-
-                $orderId   = $orderModel->insert($insertData);
-            }
-
             if ($deliveryMethod === 'delivery' && $deliveryAddressId > 0) {
                 $addr = $db->table('user_addresses')
                     ->where('id', $deliveryAddressId)

@@ -89,12 +89,27 @@ class Home extends BaseController
 
         $menus = $menuModel->findAll();
 
-        $out = array_map(function ($m) use ($categoryMap) {
+        $soldRows = db_connect()
+            ->table('order_items oi')
+            ->select('oi.menu_id, COALESCE(SUM(oi.qty), 0) AS sold', false)
+            ->join('orders o', 'o.id = oi.order_id', 'left')
+            ->whereNotIn('o.status', ['canceled', 'batal'])
+            ->groupBy('oi.menu_id')
+            ->get()
+            ->getResultArray();
+
+        $soldMap = [];
+        foreach ($soldRows as $row) {
+            $soldMap[(int)$row['menu_id']] = (int)$row['sold'];
+        }
+
+        $out = array_map(function ($m) use ($categoryMap, $soldMap) {
             $stock = (int)($m['stock'] ?? 0);
-            $sold = isset($m['sold']) ? (int)$m['sold'] : max(15, min(160, 90 - $stock * 2));
+            $menuId = (int)$m['id'];
+            $sold = $soldMap[$menuId] ?? 0;
 
             return [
-                'id'            => (int)$m['id'],
+                'id'            => $menuId,
                 'name'          => $m['name'],
                 'description'   => (string)($m['description'] ?? ''),
                 'price'         => (int)$m['price'],

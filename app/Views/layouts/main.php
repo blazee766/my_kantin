@@ -19,13 +19,12 @@
             <div class="brand-icon"><i class="fas fa-utensils"></i></div>
             <div>
                 <span class="brand-title">Kantin G'penk</span>
-                <span class="brand-subtitle">Pesan makanan & minuman modern</span>
             </div>
         </div>
 
         <div class="header-actions">
             <div class="header-nav">
-                <nav aria-label="Primary navigation">
+                <nav id="nav" aria-label="Primary navigation">
                     <ul class="nav-links">
                         <li><a href="<?= base_url('/'); ?>">Beranda</a></li>
                         <?php if(session('user')): ?>
@@ -40,15 +39,46 @@
                                     </a>
                                 </li>
                             <?php endif; ?>
-                            <li><a href="<?= base_url('logout'); ?>">Logout</a></li>
                         <?php endif; ?>
                     </ul>
                 </nav>
             </div>
+
+            <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </header>
 
     <!-- Konten utama -->
     <?= $this->renderSection('content'); ?>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+        const icon = hamburger?.querySelector('i');
+
+        if (hamburger && nav && icon) {
+            hamburger.addEventListener('click', () => {
+                nav.classList.toggle('active');
+
+                if (nav.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            document.querySelectorAll('#nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    nav.classList.remove('active');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+        }
+    </script>
 </body>
 </html>

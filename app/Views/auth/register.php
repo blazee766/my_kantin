@@ -469,6 +469,102 @@
     }
   }
 
+  /* Premium responsive auth layout */
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 14% 8%, rgba(255, 77, 109, 0.12), transparent 28%),
+      radial-gradient(circle at 88% 18%, rgba(255, 183, 3, 0.14), transparent 26%),
+      linear-gradient(180deg, #fffdf9 0%, #f8fafc 54%, #ffffff 100%);
+  }
+
+  .login-wrapper {
+    width: min(1160px, calc(100% - 40px));
+    min-height: calc(100vh - 92px);
+    margin-top: 86px;
+    gap: clamp(1.5rem, 5vw, 4.5rem);
+  }
+
+  .auth-visual {
+    position: relative;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: 30px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 237, 0.72)),
+      radial-gradient(circle at 88% 18%, rgba(255, 183, 3, 0.18), transparent 34%);
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    box-shadow: 0 26px 70px rgba(15, 23, 42, 0.08);
+  }
+
+  .auth-visual h1 {
+    max-width: 12ch;
+    letter-spacing: 0;
+  }
+
+  .auth-card {
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 26px 70px rgba(15, 23, 42, 0.11);
+  }
+
+  .auth-card h2 {
+    color: #0f172a;
+    letter-spacing: 0;
+  }
+
+  .auth-eyebrow {
+    padding: 0.45rem 0.8rem;
+    background: rgba(255, 77, 109, 0.1);
+  }
+
+  .auth-card input {
+    min-height: 54px;
+    border-radius: 16px;
+    background: #ffffff;
+  }
+
+  .auth-card button {
+    background: linear-gradient(135deg, #ff4d6d, #ffb703);
+  }
+
+  @media (max-width: 900px) {
+    .login-wrapper {
+      width: min(600px, calc(100% - 28px));
+      min-height: calc(100vh - 82px);
+      margin-top: 82px;
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .login-wrapper {
+      width: calc(100% - 24px);
+      margin-top: 78px;
+      padding: 0.75rem 0 1.25rem;
+    }
+
+    .auth-card {
+      padding: 1.15rem;
+      border-radius: 22px;
+    }
+
+    .auth-card h2 {
+      margin-bottom: 1.15rem;
+      font-size: 1.55rem;
+    }
+
+    .auth-card input,
+    .auth-card button {
+      min-height: 50px;
+    }
+
+    .register-success-card {
+      padding: 1.25rem;
+      border-radius: 22px;
+    }
+  }
+
   @keyframes successPopup {
     from {
       opacity: 0;

@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="<?= base_url('assets/sbadmin2/css/sb-admin-2.min.css'); ?>" rel="stylesheet">
-  <link href="<?= base_url('assets/sbadmin2/css/custom.css'); ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/sbadmin2/css/custom.css?v=' . filemtime(FCPATH . 'assets/sbadmin2/css/custom.css')); ?>" rel="stylesheet">
   <style>
     :root{
       --primary:#ff4766;
@@ -20,7 +20,8 @@
   </style>
 </head>
 
-<body id="page-top">
+<?php $adminPath = uri_string(); ?>
+<body id="page-top" class="admin-page">
 
   <div id="wrapper">
 
@@ -34,7 +35,7 @@
       </a>
 
       <hr class="sidebar-divider my-0">
-      <li class="nav-item">
+      <li class="nav-item <?= ($adminPath === '' || $adminPath === '/') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= base_url('/'); ?>">
           <i class="fas fa-fw fa-home"></i>
           <span>Beranda</span>
@@ -47,21 +48,21 @@
         Navigasi
       </div>
 
-      <li class="nav-item">
+      <li class="nav-item <?= str_starts_with($adminPath, 'admin/menus') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= base_url('admin/menus'); ?>">
           <i class="fas fa-fw fa-list"></i>
           <span>Kelola Menu</span>
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item <?= str_starts_with($adminPath, 'admin/orders') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= base_url('admin/orders'); ?>">
           <i class="fas fa-fw fa-shopping-cart"></i>
           <span>Proses Menu</span>
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item <?= str_starts_with($adminPath, 'admin/reports') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= base_url('admin/reports'); ?>">
           <i class="fas fa-fw fa-chart-area"></i>
           <span>Laporan</span>
@@ -88,10 +89,6 @@
       <div id="content">
 
         <nav class="navbar navbar-expand navbar-light bg-white topbar fixed-top shadow">
-
-          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-          </button>
 
           <ul class="navbar-nav ml-auto">
 

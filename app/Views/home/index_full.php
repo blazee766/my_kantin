@@ -180,13 +180,12 @@
         <div class="brand-icon"><i class="fas fa-utensils"></i></div>
         <div>
           <span class="brand-title">Kantin G'penk</span>
-          <span class="brand-subtitle">Pesan makanan & minuman modern</span>
         </div>
       </div>
 
       <div class="header-actions">
         <div class="header-nav">
-          <nav aria-label="Primary navigation">
+          <nav id="nav" aria-label="Primary navigation">
             <ul class="nav-links">
               <li><a href="<?= base_url('/'); ?>">Home</a></li>
               <li><a href="<?= base_url('menu'); ?>">Menu</a></li>
@@ -218,7 +217,7 @@
         <?php endif; ?>
 
         <?php if (session('user')): ?>
-          <a href="<?= base_url('logout'); ?>" class="btn btn-outline">Logout</a>
+          <a href="<?= base_url('logout'); ?>" class="btn btn-outline header-logout">Logout</a>
           <?php if (session('user.role') === 'admin'): ?>
             <a href="<?= base_url('admin'); ?>" class="btn btn-primary">Dashboard</a>
           <?php else: ?>
@@ -228,8 +227,8 @@
             </a>
           <?php endif; ?>
         <?php else: ?>
-          <a href="<?= base_url('login'); ?>" class="btn btn-outline">Sign In</a>
-          <a href="<?= base_url('register'); ?>" class="btn btn-outline">Sign Up</a>
+          <a href="<?= base_url('login'); ?>" class="btn btn-outline auth-signin">Sign In</a>
+          <a href="<?= base_url('register'); ?>" class="btn btn-outline auth-signup">Sign Up</a>
         <?php endif; ?>
 
         <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
@@ -735,28 +734,29 @@
   <script>
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
-    const icon = hamburger.querySelector('i');
+    const icon = hamburger?.querySelector('i');
 
-    hamburger.addEventListener('click', () => {
-      nav.classList.toggle('active');
+    if (hamburger && nav && icon) {
+      hamburger.addEventListener('click', () => {
+        nav.classList.toggle('active');
 
-      if (nav.classList.contains('active')) {
-        icon.classList.remove('fa-bars');
-        icon.classList.add('fa-times'); // jadi X
-      } else {
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars'); // balik ☰
-      }
-    });
-
-    // auto close saat klik menu
-    document.querySelectorAll('#nav a').forEach(link => {
-      link.addEventListener('click', () => {
-        nav.classList.remove('active');
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars');
+        if (nav.classList.contains('active')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
       });
-    });
+
+      document.querySelectorAll('#nav a').forEach(link => {
+        link.addEventListener('click', () => {
+          nav.classList.remove('active');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        });
+      });
+    }
   </script>
 
 </body>
