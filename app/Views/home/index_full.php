@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KantinG'penk - Delightful Food Experience</title>
-  <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/style.css?v=' . filemtime(FCPATH . 'assets/css/style.css')); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -191,6 +191,9 @@
               <li><a href="<?= base_url('menu'); ?>">Menu</a></li>
               <li><a href="<?= base_url('about'); ?>">About</a></li>
               <li><a href="<?= site_url('contact'); ?>">Contact</a></li>
+              <?php if (session('user')): ?>
+                <li class="mobile-only"><a href="<?= base_url('logout'); ?>" class="nav-logout">Logout</a></li>
+              <?php endif; ?>
             </ul>
           </nav>
         </div>
@@ -420,7 +423,7 @@
     window.ASSETS_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
   </script>
 
-  <script src="<?= base_url('assets/js/script.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
