@@ -1890,6 +1890,13 @@ main{padding-bottom:40px}
   box-shadow: 0 14px 30px rgba(255, 77, 109, 0.18);
 }
 
+.home-page .header-actions > .header-logout.btn-outline {
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.28);
+  background: transparent;
+  box-shadow: none;
+}
+
 .home-page main {
   padding-top: 94px;
 }
@@ -2683,8 +2690,30 @@ main{padding-bottom:40px}
   .menu-page header nav.active .nav-links a.nav-logout,
   .info-page header nav.active .nav-links a.nav-logout,
   .orders-page header nav.active .nav-links a.nav-logout {
+    color: #0f172a !important;
+    background: transparent !important;
+    border: 1px solid rgba(15, 23, 42, 0.28) !important;
+    box-shadow: none !important;
+  }
+
+  .page-header .header-nav nav.active .nav-links a.nav-logout:hover,
+  .page-header .header-nav nav.active .nav-links a.nav-logout:focus,
+  .page-header .header-nav nav.active .nav-links a.nav-logout:active,
+  .home-page header nav.active .nav-links a.nav-logout:hover,
+  .home-page header nav.active .nav-links a.nav-logout:focus,
+  .home-page header nav.active .nav-links a.nav-logout:active,
+  .menu-page header nav.active .nav-links a.nav-logout:hover,
+  .menu-page header nav.active .nav-links a.nav-logout:focus,
+  .menu-page header nav.active .nav-links a.nav-logout:active,
+  .info-page header nav.active .nav-links a.nav-logout:hover,
+  .info-page header nav.active .nav-links a.nav-logout:focus,
+  .info-page header nav.active .nav-links a.nav-logout:active,
+  .orders-page header nav.active .nav-links a.nav-logout:hover,
+  .orders-page header nav.active .nav-links a.nav-logout:focus,
+  .orders-page header nav.active .nav-links a.nav-logout:active {
     color: #ffffff !important;
     background: linear-gradient(135deg, #ff4d6d, #ffb703) !important;
+    border-color: transparent !important;
     box-shadow: 0 14px 30px rgba(255, 77, 109, 0.18) !important;
   }
 }

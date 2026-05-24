@@ -141,13 +141,21 @@
       font-size: 1.35rem;
     }
 
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--detail-border);
+      border-radius: 16px;
+      background: #fff;
+    }
+
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       overflow: hidden;
-      border-radius: 16px;
-      border: 1px solid var(--detail-border);
+      min-width: 620px;
       background: #fff;
     }
 
@@ -221,6 +229,10 @@
       margin-top: 18px;
     }
 
+    .btn-inline form {
+      margin: 0;
+    }
+
     .badge {
       display: inline-flex;
       align-items: center;
@@ -265,14 +277,42 @@
       color: #128454;
     }
 
-    @media (max-width:720px) {
+    @media (max-width: 1024px) {
       .container {
-        padding: 100px 14px 34px;
+        padding-inline: 16px;
       }
 
       .section {
-        padding: 20px;
         border-radius: 22px;
+        padding: 24px;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .btn-inline {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+      }
+
+      .btn-inline .btn,
+      .btn-inline form,
+      .btn-inline form .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width:720px) {
+      .container {
+        padding: 100px 12px 34px;
+      }
+
+      .section {
+        padding: 18px 14px;
+        border-radius: 18px;
+        margin: 14px 0;
       }
 
       .detail-title,
@@ -282,11 +322,12 @@
 
       .info-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
       }
 
       th,
       td {
-        padding: 10px 8px;
+        padding: 12px 10px;
         font-size: 0.92rem
       }
 
@@ -298,6 +339,7 @@
 
       .btn-inline {
         display: grid;
+        grid-template-columns: 1fr;
       }
 
       header nav {
@@ -330,6 +372,56 @@
         display: inline-grid;
       }
     }
+
+    @media (max-width:430px) {
+      .container {
+        padding-inline: 10px;
+      }
+
+      .section {
+        padding: 16px 12px;
+      }
+
+      .detail-title {
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+      }
+
+      .detail-title h2 {
+        font-size: 1.45rem;
+      }
+
+      .detail-title p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .order-code {
+        width: 100%;
+        justify-content: center;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .info-item {
+        padding: 13px;
+        border-radius: 14px;
+      }
+
+      .section-head h3 {
+        font-size: 1.2rem;
+      }
+
+      table {
+        min-width: 540px;
+      }
+
+      th,
+      td {
+        font-size: 0.86rem;
+      }
+    }
   </style>
 
 </head>
@@ -337,6 +429,7 @@
 <body class="orders-page">
   <?php
   $status = $order['status'] ?? 'pending';
+  $statusKey = strtolower((string) $status);
 
   $labelMap = [
     'pending'    => 'Menunggu',
@@ -360,8 +453,10 @@
     'batal'      => 'cancel',
   ];
 
-  $statusLabel = $labelMap[$status]  ?? ucfirst($status);
-  $statusClass = $classMap[$status] ?? 'pending';
+  $statusLabel = $labelMap[$statusKey]  ?? ucfirst((string) $status);
+  $statusClass = $classMap[$statusKey] ?? 'pending';
+  $canModifyOrder = in_array($statusKey, ['pending', 'menunggu'], true);
+  $canPayOrder = in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true);
   $deliveryRaw  = $order['delivery_method'] ?? 'pickup';
   $deliveryText = $deliveryRaw === 'delivery'
     ? 'Diantar'
@@ -465,68 +560,70 @@
       <div class="section-head">
         <h3>Item Pesanan</h3>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Menu</th>
-            <th>Qty</th>
-            <th>Harga</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $grouped = [];
-
-          foreach (($order['items'] ?? []) as $it) {
-            $key = $it['menu_id'] ?? $it['id'] ?? $it['name'];
-
-            $qty   = (int)($it['qty'] ?? 0);
-            $price = (int)($it['price'] ?? 0);
-            $sub   = (int)($it['subtotal'] ?? ($price * $qty));
-
-            if (!isset($grouped[$key])) {
-              $grouped[$key] = [
-                'name'     => $it['name'] ?? '',
-                'qty'      => $qty,
-                'price'    => $price,
-                'subtotal' => $sub,
-              ];
-            } else {
-              $grouped[$key]['qty']      += $qty;
-              $grouped[$key]['subtotal']  = $grouped[$key]['qty'] * $grouped[$key]['price'];
-            }
-          }
-
-          $grandTotal = 0;
-          foreach ($grouped as $row):
-            $grandTotal += $row['subtotal'];
-          ?>
+      <div class="table-scroll">
+        <table>
+          <thead>
             <tr>
-              <td><?= esc($row['name']); ?></td>
-              <td><?= $row['qty']; ?></td>
-              <td>Rp <?= number_format($row['price'], 0, ',', '.'); ?></td>
-              <td>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
+              <th>Menu</th>
+              <th>Qty</th>
+              <th>Harga</th>
+              <th>Subtotal</th>
             </tr>
-          <?php endforeach; ?>
+          </thead>
+          <tbody>
+            <?php
+            $grouped = [];
 
-          <tr>
-            <td style="font-weight:bold;">Total</td>
-            <td></td>
-            <td></td>
-            <td style="font-weight:bold;">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
-          </tr>
-        </tbody>
-      </table>
+            foreach (($order['items'] ?? []) as $it) {
+              $key = $it['menu_id'] ?? $it['id'] ?? $it['name'];
+
+              $qty   = (int)($it['qty'] ?? 0);
+              $price = (int)($it['price'] ?? 0);
+              $sub   = (int)($it['subtotal'] ?? ($price * $qty));
+
+              if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                  'name'     => $it['name'] ?? '',
+                  'qty'      => $qty,
+                  'price'    => $price,
+                  'subtotal' => $sub,
+                ];
+              } else {
+                $grouped[$key]['qty']      += $qty;
+                $grouped[$key]['subtotal']  = $grouped[$key]['qty'] * $grouped[$key]['price'];
+              }
+            }
+
+            $grandTotal = 0;
+            foreach ($grouped as $row):
+              $grandTotal += $row['subtotal'];
+            ?>
+              <tr>
+                <td><?= esc($row['name']); ?></td>
+                <td><?= $row['qty']; ?></td>
+                <td>Rp <?= number_format($row['price'], 0, ',', '.'); ?></td>
+                <td>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
+              </tr>
+            <?php endforeach; ?>
+
+            <tr>
+              <td style="font-weight:bold;">Total</td>
+              <td></td>
+              <td></td>
+              <td style="font-weight:bold;">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="btn-inline">
         <a href="<?= site_url('/'); ?>" class="btn btn-ghost"><i class="fas fa-arrow-left"></i>Kembali</a>
-        <?php if (in_array($status, ['pending', 'menunggu'], true)): ?>
+        <?php if ($canModifyOrder): ?>
           <a href="<?= site_url('menu'); ?>" class="btn btn-primary"><i class="fas fa-plus"></i>Tambah Pesanan</a>
         <?php endif; ?>
 
         <?php
-        if (in_array($status, ['pending', 'menunggu'], true) && $paymentStatus !== 'paid'): ?>
+        if ($canPayOrder && $paymentStatus !== 'paid'): ?>
           <a href="<?= site_url('p/payment/' . $order['id']); ?>" class="btn btn-primary">
             <i class="fas fa-credit-card"></i>
             Bayar Sekarang
@@ -534,7 +631,7 @@
         <?php endif; ?>
 
         <?php
-        if (in_array($status, ['pending', 'menunggu'], true)): ?>
+        if ($canModifyOrder): ?>
           <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
             method="post"
             onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"

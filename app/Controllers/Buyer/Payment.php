@@ -30,8 +30,9 @@ class Payment extends BaseController
                 ->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        // Hanya boleh bayar kalau status order masih pending & belum dibayar
-        if (!in_array($order['status'], ['pending','menunggu'], true)) {
+        // Pesanan yang sudah diproses tetap boleh dibayar selama belum lunas.
+        $statusKey = strtolower((string) ($order['status'] ?? 'pending'));
+        if (!in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true)) {
             return redirect()->to(site_url('p/orders/'.$orderId))
                 ->with('error', 'Pesanan ini tidak bisa dibayar lagi.');
         }
