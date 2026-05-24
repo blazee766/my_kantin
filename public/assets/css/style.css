@@ -2000,17 +2000,21 @@ main{padding-bottom:40px}
   right: 12px !important;
 }
 
-/* Header Sign Up stays outlined until interaction */
-.home-page .header-actions > .btn-outline:last-of-type {
+/* Header auth buttons stay lightly outlined until interaction */
+.home-page .header-actions > .auth-signin,
+.home-page .header-actions > .auth-signup {
   color: #0f172a !important;
   background: transparent !important;
   border: 1px solid rgba(15, 23, 42, 0.18) !important;
   box-shadow: none !important;
 }
 
-.home-page .header-actions > .btn-outline:last-of-type:hover,
-.home-page .header-actions > .btn-outline:last-of-type:focus,
-.home-page .header-actions > .btn-outline:last-of-type:active {
+.home-page .header-actions > .auth-signin:hover,
+.home-page .header-actions > .auth-signin:focus,
+.home-page .header-actions > .auth-signin:active,
+.home-page .header-actions > .auth-signup:hover,
+.home-page .header-actions > .auth-signup:focus,
+.home-page .header-actions > .auth-signup:active {
   color: #ffffff !important;
   background: linear-gradient(135deg, #ff4d6d, #ffb703) !important;
   border-color: transparent !important;
