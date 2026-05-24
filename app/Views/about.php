@@ -368,9 +368,12 @@
 
 <body class="about-page info-page">
   <?php
-  $contactPhone = getenv('CONTACT_PHONE') ?: (isset($contactPhone) ? $contactPhone : '08123456789');
+  $contactPhone = env('CONTACT_PHONE', isset($contactPhone) ? $contactPhone : '085748543921');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
   $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
+  if (str_starts_with($waNormalized, '0')) {
+    $waNormalized = '62' . substr($waNormalized, 1);
+  }
   $waMessage = rawurlencode("Halo Kantin G'penk, saya ingin bertanya.");
   $telDisplay = $contactPhone;
   ?>

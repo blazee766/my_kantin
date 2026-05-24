@@ -596,7 +596,11 @@
       </div>
 
       <?php
-      $adminWa = '6285707559188';
+      $adminPhone = '085748543921';
+      $adminWa = preg_replace('/[^\d]/', '', $adminPhone);
+      if (str_starts_with($adminWa, '0')) {
+        $adminWa = '62' . substr($adminWa, 1);
+      }
 
       $msg = urlencode(
         "Halo Admin,\n"
