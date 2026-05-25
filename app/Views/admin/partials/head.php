@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= esc($title ?? 'Admin'); ?></title>
   <link href="<?= base_url('assets/sbadmin2/vendor/fontawesome-free/css/all.min.css'); ?>" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="<?= base_url('assets/sbadmin2/css/sb-admin-2.min.css'); ?>" rel="stylesheet">

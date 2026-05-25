@@ -92,11 +92,134 @@ include APPPATH . 'Views/admin/partials/head.php';
     .table td { padding:10px 12px; }
     .card { padding:12px; }
   }
+
+  .admin-menu-table .menu-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 991.98px) {
+    .admin-menu-card .card-header .d-flex.align-items-center {
+      align-items: stretch !important;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .admin-menu-card .card-header .form-inline {
+      margin-right: 0 !important;
+    }
+
+    .admin-menu-card .card-body {
+      padding: 0.85rem !important;
+    }
+
+    .admin-menu-card .table-responsive {
+      overflow: visible !important;
+      border-radius: 0;
+    }
+
+    .admin-menu-table {
+      min-width: 0 !important;
+      border-spacing: 0 !important;
+    }
+
+    .admin-menu-table thead {
+      display: none;
+    }
+
+    .admin-menu-table,
+    .admin-menu-table tbody,
+    .admin-menu-table tr,
+    .admin-menu-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .admin-menu-table tbody tr {
+      margin-bottom: 0.9rem;
+      padding: 0.9rem;
+      border: 1px solid #eef2f7;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    .admin-menu-table tbody td,
+    .admin-menu-table tbody td:first-child,
+    .admin-menu-table tbody td:last-child {
+      display: grid;
+      grid-template-columns: minmax(86px, 34%) minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.55rem 0 !important;
+      border: 0 !important;
+      border-radius: 0;
+      word-break: break-word;
+    }
+
+    .admin-menu-table tbody td::before {
+      content: attr(data-label);
+      color: var(--admin-muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .admin-menu-table .menu-image-cell {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+      padding-top: 0 !important;
+    }
+
+    .admin-menu-table .menu-image-cell::before {
+      display: none;
+    }
+
+    .admin-menu-table .img-thumb {
+      width: 72px !important;
+      height: 72px !important;
+    }
+
+    .admin-menu-table .menu-name-cell {
+      color: #111827;
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .admin-menu-table .menu-actions {
+      justify-content: flex-start;
+    }
+
+    .admin-menu-table .menu-actions .btn {
+      flex: 1 1 112px;
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .admin-menu-table tbody td,
+    .admin-menu-table tbody td:first-child,
+    .admin-menu-table tbody td:last-child {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+
+    .admin-menu-table .menu-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .admin-menu-table .menu-actions form,
+    .admin-menu-table .menu-actions .btn {
+      width: 100%;
+    }
+  }
 </style>
 
 <h1 class="h3 mb-4 text-gray-800">Kelola Menu</h1>
 
-<div class="card shadow mb-4">
+<div class="card shadow mb-4 admin-menu-card">
 
   <div class="card-header py-3 d-flex justify-content-between align-items-center">
     <h6 class="m-0 font-weight-bold text-primary">Daftar Menu</h6>
@@ -132,7 +255,7 @@ include APPPATH . 'Views/admin/partials/head.php';
     <?php endif; ?>
 
     <div class="table-responsive">
-      <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+      <table class="table table-bordered table-hover admin-menu-table" width="100%" cellspacing="0">
         <thead class="thead-light">
           <tr>
             <th>Gambar</th>
@@ -148,21 +271,21 @@ include APPPATH . 'Views/admin/partials/head.php';
         <tbody>
           <?php foreach ($menus as $m): ?>
             <tr>
-              <td>
+              <td class="menu-image-cell" data-label="Gambar">
                 <?php if ($m['image']): ?>
                   <img class="img-thumb" src="<?= base_url('assets/img/' . $m['image']); ?>" alt="">
                 <?php endif; ?>
               </td>
 
-              <td><?= esc(ucwords($m['name'])); ?></td>
+              <td class="menu-name-cell" data-label="Nama"><?= esc(ucwords($m['name'])); ?></td>
 
-              <td><?= esc(ucwords($m['category_name'] ?? '-')); ?></td>
+              <td data-label="Kategori"><?= esc(ucwords($m['category_name'] ?? '-')); ?></td>
 
-              <td>Rp <?= number_format($m['price'], 0, ',', '.'); ?></td>
+              <td data-label="Harga">Rp <?= number_format($m['price'], 0, ',', '.'); ?></td>
 
-              <td><?= (int)($m['stock'] ?? 0); ?></td>
+              <td data-label="Stok"><?= (int)($m['stock'] ?? 0); ?></td>
 
-              <td>
+              <td data-label="Aktif">
                 <?php if ($m['is_active']): ?>
                   <span class="badge badge-success"><i class="fas fa-check-circle"></i> <span class="badge-text">Ya</span></span>
                 <?php else: ?>
@@ -170,7 +293,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                 <?php endif; ?>
               </td>
 
-              <td>
+              <td data-label="Populer">
                 <?php if (!empty($m['is_popular'])): ?>
                   <span class="badge badge-warning"><i class="fas fa-star"></i> <span class="badge-text">Ya</span></span>
                 <?php else: ?>
@@ -178,7 +301,8 @@ include APPPATH . 'Views/admin/partials/head.php';
                 <?php endif; ?>
               </td>
 
-              <td class="text-nowrap">
+              <td class="text-nowrap" data-label="Aksi">
+                <div class="menu-actions">
                 <a class="btn btn-sm btn-edit" href="<?= base_url('admin/menus/' . $m['id'] . '/edit'); ?>" title="Edit">
                   <i class="fas fa-pen"></i><span class="btn-text">Edit</span>
                 </a>
@@ -192,6 +316,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                     <i class="fas fa-trash"></i><span class="btn-text">Hapus</span>
                   </button>
                 </form>
+                </div>
               </td>
             </tr>
           <?php endforeach; ?>
