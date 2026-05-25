@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($title ?? 'Kantin'); ?></title>
-    <link rel="stylesheet" href="<?= base_url('assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/style.css?v=' . filemtime(FCPATH . 'assets/css/style.css')); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
     </script>
-    <script defer src="<?= base_url('assets/js/script.js'); ?>"></script>
+    <script defer src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
 </head>
 <body>
     <!-- Navbar -->
@@ -44,7 +44,7 @@
                 </nav>
             </div>
 
-            <button class="hamburger icon-btn d-md-none" id="hamburger" aria-label="Toggle menu">
+            <button class="hamburger icon-btn" id="hamburger" type="button" aria-label="Toggle menu" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -61,8 +61,11 @@
         if (hamburger && nav && icon) {
             hamburger.addEventListener('click', () => {
                 nav.classList.toggle('active');
+                const opened = nav.classList.contains('active');
+                hamburger.classList.toggle('is-open', opened);
+                hamburger.setAttribute('aria-expanded', opened ? 'true' : 'false');
 
-                if (nav.classList.contains('active')) {
+                if (opened) {
                     icon.classList.remove('fa-bars');
                     icon.classList.add('fa-times');
                 } else {
@@ -74,6 +77,8 @@
             document.querySelectorAll('#nav a').forEach(link => {
                 link.addEventListener('click', () => {
                     nav.classList.remove('active');
+                    hamburger.classList.remove('is-open');
+                    hamburger.setAttribute('aria-expanded', 'false');
                     icon.classList.remove('fa-times');
                     icon.classList.add('fa-bars');
                 });

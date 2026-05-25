@@ -700,7 +700,7 @@
 
     })();
   </script>
-  <script src="<?= base_url('assets/js/script.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
 </body>
 
 </html>

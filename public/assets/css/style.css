@@ -2045,12 +2045,6 @@ main{padding-bottom:40px}
   box-shadow: 0 14px 30px rgba(255, 77, 109, 0.18) !important;
 }
 
-@media (max-width: 430px) {
-  .home-page .header-actions > .auth-signin {
-    display: none !important;
-  }
-}
-
 /* Home popular menu: keep two columns on phones */
 .home-page .home-menu-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -2864,5 +2858,211 @@ main{padding-bottom:40px}
     flex: 0 0 auto !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+  }
+}
+
+/* Always keep the navigation behind a visible hamburger button. */
+.page-header .header-nav,
+.home-page .page-header .header-nav,
+.menu-page .page-header .header-nav,
+.info-page .page-header .header-nav,
+.orders-page .page-header .header-nav {
+  position: static !important;
+}
+
+.page-header .header-nav nav,
+.home-page header nav,
+.menu-page header nav,
+.info-page header nav,
+.orders-page header nav {
+  display: none !important;
+}
+
+.page-header .hamburger,
+.home-page .page-header .hamburger,
+.menu-page .page-header .hamburger,
+.info-page .page-header .hamburger,
+.orders-page .page-header .hamburger {
+  position: relative;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08) !important;
+  cursor: pointer !important;
+}
+
+.page-header .hamburger i,
+.home-page .page-header .hamburger i,
+.menu-page .page-header .hamburger i,
+.info-page .page-header .hamburger i,
+.orders-page .page-header .hamburger i {
+  display: none !important;
+}
+
+.page-header .hamburger::before,
+.home-page .page-header .hamburger::before,
+.menu-page .page-header .hamburger::before,
+.info-page .page-header .hamburger::before,
+.orders-page .page-header .hamburger::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 -6px 0 currentColor, 0 6px 0 currentColor;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-header .hamburger.is-open::before,
+.page-header .hamburger[aria-expanded="true"]::before,
+.home-page .page-header .hamburger[aria-expanded="true"]::before,
+.menu-page .page-header .hamburger[aria-expanded="true"]::before,
+.info-page .page-header .hamburger[aria-expanded="true"]::before,
+.orders-page .page-header .hamburger[aria-expanded="true"]::before {
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 currentColor;
+}
+
+.page-header .hamburger.is-open::after,
+.page-header .hamburger[aria-expanded="true"]::after,
+.home-page .page-header .hamburger[aria-expanded="true"]::after,
+.menu-page .page-header .hamburger[aria-expanded="true"]::after,
+.info-page .page-header .hamburger[aria-expanded="true"]::after,
+.orders-page .page-header .hamburger[aria-expanded="true"]::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(-45deg);
+}
+
+.page-header .header-nav nav.active,
+.home-page header nav.active,
+.menu-page header nav.active,
+.info-page header nav.active,
+.orders-page header nav.active {
+  display: flex !important;
+  position: absolute !important;
+  top: calc(100% + 0.6rem) !important;
+  left: clamp(0.75rem, 3vw, 2rem) !important;
+  right: clamp(0.75rem, 3vw, 2rem) !important;
+  width: auto !important;
+  max-width: 560px !important;
+  margin-left: auto !important;
+  padding: 0.75rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 24px 58px rgba(15, 23, 42, 0.16) !important;
+  z-index: 1001 !important;
+}
+
+.page-header .header-nav nav.active .nav-links,
+.home-page header nav.active .nav-links,
+.menu-page header nav.active .nav-links,
+.info-page header nav.active .nav-links,
+.orders-page header nav.active .nav-links {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.35rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.page-header .header-nav nav.active .nav-links a,
+.home-page header nav.active .nav-links a,
+.menu-page header nav.active .nav-links a,
+.info-page header nav.active .nav-links a,
+.orders-page header nav.active .nav-links a {
+  width: 100% !important;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 0.85rem 1rem !important;
+  border-radius: 14px !important;
+  color: #0f172a !important;
+  text-align: left !important;
+  text-decoration: none !important;
+}
+
+@media (max-width: 520px) {
+  .page-header .hamburger,
+  .home-page .page-header .hamburger,
+  .menu-page .page-header .hamburger,
+  .info-page .page-header .hamburger,
+  .orders-page .page-header .hamburger {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+}
+
+/* Mobile/tablet auth flow: show login first, keep desktop as the full header. */
+@media (max-width: 992px) {
+  .home-page .header-actions > .auth-signup {
+    display: none !important;
+  }
+
+  .home-page .header-actions > .auth-signin {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 993px) {
+  .page-header .header-nav nav,
+  .home-page header nav,
+  .menu-page header nav,
+  .info-page header nav,
+  .orders-page header nav {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .page-header .header-nav nav .nav-links,
+  .home-page header nav .nav-links,
+  .menu-page header nav .nav-links,
+  .info-page header nav .nav-links,
+  .orders-page header nav .nav-links {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 1rem !important;
+  }
+
+  .page-header .hamburger,
+  .home-page .page-header .hamburger,
+  .menu-page .page-header .hamburger,
+  .info-page .page-header .hamburger,
+  .orders-page .page-header .hamburger {
+    display: none !important;
+  }
+
+  .home-page .header-actions > .auth-signin,
+  .home-page .header-actions > .auth-signup {
+    display: inline-flex !important;
   }
 }

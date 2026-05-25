@@ -13,6 +13,7 @@
     nav.classList.remove('active');
     if (button) {
       button.setAttribute('aria-expanded', 'false');
+      button.classList.remove('is-open');
       setIcon(button, false);
     }
   }
@@ -41,6 +42,7 @@
 
     const opened = nav.classList.toggle('active');
     button.setAttribute('aria-expanded', opened ? 'true' : 'false');
+    button.classList.toggle('is-open', opened);
     setIcon(button, opened);
   }, true);
 
