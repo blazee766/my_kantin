@@ -146,7 +146,7 @@ include APPPATH . 'Views/admin/partials/head.php';
   <div class="alert alert-danger"><?= esc(session('error')); ?></div>
 <?php endif; ?>
 
-<form action="<?= base_url('admin/orders/store'); ?>" method="post" class="card order-create-card mb-4" id="adminOrderForm">
+<form action="<?= base_url('admin/orders/store'); ?>" method="post" class="card order-create-card mb-4" id="adminOrderForm" data-ajax-form data-ajax-action="save-admin-order">
   <?= csrf_field(); ?>
   <div class="card-header">
     <h6>Informasi Pesanan</h6>

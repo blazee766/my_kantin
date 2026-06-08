@@ -310,7 +310,9 @@ include APPPATH . 'Views/admin/partials/head.php';
                 <form action="<?= base_url('admin/menus/' . $m['id'] . '/delete'); ?>"
                   method="post"
                   style="display:inline"
-                  onsubmit="return confirm('Hapus menu ini?')">
+                  data-ajax-form
+                  data-ajax-action="remove-row"
+                  data-confirm="Hapus menu ini?">
                   <?= csrf_field(); ?>
                   <button type="submit" class="btn btn-sm btn-delete" title="Hapus">
                     <i class="fas fa-trash"></i><span class="btn-text">Hapus</span>

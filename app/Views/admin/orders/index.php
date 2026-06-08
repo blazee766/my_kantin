@@ -130,7 +130,7 @@ include APPPATH . 'Views/admin/partials/head.php';
         <?php endif; ?>
 
         <div class="table-responsive">
-            <table class="table table-bordered" width="100%" cellspacing="0">
+            <table class="table table-bordered" width="100%" cellspacing="0" data-admin-orders-poll="<?= base_url('admin/orders/statuses'); ?>">
                 <thead class="thead-light">
                     <tr>
                         <th>Kode</th>
@@ -198,7 +198,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                                 <td><?= esc($o['customer_name'] ?? '-'); ?></td>
                                 <td>Rp <?= number_format((int)$o['total_amount'], 0, ',', '.'); ?></td>
                                                                 <td>
-                                                                        <span class="badge order-pill <?= esc($clsKey); ?>">
+                                                                        <span class="badge order-pill <?= esc($clsKey); ?>" data-order-status-badge data-order-id="<?= (int) $o['id']; ?>">
                                                                                 <?php if ($clsKey === 'badge-done'): ?>
                                                                                     <i class="fas fa-check-circle"></i>
                                                                                 <?php elseif ($clsKey === 'badge-cancel'): ?>
@@ -210,7 +210,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                                                                         </span>
                                                                 </td>
                                                                 <td>
-                                                                        <span class="order-pill <?= esc($payClass); ?>">
+                                                                        <span class="order-pill <?= esc($payClass); ?>" data-order-payment-badge data-order-id="<?= (int) $o['id']; ?>">
                                                                                 <?php if ($payClass === 'badge-pay-paid'): ?>
                                                                                     <i class="fas fa-wallet"></i>
                                                                                 <?php elseif ($payClass === 'badge-pay-failed'): ?>

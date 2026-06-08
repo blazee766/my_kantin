@@ -647,11 +647,11 @@
             foreach ($grouped as $row):
               $grandTotal += $row['subtotal'];
             ?>
-              <tr>
+              <tr data-order-item-row data-menu-id="<?= (int) $row['menu_id']; ?>">
                 <td><?= esc($row['name']); ?></td>
-                <td><?= $row['qty']; ?></td>
+                <td data-item-qty><?= $row['qty']; ?></td>
                 <td>Rp <?= number_format($row['price'], 0, ',', '.'); ?></td>
-                <td>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
+                <td data-item-subtotal>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
                 <?php if ($canModifyItem): ?>
                   <td>
                     <?php if (!empty($row['menu_id'])): ?>
@@ -659,7 +659,9 @@
                         class="item-remove-form"
                         action="<?= site_url('p/orders/' . $order['id'] . '/items/' . $row['menu_id'] . '/remove'); ?>"
                         method="post"
-                        onsubmit="return confirm('Hapus 1 qty menu ini dari pesanan?');">
+                        data-ajax-form
+                        data-ajax-action="remove-order-item"
+                        data-confirm="Hapus 1 qty menu ini dari pesanan?">
                         <?= csrf_field(); ?>
                         <button type="submit" class="btn-item-remove" title="Hapus">
                           <i class="fas fa-trash"></i>
@@ -676,7 +678,7 @@
               <td style="font-weight:bold;">Total</td>
               <td></td>
               <td></td>
-              <td style="font-weight:bold;">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
+              <td style="font-weight:bold;" data-order-total>Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
               <?php if ($canModifyItem): ?>
                 <td></td>
               <?php endif; ?>
@@ -703,7 +705,8 @@
         if ($canModifyOrder): ?>
           <form action="<?= site_url('p/orders/' . $order['id'] . '/delete'); ?>"
             method="post"
-            onsubmit="return confirm('Yakin ingin membatalkan pesanan?');"
+            data-ajax-form
+            data-confirm="Yakin ingin membatalkan pesanan?"
             style="display:inline">
             <?= csrf_field(); ?>
             <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i>Hapus / Batalkan</button>
@@ -716,6 +719,7 @@
     window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
   </script>
   <script src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
+  <script src="<?= base_url('assets/js/ajax-actions.js?v=' . filemtime(FCPATH . 'assets/js/ajax-actions.js')); ?>"></script>
   <script>
     const hamburger = document.querySelector('.hamburger');
     const nav = document.querySelector('header nav');

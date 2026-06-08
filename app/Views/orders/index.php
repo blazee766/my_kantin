@@ -518,6 +518,7 @@
     window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
   </script>
   <script src="<?= base_url('assets/js/script.js?v=' . filemtime(FCPATH . 'assets/js/script.js')); ?>"></script>
+  <script src="<?= base_url('assets/js/ajax-actions.js?v=' . filemtime(FCPATH . 'assets/js/ajax-actions.js')); ?>"></script>
 
   <script>
     (function() {

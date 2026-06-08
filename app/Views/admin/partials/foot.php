@@ -24,6 +24,7 @@
   <script src="<?= base_url('assets/sbadmin2/vendor/jquery-easing/jquery.easing.min.js'); ?>"></script>
 
   <script src="<?= base_url('assets/sbadmin2/js/sb-admin-2.min.js'); ?>"></script>
+  <script src="<?= base_url('assets/js/ajax-actions.js?v=' . filemtime(FCPATH . 'assets/js/ajax-actions.js')); ?>"></script>
   <script>
 window.addEventListener("scroll", function () {
     document.body.classList.toggle("scrolled", window.scrollY > 5);

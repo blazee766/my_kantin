@@ -37,7 +37,10 @@ include APPPATH . 'Views/admin/partials/head.php';
       action="<?= $mode === 'create'
                 ? base_url('admin/menus/store')
                 : base_url('admin/menus/' . $menu['id'] . '/update'); ?>"
-      method="post" enctype="multipart/form-data">
+      method="post" enctype="multipart/form-data"
+      data-ajax-form
+      data-ajax-action="save-menu"
+      <?= $mode === 'create' ? 'data-reset-on-success="1"' : ''; ?>>
 
       <?= csrf_field(); ?>
 

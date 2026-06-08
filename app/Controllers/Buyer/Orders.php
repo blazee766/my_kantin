@@ -9,6 +9,25 @@ use Dompdf\Dompdf;
 
 class Orders extends BaseController
 {
+    private function isAjaxRequest(): bool
+    {
+        return $this->request->isAJAX()
+            || str_contains((string) $this->request->getHeaderLine('Accept'), 'application/json');
+    }
+
+    private function jsonOrRedirect(array $payload, string $redirectTo, string $flashType = 'success', int $statusCode = 200)
+    {
+        if ($this->isAjaxRequest()) {
+            if (function_exists('csrf_token') && function_exists('csrf_hash')) {
+                $payload['csrfTokenName'] = csrf_token();
+                $payload['csrfHash'] = csrf_hash();
+            }
+            return $this->response->setStatusCode($statusCode)->setJSON($payload);
+        }
+
+        return redirect()->to($redirectTo)->with($flashType, $payload['message'] ?? $payload['msg'] ?? '');
+    }
+
     private function mustLogin()
     {
         $user = session('user');
@@ -144,13 +163,18 @@ class Orders extends BaseController
         $order = $orderModel->getOneWithItems($orderId, (int) $user['id']);
 
         if (!$order) {
-            return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], site_url('p/orders'), 'error', 404);
         }
 
         $statusKey = strtolower((string) ($order['status'] ?? 'pending'));
         if (!in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true)) {
-            return redirect()->to(site_url('p/orders/' . $orderId))
-                ->with('error', 'Item pesanan ini tidak bisa dihapus lagi.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Item pesanan ini tidak bisa dihapus lagi.',
+            ], site_url('p/orders/' . $orderId), 'error', 422);
         }
 
         $db = \Config\Database::connect();
@@ -163,8 +187,10 @@ class Orders extends BaseController
             ->getRowArray();
 
         if (!$item) {
-            return redirect()->to(site_url('p/orders/' . $orderId))
-                ->with('error', 'Item pesanan tidak ditemukan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Item pesanan tidak ditemukan.',
+            ], site_url('p/orders/' . $orderId), 'error', 404);
         }
 
         $price = (int) ($item['price'] ?? 0);
@@ -209,16 +235,38 @@ class Orders extends BaseController
         $db->transComplete();
 
         if ($db->transStatus() === false) {
-            return redirect()->to(site_url('p/orders/' . $orderId))
-                ->with('error', 'Gagal menghapus item pesanan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Gagal menghapus item pesanan.',
+            ], site_url('p/orders/' . $orderId), 'error', 500);
         }
 
         if ((int) ($remaining['total'] ?? 0) === 0) {
-            return redirect()->to(site_url('p/orders'))->with('success', 'Semua item pesanan sudah dihapus.');
+            return $this->jsonOrRedirect([
+                'ok' => true,
+                'message' => 'Semua item pesanan sudah dihapus.',
+                'removedOrder' => true,
+                'redirect' => site_url('p/orders'),
+            ], site_url('p/orders'));
         }
 
-        return redirect()->to(site_url('p/orders/' . $orderId))
-            ->with('success', '1 item berhasil dihapus dari pesanan.');
+        $newTotal = $db->table('orders')
+            ->select('total_amount')
+            ->where('id', $orderId)
+            ->get()
+            ->getRowArray();
+
+        $newQty = $qty > 1 ? $qty - 1 : 0;
+
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => '1 item berhasil dihapus dari pesanan.',
+            'menuId' => $menuId,
+            'qty' => $newQty,
+            'rowRemoved' => $newQty === 0,
+            'lineSubtotal' => max(($qty - 1) * $price, 0),
+            'totalAmount' => (int) ($newTotal['total_amount'] ?? 0),
+        ], site_url('p/orders/' . $orderId));
     }
 
     public function delete(int $id)
@@ -233,12 +281,18 @@ class Orders extends BaseController
         $orderModel->autoPromoteWaitingOrders();
         $order = $orderModel->getOneWithItems($id, (int) $user['id']);
         if (!$order) {
-            return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], site_url('p/orders'), 'error', 404);
         }
 
         $statusKey = strtolower((string) ($order['status'] ?? 'pending'));
         if (!in_array($statusKey, ['pending', 'menunggu'], true)) {
-            return redirect()->to(site_url('p/orders/' . $id))->with('error', 'Pesanan yang sudah diproses tidak bisa dihapus.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan yang sudah diproses tidak bisa dihapus.',
+            ], site_url('p/orders/' . $id), 'error', 422);
         }
 
         $db = \Config\Database::connect();
@@ -258,10 +312,18 @@ class Orders extends BaseController
         $db->transComplete();
 
         if ($db->transStatus() === false) {
-            return redirect()->to(site_url('p/orders/' . $id))->with('error', 'Gagal menghapus pesanan (transaksi gagal).');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Gagal menghapus pesanan (transaksi gagal).',
+            ], site_url('p/orders/' . $id), 'error', 500);
         }
 
-        return redirect()->to(site_url('p/orders'))->with('success', 'Pesanan berhasil dihapus.');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Pesanan berhasil dihapus.',
+            'removedOrder' => true,
+            'redirect' => site_url('p/orders'),
+        ], site_url('p/orders'));
     }
     public function nota(int $id)
     {

@@ -445,13 +445,13 @@ foreach ($items as $it) {
         <div class="summary-card">
             <div class="summary-label">Status Pesanan</div>
             <div class="summary-value">
-                <span class="<?= $badgeClass; ?>"><i class="<?= esc($statusIcon); ?>"></i><?= esc($label); ?></span>
+                <span class="<?= $badgeClass; ?>" data-order-status-badge data-order-id="<?= (int) $order['id']; ?>"><i class="<?= esc($statusIcon); ?>"></i><span class="badge-text"> <?= esc($label); ?></span></span>
             </div>
         </div>
         <div class="summary-card">
             <div class="summary-label">Pembayaran</div>
             <div class="summary-value">
-                <span class="<?= $paymentBadgeClass; ?>"><i class="<?= esc($paymentIcon); ?>"></i><?= esc($paymentLabel); ?></span>
+                <span class="<?= $paymentBadgeClass; ?>" data-order-payment-badge data-order-id="<?= (int) $order['id']; ?>"><i class="<?= esc($paymentIcon); ?>"></i><span class="badge-text"> <?= esc($paymentLabel); ?></span></span>
             </div>
         </div>
     </div>
@@ -482,11 +482,11 @@ foreach ($items as $it) {
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Status</span>
-                            <span class="detail-value"><span class="<?= $badgeClass; ?>"><?= esc($label); ?></span></span>
+                            <span class="detail-value"><span class="<?= $badgeClass; ?>" data-order-status-badge data-order-id="<?= (int) $order['id']; ?>"><i class="<?= esc($statusIcon); ?>"></i><span class="badge-text"> <?= esc($label); ?></span></span></span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Pembayaran</span>
-                            <span class="detail-value"><span class="<?= $paymentBadgeClass; ?>"><?= esc($paymentLabel); ?></span></span>
+                            <span class="detail-value"><span class="<?= $paymentBadgeClass; ?>" data-order-payment-badge data-order-id="<?= (int) $order['id']; ?>"><i class="<?= esc($paymentIcon); ?>"></i><span class="badge-text"> <?= esc($paymentLabel); ?></span></span></span>
                         </div>
                     </div>
 
@@ -518,7 +518,7 @@ foreach ($items as $it) {
                     </div>
 
                     <?php if ($paymentStatus !== 'paid'): ?>
-                        <form action="<?= base_url('admin/orders/' . $order['id'] . '/paid'); ?>" method="post" class="action-section">
+                        <form action="<?= base_url('admin/orders/' . $order['id'] . '/paid'); ?>" method="post" class="action-section" data-ajax-form data-ajax-action="admin-paid">
                             <?= csrf_field(); ?>
                             <div class="section-label">Pembayaran</div>
                             <button type="submit" class="btn btn-success">
@@ -528,7 +528,7 @@ foreach ($items as $it) {
                         </form>
                     <?php endif; ?>
 
-                    <form action="<?= base_url('admin/orders/' . $order['id'] . '/status'); ?>" method="post" class="action-section">
+                    <form action="<?= base_url('admin/orders/' . $order['id'] . '/status'); ?>" method="post" class="action-section" data-ajax-form data-ajax-action="admin-status">
                         <?= csrf_field(); ?>
                         <div class="section-label">Ubah Status Pesanan</div>
                         <div class="status-actions" role="group" aria-label="Ubah Status">

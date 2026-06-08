@@ -7,6 +7,31 @@ use App\Models\MenuModel;
 
 class Menus extends BaseController
 {
+    private function isAjaxRequest(): bool
+    {
+        return $this->request->isAJAX()
+            || str_contains((string) $this->request->getHeaderLine('Accept'), 'application/json');
+    }
+
+    private function jsonOrRedirect(array $payload, string $redirectTo, string $flashType = 'success', int $statusCode = 200)
+    {
+        if ($this->isAjaxRequest()) {
+            return $this->response->setStatusCode($statusCode)->setJSON($this->withCsrf($payload));
+        }
+
+        return redirect()->to($redirectTo)->with($flashType, $payload['message'] ?? $payload['msg'] ?? '');
+    }
+
+    private function withCsrf(array $payload): array
+    {
+        if (function_exists('csrf_token') && function_exists('csrf_hash')) {
+            $payload['csrfTokenName'] = csrf_token();
+            $payload['csrfHash'] = csrf_hash();
+        }
+
+        return $payload;
+    }
+
     public function index()
     {
         $menuModel = new MenuModel();
@@ -54,7 +79,15 @@ class Menus extends BaseController
         ];
         
         if (!$m->save($data)) {
-            return redirect()->back()->with('error', implode(' ', $m->errors()))->withInput();
+            $message = implode(' ', $m->errors());
+            if ($this->isAjaxRequest()) {
+                return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                    'ok' => false,
+                    'message' => $message,
+                ]));
+            }
+
+            return redirect()->back()->with('error', $message)->withInput();
         }
         $id = $m->getInsertID();
 
@@ -64,7 +97,12 @@ class Menus extends BaseController
             $file->move(FCPATH . 'assets/img', $newName, true);
             $m->update($id, ['image' => $newName]);
         }
-        return redirect()->to('/admin/menus')->with('success', 'Menu berhasil ditambahkan.');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Menu berhasil ditambahkan.',
+            'id' => (int) $id,
+            'redirect' => base_url('admin/menus'),
+        ], base_url('admin/menus'));
     }
 
     public function edit($id)
@@ -92,7 +130,15 @@ class Menus extends BaseController
 
         ];
         if (!$m->save($data)) {
-            return redirect()->back()->with('error', implode(' ', $m->errors()))->withInput();
+            $message = implode(' ', $m->errors());
+            if ($this->isAjaxRequest()) {
+                return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                    'ok' => false,
+                    'message' => $message,
+                ]));
+            }
+
+            return redirect()->back()->with('error', $message)->withInput();
         }
 
         $file = $this->request->getFile('image');
@@ -101,7 +147,12 @@ class Menus extends BaseController
             $file->move(FCPATH . 'assets/img', $newName, true);
             $m->update($id, ['image' => $newName]);
         }
-        return redirect()->to('/admin/menus')->with('success', 'Menu diperbarui.');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Menu diperbarui.',
+            'id' => $id,
+            'redirect' => base_url('admin/menus'),
+        ], base_url('admin/menus'));
     }
 
     public function delete($id)
@@ -112,12 +163,19 @@ class Menus extends BaseController
         $used = $db->table('order_items')->where('menu_id', $id)->countAllResults();
 
         if ($used > 0) {
-            return redirect()->to('/admin/menus')
-                ->with('error', 'Menu ini sudah pernah dipesan sehingga tidak dapat dihapus. Silakan nonaktifkan menu saja.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Menu ini sudah pernah dipesan sehingga tidak dapat dihapus. Silakan nonaktifkan menu saja.',
+            ], base_url('admin/menus'), 'error', 422);
         }
 
         (new MenuModel())->delete($id);
-        return redirect()->to('/admin/menus')->with('success', 'Menu dihapus.');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Menu dihapus.',
+            'id' => $id,
+            'removed' => true,
+        ], base_url('admin/menus'));
     }
 
     public function search()

@@ -84,6 +84,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
     // orders
     $routes->get('orders', 'Admin\Orders::index');
+    $routes->get('orders/statuses', 'Admin\Orders::statuses');
     $routes->get('orders/create', 'Admin\Orders::create');
     $routes->post('orders/store', 'Admin\Orders::store');
     $routes->get('orders/(:num)', 'Admin\Orders::show/$1');

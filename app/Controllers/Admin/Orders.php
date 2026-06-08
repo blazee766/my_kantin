@@ -10,6 +10,90 @@ use Dompdf\Dompdf;
 
 class Orders extends BaseController
 {
+    private function isAjaxRequest(): bool
+    {
+        return $this->request->isAJAX()
+            || str_contains((string) $this->request->getHeaderLine('Accept'), 'application/json');
+    }
+
+    private function jsonOrRedirect(array $payload, string $redirectTo, string $flashType = 'success', int $statusCode = 200)
+    {
+        if ($this->isAjaxRequest()) {
+            return $this->response->setStatusCode($statusCode)->setJSON($this->withCsrf($payload));
+        }
+
+        return redirect()->to($redirectTo)->with($flashType, $payload['message'] ?? $payload['msg'] ?? '');
+    }
+
+    private function withCsrf(array $payload): array
+    {
+        if (function_exists('csrf_token') && function_exists('csrf_hash')) {
+            $payload['csrfTokenName'] = csrf_token();
+            $payload['csrfHash'] = csrf_hash();
+        }
+
+        return $payload;
+    }
+
+    private function statusPayload(string $status): array
+    {
+        $labelMap = [
+            'pending' => 'Menunggu',
+            'processing' => 'Diproses',
+            'completed' => 'Selesai',
+            'canceled' => 'Batal',
+        ];
+
+        $classMap = [
+            'pending' => 'wait',
+            'processing' => 'proc',
+            'completed' => 'done',
+            'canceled' => 'cancel',
+        ];
+
+        $iconMap = [
+            'pending' => 'fas fa-clock',
+            'processing' => 'fas fa-utensils',
+            'completed' => 'fas fa-check-circle',
+            'canceled' => 'fas fa-times-circle',
+        ];
+
+        return [
+            'status' => $status,
+            'statusLabel' => $labelMap[$status] ?? ucfirst($status),
+            'statusClass' => $classMap[$status] ?? 'wait',
+            'statusIcon' => $iconMap[$status] ?? 'fas fa-info-circle',
+        ];
+    }
+
+    private function paymentPayload(string $paymentStatus): array
+    {
+        $labelMap = [
+            'unpaid' => 'Belum Dibayar',
+            'paid' => 'Sudah Dibayar',
+            'failed' => 'Gagal / Kadaluarsa',
+        ];
+
+        $classMap = [
+            'unpaid' => 'wait',
+            'paid' => 'done',
+            'failed' => 'cancel',
+        ];
+
+        $iconMap = [
+            'unpaid' => 'fas fa-credit-card',
+            'paid' => 'fas fa-wallet',
+            'failed' => 'fas fa-exclamation-triangle',
+        ];
+
+        return [
+            'paymentStatus' => $paymentStatus,
+            'paymentLabel' => $labelMap[$paymentStatus] ?? ucfirst($paymentStatus),
+            'paymentClass' => $classMap[$paymentStatus] ?? 'wait',
+            'paymentIcon' => $iconMap[$paymentStatus] ?? 'fas fa-wallet',
+        ];
+    }
+
     public function index()
     {
         $orderModel = model(OrderModel::class);
@@ -41,6 +125,37 @@ class Orders extends BaseController
         ]);
     }
 
+    public function statuses()
+    {
+        $ids = array_filter(array_map('intval', explode(',', (string) $this->request->getGet('ids'))));
+
+        if (empty($ids)) {
+            return $this->response->setJSON([
+                'ok' => true,
+                'orders' => [],
+            ]);
+        }
+
+        $rows = model(OrderModel::class)
+            ->select('id, status, payment_status')
+            ->whereIn('id', $ids)
+            ->findAll();
+
+        $orders = [];
+        foreach ($rows as $row) {
+            $status = (string) ($row['status'] ?? 'pending');
+            $paymentStatus = (string) ($row['payment_status'] ?? 'unpaid');
+            $orders[] = [
+                'orderId' => (int) $row['id'],
+            ] + $this->statusPayload($status) + $this->paymentPayload($paymentStatus);
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'orders' => $orders,
+        ]);
+    }
+
     public function create()
     {
         $menus = model(MenuModel::class)
@@ -64,6 +179,12 @@ class Orders extends BaseController
         $qtys = (array) $this->request->getPost('qty');
 
         if ($userId <= 0) {
+            if ($this->isAjaxRequest()) {
+                return $this->response->setStatusCode(401)->setJSON($this->withCsrf([
+                    'ok' => false,
+                    'message' => 'Session admin tidak ditemukan.',
+                ]));
+            }
             return redirect()->back()->withInput()->with('error', 'Session admin tidak ditemukan.');
         }
 
@@ -81,10 +202,22 @@ class Orders extends BaseController
 
             $menu = $menuModel->find($menuId);
             if (!$menu || (int) ($menu['is_active'] ?? 0) !== 1) {
+                if ($this->isAjaxRequest()) {
+                    return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                        'ok' => false,
+                        'message' => 'Ada menu yang tidak tersedia.',
+                    ]));
+                }
                 return redirect()->back()->withInput()->with('error', 'Ada menu yang tidak tersedia.');
             }
 
             if ((int) ($menu['stock'] ?? 0) < $qty) {
+                if ($this->isAjaxRequest()) {
+                    return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                        'ok' => false,
+                        'message' => "Stok {$menu['name']} tidak mencukupi.",
+                    ]));
+                }
                 return redirect()->back()->withInput()->with('error', "Stok {$menu['name']} tidak mencukupi.");
             }
 
@@ -101,6 +234,12 @@ class Orders extends BaseController
         }
 
         if (empty($items)) {
+            if ($this->isAjaxRequest()) {
+                return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                    'ok' => false,
+                    'message' => 'Pilih minimal satu menu.',
+                ]));
+            }
             return redirect()->back()->withInput()->with('error', 'Pilih minimal satu menu.');
         }
 
@@ -147,10 +286,25 @@ class Orders extends BaseController
 
             $db->transCommit();
 
+            if ($this->isAjaxRequest()) {
+                return $this->response->setJSON($this->withCsrf([
+                    'ok' => true,
+                    'message' => 'Pesanan kantin berhasil dibuat oleh admin.',
+                    'orderId' => (int) $orderId,
+                    'redirect' => base_url('admin/orders/' . $orderId),
+                ]));
+            }
+
             return redirect()->to(base_url('admin/orders/' . $orderId))
                 ->with('success', 'Pesanan kantin berhasil dibuat oleh admin.');
         } catch (\Throwable $e) {
             $db->transRollback();
+            if ($this->isAjaxRequest()) {
+                return $this->response->setStatusCode(500)->setJSON($this->withCsrf([
+                    'ok' => false,
+                    'message' => $e->getMessage(),
+                ]));
+            }
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
@@ -211,19 +365,29 @@ class Orders extends BaseController
         $allowed = ['pending', 'processing', 'completed', 'canceled'];
 
         if (!in_array($status, $allowed, true)) {
-            return redirect()->back()->with('error', 'Status tidak dikenal.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Status tidak dikenal.',
+            ], (string) previous_url(), 'error', 422);
         }
 
         $orderModel = model(OrderModel::class);
         $order      = $orderModel->find($id);
 
         if (!$order) {
-            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], base_url('admin/orders'), 'error', 404);
         }
 
         $orderModel->update($id, ['status' => $status]);
 
-        return redirect()->back()->with('success', 'Status pesanan diperbarui.');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Status pesanan diperbarui.',
+            'orderId' => $id,
+        ] + $this->statusPayload($status), (string) previous_url());
     }
     public function markPaid($id)
     {
@@ -233,13 +397,17 @@ class Orders extends BaseController
         $order      = $orderModel->find($id);
 
         if (! $order) {
-            return redirect()->to('/admin/orders')
-                ->with('error', 'Pesanan tidak ditemukan.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ], base_url('admin/orders'), 'error', 404);
         }
 
         if ($order['status'] === 'canceled') {
-            return redirect()->back()
-                ->with('error', 'Pesanan yang dibatalkan tidak bisa ditandai sudah dibayar.');
+            return $this->jsonOrRedirect([
+                'ok' => false,
+                'message' => 'Pesanan yang dibatalkan tidak bisa ditandai sudah dibayar.',
+            ], (string) previous_url(), 'error', 422);
         }
 
         $orderModel->update($id, [
@@ -249,8 +417,11 @@ class Orders extends BaseController
             // 'paid_at'        => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->back()
-            ->with('success', 'Pembayaran ditandai sudah dibayar (tunai).');
+        return $this->jsonOrRedirect([
+            'ok' => true,
+            'message' => 'Pembayaran ditandai sudah dibayar (tunai).',
+            'orderId' => $id,
+        ] + $this->paymentPayload('paid'), (string) previous_url());
     }
     public function nota($id)
     {
