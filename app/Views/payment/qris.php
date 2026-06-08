@@ -213,10 +213,13 @@
 
   .note {
     margin: 1rem auto 0;
-    max-width: 32ch;
+    transform: translateX(8px);
+    width: min(100%, 310px);
+    max-width: 310px;
     font-size: 0.82rem;
     line-height: 1.6;
     color: #71717a;
+    text-align: center;
   }
 
   .btn-row {
@@ -278,6 +281,87 @@
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   }
 
+  .flash {
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    background: #fff1f2;
+    color: #be123c;
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  .proof-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.5);
+  }
+
+  .proof-modal.is-open {
+    display: grid;
+  }
+
+  .proof-dialog {
+    width: min(100%, 430px);
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.22);
+    padding: 1.2rem;
+    box-sizing: border-box;
+  }
+
+  .proof-dialog h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .proof-dialog p {
+    margin: 0.5rem 0 1rem;
+    color: #64748b;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .proof-input {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 16px;
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+    box-sizing: border-box;
+    color: #334155;
+  }
+
+  .proof-preview {
+    display: none;
+    width: 100%;
+    max-height: 240px;
+    margin-top: 0.85rem;
+    border-radius: 16px;
+    object-fit: contain;
+    background: #f8fafc;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+  }
+
+  .proof-preview.is-visible {
+    display: block;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
   form {
     margin: 0;
   }
@@ -330,7 +414,14 @@
     }
 
     .note {
+      width: min(100%, 280px);
+      max-width: 280px;
+      transform: translateX(0);
       font-size: 0.78rem;
+    }
+
+    .modal-actions {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -372,6 +463,10 @@
     <h1>QRIS Pembayaran</h1>
     <p>Scan gambar QR berikut untuk melakukan pembayaran pesanan.</p>
 
+    <?php if ($msg = session()->getFlashdata('error')): ?>
+      <div class="flash"><?= esc($msg); ?></div>
+    <?php endif; ?>
+
     <div class="meta">
       <span>Kode Pesanan <strong>#<?= esc($order['code']); ?></strong></span>
       <span>Total Tagihan <strong><?= esc($formattedTotal); ?></strong></span>
@@ -388,12 +483,64 @@
 
     <div class="btn-row">
       <a href="<?= site_url('p/orders/' . $order['id']); ?>" class="btn btn-secondary">Kembali ke Pesanan</a>
-      <form action="<?= site_url('p/payment/' . $order['id'] . '/confirm'); ?>" method="post" style="margin:0;">
-        <?= csrf_field(); ?>
-        <button type="submit" class="btn btn-primary">Saya Sudah Bayar</button>
-      </form>
+      <button type="button" class="btn btn-primary" id="openProofModal">Saya Sudah Bayar</button>
     </div>
     </section>
   </main>
+
+  <div class="proof-modal" id="proofModal" aria-hidden="true">
+    <form
+      class="proof-dialog"
+      action="<?= site_url('p/payment/' . $order['id'] . '/confirm'); ?>"
+      method="post"
+      enctype="multipart/form-data">
+      <?= csrf_field(); ?>
+      <h2>Upload Bukti Pembayaran</h2>
+      <p>Pilih screenshot atau foto bukti transfer QRIS agar admin bisa memverifikasi pembayaranmu.</p>
+      <input
+        class="proof-input"
+        type="file"
+        name="payment_proof"
+        id="paymentProofInput"
+        accept="image/png,image/jpeg,image/webp"
+        required>
+      <img class="proof-preview" id="paymentProofPreview" alt="Preview bukti pembayaran">
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="closeProofModal">Batal</button>
+        <button type="submit" class="btn btn-primary">Kirim Bukti</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const proofModal = document.getElementById('proofModal');
+    const openProofModal = document.getElementById('openProofModal');
+    const closeProofModal = document.getElementById('closeProofModal');
+    const paymentProofInput = document.getElementById('paymentProofInput');
+    const paymentProofPreview = document.getElementById('paymentProofPreview');
+
+    function setProofModal(open) {
+      proofModal.classList.toggle('is-open', open);
+      proofModal.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+
+    openProofModal?.addEventListener('click', () => setProofModal(true));
+    closeProofModal?.addEventListener('click', () => setProofModal(false));
+    proofModal?.addEventListener('click', (event) => {
+      if (event.target === proofModal) setProofModal(false);
+    });
+
+    paymentProofInput?.addEventListener('change', () => {
+      const file = paymentProofInput.files?.[0];
+      if (!file) {
+        paymentProofPreview.classList.remove('is-visible');
+        paymentProofPreview.removeAttribute('src');
+        return;
+      }
+
+      paymentProofPreview.src = URL.createObjectURL(file);
+      paymentProofPreview.classList.add('is-visible');
+    });
+  </script>
 </body>
 </html>

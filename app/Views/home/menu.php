@@ -17,7 +17,7 @@
 <body class="menu-page">
 
   <?php
-  $contactPhone = env('CONTACT_PHONE', isset($contactPhone) ? $contactPhone : '085748543921');
+  $contactPhone = env('CONTACT_PHONE', isset($contactPhone) ? $contactPhone : '085808316292');
   $telNormalized = preg_replace('/[^\d+]/', '', $contactPhone);
   $waNormalized = preg_replace('/[^\d]/', '', preg_replace('/^\+/', '', $contactPhone));
   if (str_starts_with($waNormalized, '0')) {
@@ -428,7 +428,7 @@
                   refreshCartCount();
                 }
               } else {
-                alert(data.msg || 'Gagal menambahkan item.');
+                alert(data.msg || 'Maaf, anda harus login terlebih dahulu sebelum memesan');
               }
 
             });

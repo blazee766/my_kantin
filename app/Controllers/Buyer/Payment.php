@@ -23,7 +23,9 @@ class Payment extends BaseController
         if ($u instanceof \CodeIgniter\HTTP\RedirectResponse) return $u;
 
         $orderId = (int) $id;
-        $order   = (new OrderModel())->getOneWithItems($orderId, (int)$u['id']);
+        $orderModel = new OrderModel();
+        $orderModel->autoPromoteWaitingOrders();
+        $order = $orderModel->getOneWithItems($orderId, (int)$u['id']);
 
         if (!$order) {
             return redirect()->to(site_url('p/orders'))
@@ -52,7 +54,9 @@ class Payment extends BaseController
         if ($u instanceof \CodeIgniter\HTTP\RedirectResponse) return $u;
 
         $orderId = (int) $id;
-        $order   = (new OrderModel())->getOneWithItems($orderId, (int)$u['id']);
+        $orderModel = new OrderModel();
+        $orderModel->autoPromoteWaitingOrders();
+        $order = $orderModel->getOneWithItems($orderId, (int)$u['id']);
 
         if (!$order) {
             return redirect()->to(site_url('p/orders'))
@@ -64,11 +68,36 @@ class Payment extends BaseController
                 ->with('success', 'Pesanan sudah dibayar.');
         }
 
-        $orderModel = new OrderModel();
+        $proof = $this->request->getFile('payment_proof');
+        if (!$proof || !$proof->isValid()) {
+            return redirect()->to(site_url('p/payment/'.$orderId))
+                ->with('error', 'Silakan upload gambar bukti pembayaran.');
+        }
+
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!in_array($proof->getMimeType(), $allowedTypes, true)) {
+            return redirect()->to(site_url('p/payment/'.$orderId))
+                ->with('error', 'Bukti pembayaran harus berupa gambar JPG, PNG, atau WEBP.');
+        }
+
+        if ($proof->getSizeByUnit('mb') > 3) {
+            return redirect()->to(site_url('p/payment/'.$orderId))
+                ->with('error', 'Ukuran bukti pembayaran maksimal 3 MB.');
+        }
+
+        $proofDir = FCPATH . 'assets/img/payment-proofs';
+        if (!is_dir($proofDir)) {
+            mkdir($proofDir, 0775, true);
+        }
+
+        $proofName = $proof->getRandomName();
+        $proof->move($proofDir, $proofName);
+
         $orderModel->update($orderId, [
             'payment_status' => 'paid',
             'payment_method' => 'qris',
             'payment_type' => 'qris',
+            'payment_proof' => 'assets/img/payment-proofs/' . $proofName,
         ]);
 
         return redirect()->to(site_url('p/orders/'.$orderId))

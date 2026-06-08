@@ -543,8 +543,19 @@
         }, 220);
       }
 
-      // Realtime status polling disabled - admin control only
-      // pollAll() dan setInterval dihapus agar hanya admin yang bisa ubah status
+      function pollAll() {
+        badges.forEach((badge) => {
+          fetch(badge.dataset.checkUrl, { cache: 'no-store' })
+            .then((response) => response.ok ? response.json() : null)
+            .then((data) => {
+              if (data && data.ok) updateBadge(badge, data);
+            })
+            .catch(() => {});
+        });
+      }
+
+      pollAll();
+      setInterval(pollAll, 15000);
     })();
   </script>
   <script>

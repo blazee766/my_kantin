@@ -253,6 +253,52 @@ include APPPATH . 'Views/admin/partials/head.php';
         font-size: 1rem;
     }
 
+    .proof-card {
+        border-top: 1px solid #edf0f6;
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+
+    .proof-image-link {
+        display: block;
+        width: 100%;
+        max-width: 360px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #edf0f6;
+        background: #f8fafc;
+        box-shadow: 0 14px 32px rgba(31, 44, 71, 0.06);
+    }
+
+    .proof-image-link img {
+        display: block;
+        width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+        background: #fff;
+    }
+
+    .proof-empty {
+        padding: 14px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px dashed #d8deea;
+        color: #778196;
+        font-weight: 700;
+    }
+
+    .proof-admin-paid {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+        color: #128454;
+        font-weight: 800;
+    }
+
     @media (max-width: 992px) {
         .summary-grid {
             grid-template-columns: 1fr;
@@ -323,6 +369,7 @@ $paymentIconMap = [
     'failed' => 'fas fa-exclamation-triangle',
 ];
 $paymentIcon = $paymentIconMap[$paymentStatus] ?? 'fas fa-wallet';
+$isAdminOrder = ($order['customer_role'] ?? '') === 'admin';
 
 $waLink = null;
 
@@ -449,6 +496,26 @@ foreach ($items as $it) {
                             <span class="detail-value"><?= esc($locNote); ?></span>
                         </div>
                     <?php endif; ?>
+
+                    <div class="proof-card">
+                        <div class="section-label">Bukti Pembayaran</div>
+                        <?php if ($isAdminOrder): ?>
+                            <div class="proof-admin-paid">
+                                <i class="fas fa-check-circle"></i>
+                                Pembayaran kasir admin
+                            </div>
+                        <?php elseif (!empty($order['payment_proof'])): ?>
+                            <a
+                                class="proof-image-link"
+                                href="<?= base_url($order['payment_proof']); ?>"
+                                target="_blank"
+                                rel="noopener">
+                                <img src="<?= base_url($order['payment_proof']); ?>" alt="Bukti pembayaran #<?= esc($order['code']); ?>">
+                            </a>
+                        <?php else: ?>
+                            <div class="proof-empty">Belum ada bukti pembayaran.</div>
+                        <?php endif; ?>
+                    </div>
 
                     <?php if ($paymentStatus !== 'paid'): ?>
                         <form action="<?= base_url('admin/orders/' . $order['id'] . '/paid'); ?>" method="post" class="action-section">

@@ -58,6 +58,7 @@ $routes->group('p', ['filter' => 'verified'], function ($routes) {
     $routes->get('orders/(:num)/nota/pdf', 'Buyer\Orders::notaPdf/$1');
 
     $routes->get('orders/(:num)/check', 'Buyer\Orders::checkStatus/$1');
+    $routes->post('orders/(:num)/items/(:num)/remove', 'Buyer\Orders::removeItem/$1/$2');
     $routes->post('orders/(:num)/delete', 'Buyer\Orders::delete/$1');
 
     $routes->get('payment/(:num)', 'Buyer\Payment::pay/$1');
@@ -83,6 +84,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
     // orders
     $routes->get('orders', 'Admin\Orders::index');
+    $routes->get('orders/create', 'Admin\Orders::create');
+    $routes->post('orders/store', 'Admin\Orders::store');
     $routes->get('orders/(:num)', 'Admin\Orders::show/$1');
     $routes->post('orders/(:num)/status', 'Admin\Orders::updateStatus/$1');
     $routes->post('orders/(:num)/paid', 'Admin\Orders::markPaid/$1');

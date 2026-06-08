@@ -277,6 +277,43 @@
       color: #128454;
     }
 
+    .flash {
+      margin: 0 0 14px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+
+    .flash.success {
+      background: #dcfce7;
+      color: #128454;
+      border: 1px solid #bbf7d0;
+    }
+
+    .flash.error {
+      background: #ffe4e6;
+      color: #d12b3f;
+      border: 1px solid #fecdd3;
+    }
+
+    .item-remove-form {
+      margin: 0;
+    }
+
+    .btn-item-remove {
+      min-height: 34px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 0;
+      background: #ff5566;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     @media (max-width: 1024px) {
       .container {
         padding-inline: 16px;
@@ -456,6 +493,7 @@
   $statusLabel = $labelMap[$statusKey]  ?? ucfirst((string) $status);
   $statusClass = $classMap[$statusKey] ?? 'pending';
   $canModifyOrder = in_array($statusKey, ['pending', 'menunggu'], true);
+  $canModifyItem = in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true);
   $canPayOrder = in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true);
   $deliveryRaw  = $order['delivery_method'] ?? 'pickup';
   $deliveryText = $deliveryRaw === 'delivery'
@@ -490,6 +528,13 @@
   </header>
 
   <div class="container">
+    <?php if ($msg = session()->getFlashdata('success')): ?>
+      <div class="flash success"><?= esc($msg); ?></div>
+    <?php endif; ?>
+    <?php if ($msg = session()->getFlashdata('error')): ?>
+      <div class="flash error"><?= esc($msg); ?></div>
+    <?php endif; ?>
+
     <div class="section">
       <div class="detail-title">
         <div>
@@ -568,6 +613,9 @@
               <th>Qty</th>
               <th>Harga</th>
               <th>Subtotal</th>
+              <?php if ($canModifyItem): ?>
+                <th>Aksi</th>
+              <?php endif; ?>
             </tr>
           </thead>
           <tbody>
@@ -583,6 +631,7 @@
 
               if (!isset($grouped[$key])) {
                 $grouped[$key] = [
+                  'menu_id'   => (int)($it['menu_id'] ?? 0),
                   'name'     => $it['name'] ?? '',
                   'qty'      => $qty,
                   'price'    => $price,
@@ -603,6 +652,23 @@
                 <td><?= $row['qty']; ?></td>
                 <td>Rp <?= number_format($row['price'], 0, ',', '.'); ?></td>
                 <td>Rp <?= number_format($row['subtotal'], 0, ',', '.'); ?></td>
+                <?php if ($canModifyItem): ?>
+                  <td>
+                    <?php if (!empty($row['menu_id'])): ?>
+                      <form
+                        class="item-remove-form"
+                        action="<?= site_url('p/orders/' . $order['id'] . '/items/' . $row['menu_id'] . '/remove'); ?>"
+                        method="post"
+                        onsubmit="return confirm('Hapus 1 qty menu ini dari pesanan?');">
+                        <?= csrf_field(); ?>
+                        <button type="submit" class="btn-item-remove" title="Hapus">
+                          <i class="fas fa-trash"></i>
+                          <span>Hapus</span>
+                        </button>
+                      </form>
+                    <?php endif; ?>
+                  </td>
+                <?php endif; ?>
               </tr>
             <?php endforeach; ?>
 
@@ -611,6 +677,9 @@
               <td></td>
               <td></td>
               <td style="font-weight:bold;">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></td>
+              <?php if ($canModifyItem): ?>
+                <td></td>
+              <?php endif; ?>
             </tr>
           </tbody>
         </table>
@@ -675,8 +744,32 @@
       const orderId = <?= (int) $order['id']; ?>;
       const checkUrl = "<?= site_url('p/orders/' . $order['id'] . '/check'); ?>";
 
-      // Realtime status polling disabled - admin control only
-      // pollStatus() dan setInterval dihapus agar hanya admin yang bisa ubah status
+      function updateBadge(data) {
+        const oldStatus = badge.dataset.status || '';
+        const newStatus = data.status || '';
+
+        if (!newStatus || oldStatus === newStatus) return;
+
+        badge.dataset.status = newStatus;
+        badge.textContent = data.statusLabel || newStatus;
+        badge.className = 'badge ' + (data.statusClass || 'pending');
+
+        if (['processing', 'diproses'].includes(newStatus.toLowerCase())) {
+          setTimeout(() => window.location.reload(), 400);
+        }
+      }
+
+      function pollStatus() {
+        fetch(checkUrl, { cache: 'no-store' })
+          .then((response) => response.ok ? response.json() : null)
+          .then((data) => {
+            if (data && data.ok) updateBadge(data);
+          })
+          .catch(() => {});
+      }
+
+      pollStatus();
+      setInterval(pollStatus, 15000);
     })();
     
   </script>

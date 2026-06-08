@@ -19,23 +19,37 @@ class Orders extends BaseController
         return $user;
     }
 
-    private function autoUpdatePendingToProcessing(): void
+    private function statusPayload(string $status): array
     {
-        
-        $db = \Config\Database::connect();
+        $statusKey = strtolower($status);
 
-        $limitTime = date('Y-m-d H:i:s', time() - (5 * 60));
+        $labelMap = [
+            'pending'    => 'Menunggu',
+            'menunggu'   => 'Menunggu',
+            'processing' => 'Diproses',
+            'diproses'   => 'Diproses',
+            'completed'  => 'Selesai',
+            'selesai'    => 'Selesai',
+            'canceled'   => 'Batal',
+            'batal'      => 'Batal',
+        ];
 
-        // UPDATE orders
-        // SET status = 'processing'
-        // WHERE status IN ('pending','menunggu')
-        //   AND created_at <= $limitTime
-        $db->table('orders')
-            ->set('status', 'processing')
-            ->whereIn('status', ['pending', 'menunggu'])
-            ->where('created_at <=', $limitTime)
-            ->update();
-            
+        $classMap = [
+            'pending'    => 'pending',
+            'menunggu'   => 'pending',
+            'processing' => 'pending',
+            'diproses'   => 'pending',
+            'completed'  => 'paid',
+            'selesai'    => 'paid',
+            'canceled'   => 'cancel',
+            'batal'      => 'cancel',
+        ];
+
+        return [
+            'status'      => $status,
+            'statusLabel' => $labelMap[$statusKey] ?? ucfirst($status),
+            'statusClass' => $classMap[$statusKey] ?? 'pending',
+        ];
     }
 
     public function index()
@@ -45,7 +59,9 @@ class Orders extends BaseController
             return $check;
         $user = $check;
 
-        $orders = (new OrderModel())->getByUserWithAddress((int) $user['id']);
+        $orderModel = new OrderModel();
+        $orderModel->autoPromoteWaitingOrders();
+        $orders = $orderModel->getByUserWithAddress((int) $user['id']);
 
         return view('orders/index', [
             'orders' => $orders,
@@ -63,6 +79,7 @@ class Orders extends BaseController
         $orderModel = new OrderModel();
         $paymentModel = new PaymentModel();
 
+        $orderModel->autoPromoteWaitingOrders();
         $order = $orderModel->getOneWithItemsWithAddress((int) $id, (int) $user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
@@ -87,6 +104,123 @@ class Orders extends BaseController
         ]);
     }
 
+    public function checkStatus($id)
+    {
+        $check = $this->mustLogin();
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'ok' => false,
+                'message' => 'Silakan login terlebih dahulu.',
+            ]);
+        }
+        $user = $check;
+
+        $orderModel = new OrderModel();
+        $orderModel->autoPromoteWaitingOrders();
+        $order = $orderModel->getOneWithItems((int) $id, (int) $user['id']);
+
+        if (!$order) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'ok' => false,
+                'message' => 'Pesanan tidak ditemukan.',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
+        ] + $this->statusPayload((string) ($order['status'] ?? 'pending')));
+    }
+
+    public function removeItem(int $orderId, int $menuId)
+    {
+        $check = $this->mustLogin();
+        if ($check instanceof \CodeIgniter\HTTP\RedirectResponse) {
+            return $check;
+        }
+        $user = $check;
+
+        $orderModel = new OrderModel();
+        $orderModel->autoPromoteWaitingOrders();
+        $order = $orderModel->getOneWithItems($orderId, (int) $user['id']);
+
+        if (!$order) {
+            return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        $statusKey = strtolower((string) ($order['status'] ?? 'pending'));
+        if (!in_array($statusKey, ['pending', 'menunggu', 'processing', 'diproses'], true)) {
+            return redirect()->to(site_url('p/orders/' . $orderId))
+                ->with('error', 'Item pesanan ini tidak bisa dihapus lagi.');
+        }
+
+        $db = \Config\Database::connect();
+        $item = $db->table('order_items')
+            ->where('order_id', $orderId)
+            ->where('menu_id', $menuId)
+            ->where('qty >', 0)
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->getRowArray();
+
+        if (!$item) {
+            return redirect()->to(site_url('p/orders/' . $orderId))
+                ->with('error', 'Item pesanan tidak ditemukan.');
+        }
+
+        $price = (int) ($item['price'] ?? 0);
+        $qty = (int) ($item['qty'] ?? 0);
+
+        $db->transStart();
+
+        if ($qty > 1) {
+            $db->table('order_items')
+                ->set('qty', 'qty - 1', false)
+                ->set('subtotal', 'GREATEST(subtotal - ' . $price . ', 0)', false)
+                ->where('id', (int) $item['id'])
+                ->update();
+        } else {
+            $db->table('order_items')
+                ->where('id', (int) $item['id'])
+                ->delete();
+        }
+
+        $db->table('menus')
+            ->set('stock', 'stock + 1', false)
+            ->where('id', $menuId)
+            ->update();
+
+        $db->table('orders')
+            ->set('total_amount', 'GREATEST(total_amount - ' . $price . ', 0)', false)
+            ->where('id', $orderId)
+            ->where('user_id', (int) $user['id'])
+            ->update();
+
+        $remaining = $db->table('order_items')
+            ->select('COUNT(*) AS total')
+            ->where('order_id', $orderId)
+            ->get()
+            ->getRowArray();
+
+        if ((int) ($remaining['total'] ?? 0) === 0) {
+            $db->table('payments')->where('order_id', $orderId)->delete();
+            $db->table('orders')->where('id', $orderId)->delete();
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->to(site_url('p/orders/' . $orderId))
+                ->with('error', 'Gagal menghapus item pesanan.');
+        }
+
+        if ((int) ($remaining['total'] ?? 0) === 0) {
+            return redirect()->to(site_url('p/orders'))->with('success', 'Semua item pesanan sudah dihapus.');
+        }
+
+        return redirect()->to(site_url('p/orders/' . $orderId))
+            ->with('success', '1 item berhasil dihapus dari pesanan.');
+    }
+
     public function delete(int $id)
     {
         $check = $this->mustLogin();
@@ -96,13 +230,15 @@ class Orders extends BaseController
 
         $orderModel = new \App\Models\OrderModel();
 
+        $orderModel->autoPromoteWaitingOrders();
         $order = $orderModel->getOneWithItems($id, (int) $user['id']);
         if (!$order) {
             return redirect()->to(site_url('p/orders'))->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        if (($order['status'] ?? '') === 'paid') {
-            return redirect()->to(site_url('p/orders/' . $id))->with('error', 'Pesanan sudah dibayar dan tidak bisa dihapus.');
+        $statusKey = strtolower((string) ($order['status'] ?? 'pending'));
+        if (!in_array($statusKey, ['pending', 'menunggu'], true)) {
+            return redirect()->to(site_url('p/orders/' . $id))->with('error', 'Pesanan yang sudah diproses tidak bisa dihapus.');
         }
 
         $db = \Config\Database::connect();

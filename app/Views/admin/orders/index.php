@@ -45,6 +45,39 @@ include APPPATH . 'Views/admin/partials/head.php';
   .btn-detail:hover { color:#fff; text-decoration:none; }
   .btn-text,
   .badge-text { margin-left:0; }
+  .proof-thumb {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:64px;
+    height:64px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#f8f9fc;
+    border:1px solid #edf1f7;
+  }
+  .proof-thumb img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .proof-empty {
+    color:var(--muted);
+    font-size:0.82rem;
+    white-space:nowrap;
+  }
+  .proof-check {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    height:38px;
+    border-radius:999px;
+    background:#dcfce7;
+    color:#128454;
+    font-size:1rem;
+  }
 
   /* Pagination */
   .pagination li { display:inline-block; margin:0 4px; }
@@ -65,14 +98,21 @@ include APPPATH . 'Views/admin/partials/head.php';
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Daftar Pesanan</h6>
 
-        <form method="get" class="form-inline">
-            <label class="mr-2 mb-0 small text-muted">Pembayaran:</label>
-            <select name="payment" class="form-control form-control-sm" onchange="this.form.submit()">
-                <option value="">Semua</option>
-                <option value="lunas" <?= (isset($payment) && $payment === 'lunas') ? 'selected' : '' ?>>Lunas</option>
-                <option value="belum" <?= (isset($payment) && $payment === 'belum') ? 'selected' : '' ?>>Belum bayar</option>
-            </select>
-        </form>
+        <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
+            <a href="<?= base_url('admin/orders/create'); ?>" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i>
+                Buat Pesanan
+            </a>
+
+            <form method="get" class="form-inline">
+                <label class="mr-2 mb-0 small text-muted">Pembayaran:</label>
+                <select name="payment" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">Semua</option>
+                    <option value="lunas" <?= (isset($payment) && $payment === 'lunas') ? 'selected' : '' ?>>Lunas</option>
+                    <option value="belum" <?= (isset($payment) && $payment === 'belum') ? 'selected' : '' ?>>Belum bayar</option>
+                </select>
+            </form>
+        </div>
     </div>
 
     <div class="card-body">
@@ -99,6 +139,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                         <th>Total</th>
                         <th>Status</th>
                         <th>Pembayaran</th>
+                        <th>Bukti Bayar</th>
                         <th style="width: 140px;">Aksi</th>
                     </tr>
                 </thead>
@@ -149,6 +190,7 @@ include APPPATH . 'Views/admin/partials/head.php';
                             $payStatus = $o['payment_status'] ?? 'unpaid';
                             $payLabel  = $payLabelMap[$payStatus] ?? 'Belum dibayar';
                             $payClass  = $payClassMap[$payStatus] ?? 'badge-pay-unpaid';
+                            $isAdminOrder = ($o['customer_role'] ?? '') === 'admin';
                             ?>
                             <tr>
                                 <td>#<?= esc($o['code']); ?></td>
@@ -180,6 +222,19 @@ include APPPATH . 'Views/admin/partials/head.php';
                                                                         </span>
                                                                 </td>
                                                                 <td>
+                                                                    <?php if ($isAdminOrder): ?>
+                                                                        <span class="proof-check" title="Pembayaran kasir admin">
+                                                                            <i class="fas fa-check"></i>
+                                                                        </span>
+                                                                    <?php elseif (!empty($o['payment_proof'])): ?>
+                                                                        <a class="proof-thumb" href="<?= base_url($o['payment_proof']); ?>" target="_blank" rel="noopener" title="Lihat bukti bayar">
+                                                                            <img src="<?= base_url($o['payment_proof']); ?>" alt="Bukti bayar #<?= esc($o['code']); ?>">
+                                                                        </a>
+                                                                    <?php else: ?>
+                                                                        <span class="proof-empty">Belum ada</span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                                <td>
                                                                         <a href="<?= base_url('admin/orders/' . $o['id']); ?>" class="btn-detail order-pill">
                                                                                 <i class="fas fa-eye"></i><span class="btn-text">Lihat Detail</span>
                                                                         </a>
@@ -189,7 +244,7 @@ include APPPATH . 'Views/admin/partials/head.php';
 
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
+                            <td colspan="8" class="text-center text-muted py-4">
                                 Belum ada pesanan.
                             </td>
                         </tr>

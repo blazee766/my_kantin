@@ -93,6 +93,7 @@ class Cart extends BaseController
         $db         = db_connect();
         $orderModel = model(\App\Models\OrderModel::class);
         $itemModel  = model(\App\Models\OrderItemModel::class);
+        $orderModel->autoPromoteWaitingOrders();
 
         $db->transBegin();
 
@@ -240,6 +241,8 @@ class Cart extends BaseController
         if (!$u) {
             return $this->response->setJSON(['count' => 0]);
         }
+
+        model(\App\Models\OrderModel::class)->autoPromoteWaitingOrders();
 
         $row = db_connect()
             ->table('order_items oi')

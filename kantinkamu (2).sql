@@ -312,7 +312,7 @@ INSERT INTO `users` (`id`, `role_id`, `name`, `no_hp`, `email`, `password_hash`,
 (30, 2, 'Rico Aditio', '081554829151', NULL, '$2y$10$Cxr5wyeent9fNZkpfBOMzeivyE78Zd1W1OMEAeeDPqIjp2IZMPUBu', 1, '2025-12-11 13:21:28', NULL, NULL, NULL, NULL, 0, NULL),
 (32, 2, 'FAIZIN NOVAL', '0895367362068', NULL, '$2y$10$Nfx70YCzQVvZb4i9tB3/sOqMjQKgJoLUYislSdUb2muMypM.dLK1y', 1, '2025-12-12 07:34:22', NULL, NULL, NULL, NULL, 0, NULL),
 (66, 2, 'panjul', '0857833544372', NULL, '$2y$10$p9XOV9kXhwcmKusGbp/PGurRZ0/Q7H8ifVNp50yiVH8rgfUK.EjZe', 1, '2025-12-14 14:45:04', NULL, NULL, NULL, NULL, 0, NULL),
-(67, 2, 'bintang', '085748543921', NULL, '$2y$10$4uWCt8DsIZuSiady1r6yRuH9IIddGP1hYcbw.tvhV.xP2GYoW4k4m', 1, '2025-12-14 15:40:09', NULL, NULL, NULL, NULL, 1, '2025-12-14 15:40:36'),
+(67, 2, 'bintang', '085808316292', NULL, '$2y$10$4uWCt8DsIZuSiady1r6yRuH9IIddGP1hYcbw.tvhV.xP2GYoW4k4m', 1, '2025-12-14 15:40:09', NULL, NULL, NULL, NULL, 1, '2025-12-14 15:40:36'),
 (68, 2, 'Fernanda Septian', '085707559188', NULL, '$2y$10$sJqY2qLEM0./y.8v5OfK7u2mMz/ahZKBJncop56pNOFPkUEt3fneq', 1, '2025-12-14 16:03:07', NULL, NULL, NULL, NULL, 1, '2025-12-14 16:04:01');
 
 -- --------------------------------------------------------

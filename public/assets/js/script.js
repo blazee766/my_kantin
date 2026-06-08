@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', refreshCartCount);
           }
           alert('Ditambahkan ke keranjang: ' + btn.dataset.name);
         } else {
-          alert(data.msg || 'Gagal menambah.');
+          alert(data.msg || 'Maaf, anda harus login terlebih dahulu sebelum memesan');
           refreshCartCount();
         }
       });

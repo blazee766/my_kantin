@@ -21,10 +21,24 @@ class OrderModel extends Model
         'payment_status',
         'payment_method',
         'payment_type',
+        'payment_proof',
         'created_at',
         'updated_at',
     ];
     protected $useTimestamps = false;
+
+    public function autoPromoteWaitingOrders(int $afterMinutes = 5): int
+    {
+        $limitTime = date('Y-m-d H:i:s', time() - ($afterMinutes * 60));
+
+        $this->builder()
+            ->set('status', 'processing')
+            ->whereIn('status', ['pending', 'menunggu'])
+            ->where('created_at <=', $limitTime)
+            ->update();
+
+        return $this->db->affectedRows();
+    }
 
     public function getByUser(int $userId): array
     {
@@ -98,6 +112,8 @@ class OrderModel extends Model
 
     public function getPendingByUser(int $userId, ?string $deliveryMethod = null): ?array
     {
+        $this->autoPromoteWaitingOrders();
+
         $builder = $this->where('user_id', $userId)
             ->whereIn('status', ['pending', 'menunggu']);
             
