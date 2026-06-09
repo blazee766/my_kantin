@@ -509,7 +509,7 @@
   <div class="container">
     <header class="page-header">
       <div class="header-brand">
-        <div class="brand-icon"><i class="fas fa-utensils"></i></div>
+        <div class="brand-icon has-logo"><img class="brand-logo" src="<?= base_url('assets/img/kantin-logo.svg'); ?>" alt="Logo Kantin G'penk"></div>
         <div>
           <span class="brand-title">Kantin G'penk</span>
         </div>

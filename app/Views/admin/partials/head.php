@@ -29,8 +29,8 @@
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('/'); ?>">
-        <div class="sidebar-brand-icon rotate-n-10">
-          <i class="fas fa-utensils"></i>
+        <div class="sidebar-brand-icon has-logo">
+          <img class="brand-logo" src="<?= base_url('assets/img/kantin-logo.svg'); ?>" alt="Logo Kantin G'penk">
         </div>
         <div class="sidebar-brand-text mx-1">Kantin G'penk</div>
       </a>

@@ -262,6 +262,20 @@ body {
     transform: none !important;
 }
 
+.admin-page .sidebar-brand-icon.has-logo {
+    overflow: hidden;
+    background: transparent;
+    box-shadow: none;
+}
+
+.admin-page .brand-logo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
 .admin-page .sidebar-brand-text {
     margin: 0 !important;
     color: var(--admin-ink);
