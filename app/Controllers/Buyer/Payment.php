@@ -7,6 +7,34 @@ use App\Models\OrderModel;
 
 class Payment extends BaseController
 {
+    private function ensurePaymentProofColumn(): bool
+    {
+        $db = db_connect();
+        if ($db->fieldExists('payment_proof', 'orders')) {
+            return true;
+        }
+
+        try {
+            $forge = \Config\Database::forge();
+            $forge->addColumn('orders', [
+                'payment_proof' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 255,
+                    'null'       => true,
+                    'after'      => 'payment_type',
+                ],
+            ]);
+
+            return $db->fieldExists('payment_proof', 'orders');
+        } catch (\Throwable $e) {
+            log_message('error', 'Failed to add orders.payment_proof column: {message}', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
     private function userOrRedirect()
     {
         $u = session('user');
@@ -83,6 +111,11 @@ class Payment extends BaseController
         if ($proof->getSizeByUnit('mb') > 3) {
             return redirect()->to(site_url('p/payment/'.$orderId))
                 ->with('error', 'Ukuran bukti pembayaran maksimal 3 MB.');
+        }
+
+        if (!$this->ensurePaymentProofColumn()) {
+            return redirect()->to(site_url('p/payment/'.$orderId))
+                ->with('error', 'Database hosting belum memiliki kolom bukti pembayaran. Jalankan migration atau tambahkan kolom payment_proof pada tabel orders.');
         }
 
         $proofDir = FCPATH . 'assets/img/payment-proofs';

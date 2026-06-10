@@ -8,6 +8,10 @@ class AddPaymentProofToOrders extends Migration
 {
     public function up()
     {
+        if ($this->db->fieldExists('payment_proof', 'orders')) {
+            return;
+        }
+
         $this->forge->addColumn('orders', [
             'payment_proof' => [
                 'type'       => 'VARCHAR',
@@ -20,6 +24,10 @@ class AddPaymentProofToOrders extends Migration
 
     public function down()
     {
+        if (!$this->db->fieldExists('payment_proof', 'orders')) {
+            return;
+        }
+
         $this->forge->dropColumn('orders', ['payment_proof']);
     }
 }
