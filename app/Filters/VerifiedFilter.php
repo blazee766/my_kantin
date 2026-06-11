@@ -12,8 +12,13 @@ class VerifiedFilter implements FilterInterface
     {
         $user = session('user');
 
-        if (!$user || ($user['wa_verified'] ?? 0) !== 1) {
+        if (!$user) {
             return redirect()->to('/login')
+                ->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        if ((int) ($user['wa_verified'] ?? 0) !== 1) {
+            return redirect()->to('/verify-wa')
                 ->with('error', 'Silakan verifikasi WhatsApp terlebih dahulu.');
         }
     }

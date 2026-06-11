@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
+  </script>
+  <script defer src="<?= base_url('assets/js/ajax-actions.js?v=' . filemtime(FCPATH . 'assets/js/ajax-actions.js')); ?>"></script>
   <style>
   body {
     margin: 0;

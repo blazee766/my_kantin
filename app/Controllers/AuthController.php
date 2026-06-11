@@ -20,6 +20,19 @@ class AuthController extends BaseController
         return view('auth/register');
     }
 
+    public function verifyWa()
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->to('/login')
+                ->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        return view('auth/verify_wa', [
+            'user' => $user,
+        ]);
+    }
+
     /* =========================
      * LOGIN
      * ========================= */

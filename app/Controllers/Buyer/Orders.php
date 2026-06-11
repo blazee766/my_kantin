@@ -244,7 +244,7 @@ class Orders extends BaseController
         if ((int) ($remaining['total'] ?? 0) === 0) {
             return $this->jsonOrRedirect([
                 'ok' => true,
-                'message' => 'Semua item pesanan sudah dihapus.',
+                'message' => 'pesanan berhasil dihapus',
                 'removedOrder' => true,
                 'redirect' => site_url('p/orders'),
             ], site_url('p/orders'));
@@ -320,7 +320,7 @@ class Orders extends BaseController
 
         return $this->jsonOrRedirect([
             'ok' => true,
-            'message' => 'Pesanan berhasil dihapus.',
+            'message' => 'pesanan berhasil dihapus',
             'removedOrder' => true,
             'redirect' => site_url('p/orders'),
         ], site_url('p/orders'));

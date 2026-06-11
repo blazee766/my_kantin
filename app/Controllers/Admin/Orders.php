@@ -289,14 +289,14 @@ class Orders extends BaseController
             if ($this->isAjaxRequest()) {
                 return $this->response->setJSON($this->withCsrf([
                     'ok' => true,
-                    'message' => 'Pesanan kantin berhasil dibuat oleh admin.',
+                    'message' => 'pesanan berhasil dibuat',
                     'orderId' => (int) $orderId,
                     'redirect' => base_url('admin/orders/' . $orderId),
                 ]));
             }
 
             return redirect()->to(base_url('admin/orders/' . $orderId))
-                ->with('success', 'Pesanan kantin berhasil dibuat oleh admin.');
+                ->with('success', 'pesanan berhasil dibuat');
         } catch (\Throwable $e) {
             $db->transRollback();
             if ($this->isAjaxRequest()) {

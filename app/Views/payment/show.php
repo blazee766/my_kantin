@@ -7,6 +7,10 @@
   <!-- Ganti ke app.midtrans.com kalau sudah production -->
   <script src="https://app.sandbox.midtrans.com/snap/snap.js"
           data-client-key="<?= esc($clientKey); ?>"></script>
+  <script>
+    window.APP_BASE = "<?= rtrim(base_url('/'), '/'); ?>/";
+  </script>
+  <script defer src="<?= base_url('assets/js/ajax-actions.js?v=' . filemtime(FCPATH . 'assets/js/ajax-actions.js')); ?>"></script>
 
   <style>
     body {

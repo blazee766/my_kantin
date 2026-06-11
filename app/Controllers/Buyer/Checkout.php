@@ -29,17 +29,19 @@ class Checkout extends BaseController
 
     public function placeOrder()
     {
-        if (empty($user['wa_verified'])) {
-            return redirect()->to('/register')
-                ->with('error', 'Silakan verifikasi nomor WhatsApp terlebih dahulu sebelum melakukan pemesanan.');
-        }
-
         $user = session('user');
-        $cart = $this->getCart();
 
         if (!$user) {
             return redirect()->to('/login')->with('error', 'Silakan login.');
         }
+
+        if (empty($user['wa_verified'])) {
+            return redirect()->to('/verify-wa')
+                ->with('error', 'Silakan verifikasi nomor WhatsApp terlebih dahulu sebelum melakukan pemesanan.');
+        }
+
+        $cart = $this->getCart();
+
         if (empty($cart)) {
             return redirect()->to('/cart/')->with('error', 'Keranjang kosong.');
         }

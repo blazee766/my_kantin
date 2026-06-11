@@ -134,7 +134,7 @@ class Payment extends BaseController
         ]);
 
         return redirect()->to(site_url('p/orders/'.$orderId))
-            ->with('success', 'Status pembayaran berhasil diubah menjadi Sudah Dibayar.');
+            ->with('success', 'Pembayaran Berhasil');
     }
 
     // === Endpoint notifikasi dari Midtrans ===

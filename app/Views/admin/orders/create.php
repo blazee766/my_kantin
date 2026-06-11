@@ -23,6 +23,17 @@ include APPPATH . 'Views/admin/partials/head.php';
     margin: 0;
   }
 
+  .order-create-card .alert,
+  .order-create-card .ajax-flash,
+  .admin-order-flash {
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
   .form-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -143,7 +154,7 @@ include APPPATH . 'Views/admin/partials/head.php';
 </div>
 
 <?php if (session('error')): ?>
-  <div class="alert alert-danger"><?= esc(session('error')); ?></div>
+  <div class="alert alert-danger admin-order-flash"><?= esc(session('error')); ?></div>
 <?php endif; ?>
 
 <form action="<?= base_url('admin/orders/store'); ?>" method="post" class="card order-create-card mb-4" id="adminOrderForm" data-ajax-form data-ajax-action="save-admin-order">

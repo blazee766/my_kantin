@@ -136,4 +136,36 @@ class Home extends BaseController
             }, $categories),
         ]);
     }
+
+    public function search()
+    {
+        $q = trim((string) $this->request->getGet('q'));
+        $menuModel = model(MenuModel::class)
+            ->where('is_active', 1)
+            ->where('stock >', 0)
+            ->orderBy('name', 'ASC');
+
+        if ($q !== '') {
+            $menuModel->groupStart()
+                ->like('name', $q)
+                ->orLike('description', $q)
+                ->groupEnd();
+        }
+
+        $menus = $menuModel->findAll(24);
+
+        return $this->response->setJSON([
+            'ok' => true,
+            'items' => array_map(static function (array $menu): array {
+                return [
+                    'id' => (int) $menu['id'],
+                    'name' => (string) $menu['name'],
+                    'description' => (string) ($menu['description'] ?? ''),
+                    'price' => (int) $menu['price'],
+                    'stock' => (int) ($menu['stock'] ?? 0),
+                    'image' => (string) ($menu['image'] ?? ''),
+                ];
+            }, $menus),
+        ]);
+    }
 }

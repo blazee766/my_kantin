@@ -40,6 +40,27 @@ class OrderModel extends Model
         return $this->db->affectedRows();
     }
 
+    public function generateCode(): string
+    {
+        do {
+            $code = 'ORD' . date('ymdHis') . random_int(10, 99);
+        } while ($this->where('code', $code)->first());
+
+        return $code;
+    }
+
+    public function increaseTotalAmount(int $orderId, int $amount): bool
+    {
+        if ($amount <= 0) {
+            return true;
+        }
+
+        return (bool) $this->builder()
+            ->set('total_amount', 'total_amount + ' . $amount, false)
+            ->where('id', $orderId)
+            ->update();
+    }
+
     public function getByUser(int $userId): array
     {
         return $this->where('user_id', $userId)

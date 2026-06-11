@@ -12,9 +12,10 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('menu', 'Home::menu');
 $routes->get('menu/json', 'Home::menuJson');
-$routes->get('menu/search', 'Menu::search');
+$routes->get('menu/search', 'Home::search');
 $routes->get('about', 'Home::about');
 $routes->get('contact', 'Home::contact');
+$routes->get('verify-wa', 'AuthController::verifyWa', ['filter' => 'auth']);
 
 // ==========================
 // AUTH (GUEST ONLY)
@@ -29,6 +30,7 @@ $routes->post('register/save', 'AuthController::attemptRegister');
 // LOGOUT (LOGIN REQUIRED)
 // ==========================
 $routes->get('logout', 'AuthController::logout', ['filter' => 'auth']);
+$routes->post('user/update_address', 'User::update_address', ['filter' => 'auth']);
 
 // ==========================
 // CART (LOGIN REQUIRED)

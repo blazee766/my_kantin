@@ -103,6 +103,16 @@ include APPPATH . 'Views/admin/partials/head.php';
         padding: 24px;
     }
 
+    .order-page .alert,
+    .order-page .ajax-flash {
+        width: 100%;
+        max-width: 100%;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
     .detail-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
